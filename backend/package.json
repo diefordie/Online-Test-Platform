@@ -11,6 +11,7 @@
   "description": "",
   "dependencies": {
     "@prisma/client": "^5.19.1",
+    "backend": "file:",
     "express": "^4.21.0"
   }
 }
