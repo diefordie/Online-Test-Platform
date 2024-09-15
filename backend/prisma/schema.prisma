@@ -6,11 +6,10 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  url = env("DATABASE_URL") // uses connection pooling
 }
 
-model User {
+model USER {
   id        String   @id @default(cuid())
   email     String   @unique
   password  String
@@ -18,10 +17,40 @@ model User {
   role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  test      Test[]
+}
+
+model Test {
+  id        String   @id @default(cuid())
+  userId    String
+  category  Category
+  title     String
+  description String
+  price     Decimal
+  similarity Decimal
+  worktime  Int
+  review    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      USER     @relation(fields: [userId], references: [id])
+}
+
+model multiplechoice {
+  id       String   @id @default(cuid())
+  testId   String
+  question String
+  number   Int
+  file     String
+  weight   Int
 }
 
 enum Role {
   USER
   ADMIN
   AUTHOR
+}
+
+enum Category {
+  CPNS
+  UTBK
 }
