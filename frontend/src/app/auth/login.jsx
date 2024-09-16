@@ -6,7 +6,7 @@ import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image'; // Import Image from next/image
-import gambar1 from '@/app/assets/Ellipse 1.png'; 
+import gambar1 from '@/app/assets/elipss.png'; 
 import gambar2 from '@/app/assets/login.png'; // Pastikan path ini benar
 
 const Login = () => {
@@ -51,7 +51,7 @@ const Login = () => {
             <div className="absolute top-0 right-0" style={{ width: '26%', height: '100%' }}>
                 <Image
                     src={gambar1}
-                    alt="Descriptive Alt Text"
+                    alt="gambar1"
                     layout="fill"  
                     objectFit="cover"
                 />
@@ -60,7 +60,7 @@ const Login = () => {
                 <div className="relative w-3/4 h-3/4 ">
                     <Image
                         src={gambar2}
-                        alt="Descriptive Alt Text"
+                        alt="gambar2"
                         layout="fill"  
                         objectFit="contain"
                     />
