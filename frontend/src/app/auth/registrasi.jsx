@@ -4,8 +4,8 @@ import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/app/firebase/config'; // Import auth
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import gambar1 from '@/app/assets/elips.png';
-import gambar2 from '@/app/assets/register.png';
+import Image from "next/image";
+import gambar1 from '@/app/assets/registrasi.png';
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
 
 const Registrasi = () => {
@@ -25,11 +25,13 @@ const Registrasi = () => {
             const user = userCredential.user;
 
             const db = getFirestore();
+
+            const status = role == 'author' ? 'false' : 'true';
             await setDoc(doc(db, 'users', user.uid), {
                 nama,
                 email,
                 role,
-                isApproved,
+                isApproved: status,
             });
 
             console.log("Akun berhasil didaftarkan", user);
@@ -42,26 +44,22 @@ const Registrasi = () => {
 
     return (
       <div className="relative min-h-screen flex items-center bg-white">
-        <div
-          style={{
-            backgroundImage: `url(${gambar1})`,
-            backgroundPosition: 'right',
-            backgroundRepeat: 'no-repeat',
-            backgroundSize: '350px auto',
-          }}
-          className="absolute inset-0 bg-cover bg-no-repeat"
-        />
-        <div
-          style={{
-            backgroundImage: `url(${gambar2})`,
-            backgroundPosition: 'right',
-            backgroundRepeat: 'no-repeat',
-            backgroundSize: '400px auto',
-          }}
-          className="absolute inset-0 bg-cover bg-no-repeat"
-        />
-        <div className="absolute top-1/2 left-0 transform -translate-y-1/2 w-full max-w-md p-8 bg-secondary shadow-md rounded-lg ml-20">
-        <h2 className="text-2xl font-bold mb-6 text-black">Registrasi</h2>
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', padding: '20px' }}>
+          <Image
+            alt="gambar1"
+            src={gambar1}
+            sizes="100vw"
+            style={{
+              width: '40%',
+              height: 'auto',
+              position: 'absolute',
+              top:'23%',
+            }}
+          />
+    </div>
+
+        <div className="absolute top-1/2 left-0 transform -translate-y-1/2 w-full max-w-sm p-8 bg-secondary shadow-md rounded-3xl ml-20">
+        <h2 className="text-3xl font-bold mb-6 text-black text-center">Daftar</h2>
           <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
               <label htmlFor='nama' className="block text-sm font-medium text-black">Nama:</label>
@@ -70,27 +68,27 @@ const Registrasi = () => {
                 id="nama"
                 name="nama"
                 onChange={(e) => setNama(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
               />
             </div>
             <div>
-              <label htmlFor='email' className="block text-sm font-medium text-black">Email:</label>
+              <label htmlFor='email' className="block text-sm font-medium text-black">Alamat Email:</label>
               <input 
                 type="text" 
                 id="email"
                 name="email"
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
               />
             </div>
             <div>
-              <label htmlFor='password' className="block text-sm font-medium text-black">Password:</label>
+              <label htmlFor='password' className="block text-sm font-medium text-black">Kata Sandi:</label>
               <input
                 type="password"
                 id="password"
                 name="password"
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
               />
             </div>
             <div>
@@ -100,19 +98,21 @@ const Registrasi = () => {
                 name="role"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
-                <option value="admin">Admin</option>
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                {/* <option value="admin">Admin</option> */}
                 <option value="author">Author</option>
-                <option value="user">Pengguna Biasa</option>
+                <option value="user">User</option>
               </select>
             </div>
+            <div className="flex justify-center">
             <button 
               type="submit" 
-              className="w-full bg-green text-black py-2 px-4 rounded-md shadow-sm hover:bg-green-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
-              Daftar
+              className="bg-birutua text-putih py-2 px-10 rounded-2xl shadow-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+              Kirim
             </button>
+            </div>
             <p className="text-center mt-4 text-sm">
-              Sudah memiliki akun? <Link href="/login" className="text-black font-bold hover:underline">Masuk</Link>
+              Sudah memiliki akun? <Link href="/auth/login" className="text-white font-bold hover:underline">Login</Link>
             </p>
           </form>
         </div>

@@ -1,13 +1,10 @@
-import Registrasi from '@/app/Components/Registrasi';
-import Login from '@/app/Components/Login';
+'use client'
+import React from 'react';
+import KelolaAuthor from './admin/kelolaauthor';
+// import Login from'
 
 const Home = () => {
-  return (
-    <div>
-      <Registrasi />
-      <Login />
-    </div>
-  );
+  return <KelolaAuthor />;
 };
 
 export default Home;
