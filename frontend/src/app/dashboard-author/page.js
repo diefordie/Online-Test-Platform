@@ -1,10 +1,9 @@
 import React from 'react'
-import LandingPage from '@/app/landingpage/landingpage'
 
 const page = () => {
   return (
     <div>
-      <LandingPage />
+      dashboard author
     </div>
   )
 }
