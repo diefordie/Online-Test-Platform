@@ -2,39 +2,31 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 
-const userRoutes = require("backend/src/routes/userRoutes.js");
-const authorRoutes = require("backend/src/routes/authorRoutes.js");
+// Route imports
+const userRoutes = require("./src/routes/userRoutes.js");
+const authorRoutes = require("./src/routes/authorRoutes.js");
 const testRoutes = require("./src/routes/testRoutes");
-const multiplechoiceRoutes = require("./src/routes/multiplechoiceRoutes")
+const multiplechoiceRoutes = require("./src/routes/multiplechoiceRoutes");
+const dashboardRoutes = require("./src/routes/dashboardRoutes"); // Correct import
 
 const app = express();
-// const prisma = new PrismaClient();
 
 dotenv.config();
 
 const PORT = process.env.PORT || 2000;
 
-app.use(express.json());
-app.use(cors());
+// Middleware
+app.use(express.json()); // Parse incoming JSON requests
+app.use(cors()); // Enable CORS for all origins
 
-// Routes
+// Register Routes
 app.use("/user", userRoutes);
 app.use("/author", authorRoutes);
 app.use("/test", testRoutes);
 app.use("/multiplechoice", multiplechoiceRoutes);
+app.use("/dashboard", dashboardRoutes); // Correct route registration
 
+// Server listener
 app.listen(PORT, () => {
-    console.log(`Express is running on port ${PORT}`);
+    console.log(`Express server running on port ${PORT}`);
 });
-
-// app.use(express.json());
-
-// app.get("/api", (req, res) => {
-//     res.send("Selamat datang");
-// })
-
-// app.get("/user", async (req, res) => {
-//     const user = await prisma.user.findMany();
-
-//     res.send(user);
-// });
