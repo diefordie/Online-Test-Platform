@@ -2,9 +2,8 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-
+import adminRoutes from './src/routes/adminRoutes.js';
 import userRoutes from './src/routes/userRoutes.js';
-import authorRoutes from './src/routes/authorRoutes.js';
 import testRoutes from './src/routes/testRoutes.js';
 import multiplechoiceRoutes from './src/routes/multiplechoiceRoutes.js';
 
@@ -27,7 +26,8 @@ app.use(cors({
 
 // Routes
 app.use("/auth", userRoutes);
-app.use("/author", authorRoutes);
+app.use("/author", userRoutes);
+app.use("/admin", adminRoutes);
 app.use("/test", testRoutes);
 app.use("/multiplechoice", multiplechoiceRoutes);
 
@@ -36,98 +36,3 @@ const PORT = process.env.PORT || 2000;
 app.listen(PORT, () => {
     console.log(`Server berjalan di http://localhost ${PORT}`);
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// app.use(express.json());
-
-// app.get("/api", (req, res) => {
-//     res.send("Selamat datang");
-// })
-
-// app.get("/user", async (req, res) => {
-//     const user = await prisma.user.findMany();
-
-//     res.send(user);
-// });
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const express = require("express");
-// const dotenv = require("dotenv");
-// const cors = require("cors");
-
-// const userRoutes = require("backend/src/routes/userRoutes.js");
-// const authorRoutes = require("backend/src/routes/authorRoutes.js");
-// const testRoutes = require("./src/routes/testRoutes");
-// const multiplechoiceRoutes = require("./src/routes/multiplechoiceRoutes")
-
-// const app = express();
-// // const prisma = new PrismaClient();
-
-// dotenv.config();
-
-// const PORT = process.env.PORT || 2000;
-
-// app.use(express.json());
-// app.use(cors());
-
-// // Routes
-// app.use("/user", userRoutes);
-// app.use("/author", authorRoutes);
-// app.use("/test", testRoutes);
-// app.use("/multiplechoice", multiplechoiceRoutes);
-
-// app.listen(PORT, () => {
-//     console.log(`Express is running on port ${PORT}`);
-// });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // app.use(express.json());
-
-// // app.get("/api", (req, res) => {
-// //     res.send("Selamat datang");
-// // })
-
-// // app.get("/user", async (req, res) => {
-// //     const user = await prisma.user.findMany();
-
-// //     res.send(user);
-// // });

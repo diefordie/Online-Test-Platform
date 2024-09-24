@@ -5,7 +5,7 @@ import React from 'react';
 // import Login from './auth/login';
 // import GuestDashboard from './guestDashboard/page.js';
 // import Registrasi from './authorAgreement/page';
-import Registrasi from './registrasi/page.js';
+import Registrasi from './auth/registrasi/page.js';
 
 const Home = () => {
   // // return <KelolaAuthor />;
