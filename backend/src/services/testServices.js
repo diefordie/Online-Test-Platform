@@ -1,4 +1,5 @@
-const { PrismaClient } = require("@prisma/client");
+import { PrismaClient } from '@prisma/client';
+
 const prisma = new PrismaClient();
 
 const createTestService = async (newTest) => {
@@ -11,9 +12,10 @@ const createTestService = async (newTest) => {
             price: newTest.price,
             similarity: newTest.similarity,
             worktime: newTest.worktime,
-            review: newTest.review
+            review: newTest.review,
         },
     });
 };
 
-module.exports = { createTestService };
+export { createTestService }; // Menggunakan named export
+

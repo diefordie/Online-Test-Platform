@@ -8,20 +8,19 @@ module.exports = {
   ],
   theme: {
     extend: {
-      fontFamily: {
-        poppins: ['Poppins'],
-      },
       colors: {
-        primary: "#5684AB",          // Warna utama
-        secondary: "#62A4D1",        // Warna sekunder
-        'primary-dark': '#0275a7',   // Warna primary lebih gelap
-        green: '#C5E4FF',   
-        putih: '#FFF7F7',
-        birutua: '#0E3876',// Warna hijau tambahan
-        birumuda: '#78AED6',
-        birulangit: '#77BEE1',
-        hitam: "#000000",
-        abu: "#6B7280",
+        primary: "#3887a7",         
+        secondary: "#c3e8e7",       
+        'primary-dark': '#0275a7',   
+        green: '#92e2a8',  
+        biru: '#7BB3B4',  
+        birumuda: '#CFE9E6', 
+        putih: '#ffff',
+        abumuda: '#F3F3F3', 
+        deepBlue: '#0B61AA', 
+        orange :'#F8B75B',
+        powderBlue : '#78AED6',
+        paleBlue : '#CAE6F9',  
       },
       container: {
         center: true,
@@ -33,7 +32,20 @@ module.exports = {
           "2xl": "6rem",
         },
       },
+      backgroundImage: {
+        'gradient-custom': 'linear-gradient(to right, #DEF6FF, #0B61AA)',
+      },
+      fontFamily: {
+        poppins: ['Poppins', 'sans-serif'],
+        bodoni: ['"Libre Bodoni"', 'serif'],
+      },
+      boxShadow: {
+        'customShadow': '0 40px 40px rgba(0, 0, 0, 0.25)',
+      }
+
+      
     },
   },
   plugins: [],
 };
+

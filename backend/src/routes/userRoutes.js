@@ -1,8 +1,12 @@
-const express = require("express");
-const { createUser } = require("backend/src/controllers/userControllers.js");
+import express from 'express';
+import { registrasi, login } from '../controllers/userControllers.js';
 
 const router = express.Router();
 
-router.post("/create-user", createUser);
+// Endpoint untuk registrasi pengguna
+router.post('/registrasi', registrasi);
 
-module.exports = router;
+// Endpoint untuk login pengguna
+router.post('/login', login);
+
+export default router;
