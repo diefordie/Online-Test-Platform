@@ -42,8 +42,9 @@ model User {
   email     String       @unique
   password  String
   role      Role         @default(USER)
-  userPhoto String?
-  adsBalance  Decimal
+  userPhoto String?      @default("")
+  adsBalance  Decimal    @default(0)
+  isApproved Boolean     @default(true)
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
   favourite      Favourite[]
@@ -57,12 +58,12 @@ model Author {
   id        String       @id @default(cuid())
   userId String
   nama String
-  handphoneNum String
-  authorPhoto String?
-  bank String
-  accountBank String
-  profit Int
-  isApproved Boolean
+  handphoneNum String    @default("")
+  authorPhoto String?    @default("")
+  bank String            @default("")
+  accountBank String     @default("")
+  profit Int             @default(0)
+  isApproved Boolean     @default(false)
   user      User         @relation(fields: [userId], references: [id])
   test      Test[]
 }

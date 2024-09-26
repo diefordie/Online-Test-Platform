@@ -1,4 +1,4 @@
-const { createTestService } = require("backend/src/services/testServices.js");
+import { createTestService } from '../services/testServices.js'; // Pastikan menggunakan ekstensi .js
 
 const createTest = async (req, res) => {
     try {
@@ -8,14 +8,38 @@ const createTest = async (req, res) => {
 
         res.status(201).send({
             data: test,
-            message: "Create test success",
+            message: 'Create test success',
         });
     } catch (error) {
         res.status(500).send({
-            message: "Failed to create test",
+            message: 'Failed to create test',
             error: error.message,
         });
     }
 };
 
-module.exports = { createTest };
+export { createTest }; // Menggunakan named export
+
+
+
+// const { createTestService } = require("backend/src/services/testServices.js");
+
+// const createTest = async (req, res) => {
+//     try {
+//         const newTest = req.body;
+
+//         const test = await createTestService(newTest);
+
+//         res.status(201).send({
+//             data: test,
+//             message: "Create test success",
+//         });
+//     } catch (error) {
+//         res.status(500).send({
+//             message: "Failed to create test",
+//             error: error.message,
+//         });
+//     }
+// };
+
+// module.exports = { createTest };
