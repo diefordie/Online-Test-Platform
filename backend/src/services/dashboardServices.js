@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 // Helper function to get test details with access count and author details
 const getTestDetailsWithAccessCountAndAuthor = async (testIds) => {
-  return await prisma.test.findMany({
+  const tests = await prisma.test.findMany({
     where: {
       id: { in: testIds },
     },
@@ -17,6 +17,18 @@ const getTestDetailsWithAccessCountAndAuthor = async (testIds) => {
       },
     },
   });
+
+  // Mapping to include access count and format author details
+  const testsWithDetails = tests.map(test => ({
+    ...test,
+    accessCount: test.history.length, // Number of times this test has been accessed
+    author: {
+      nama: test.author.nama,
+      foto: test.author.authorPhoto
+    }
+  }));
+
+  return testsWithDetails;
 };
 
 // Get 5 most popular tests based on history
