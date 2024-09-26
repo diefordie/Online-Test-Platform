@@ -69,12 +69,12 @@ const getFreeTests = async () => {
 
 // Search tests by title
 const searchTestsByTitle = async (title) => {
-  return await prisma.test.findMany({
+  const tests = await prisma.test.findMany({
     where: {
       title: { contains: title, mode: 'insensitive' },
     },
     include: {
-      history: true,
+      history: true, // Include history to get access counts
       author: {
         select: {
           nama: true,
@@ -83,6 +83,18 @@ const searchTestsByTitle = async (title) => {
       },
     },
   });
+
+  // Mapping to include access count and format author details
+  const testsWithDetails = tests.map(test => ({
+    ...test,
+    accessCount: test.history.length, // Number of times this test has been accessed
+    author: {
+      nama: test.author.nama,
+      foto: test.author.authorPhoto,
+    },
+  }));
+
+  return testsWithDetails;
 };
 
 // Get tests by category
@@ -109,7 +121,7 @@ const getPopularTestsByCategory = async (category) => {
       testId: true,
     },
     where: {
-      test: { category },
+      test: {category: category },
     },
     orderBy: {
       _count: { testId: 'desc' },

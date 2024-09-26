@@ -144,4 +144,6 @@ enum Role {
 enum Category {
   CPNS
   UTBK
+  Pemrograman
+  Psikotes
 }
