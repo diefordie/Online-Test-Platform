@@ -92,6 +92,9 @@ model Multiplechoice {
   option      Option[]
 }
 
+npx prisma migrate dev --name add-cascade-delete
+
+
 model Result {
   id       String   @id @default(cuid())
   testId String
