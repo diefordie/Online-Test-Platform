@@ -10,6 +10,7 @@ datasource db {
 }
 
 model Test {
+<<<<<<< HEAD
   id                String        @id @default(cuid())
   authorId         String
   category         Category
@@ -26,7 +27,27 @@ model Test {
   favourite        Favourite[]
   history          History[]
   result           Result[]
+=======
+  id              String       @id @default(cuid())
+  authorId        String
+  category        Category
+  title           String
+  testDescription String
+  price           Decimal?
+  similarity      Decimal?
+  worktime        Int?
+  review          String?
+  isPublished     Boolean      @default(false) // Atribut isPublished
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  author          Author       @relation(fields: [authorId], references: [id])
+  multiplechoice  Multiplechoice[]
+  favourite       Favourite[]
+  history         History[]
+  result          Result[]
+>>>>>>> e3cdbf2 (Tambah create dan publish tes)
 }
+
 
 model History {
   id        String       @id @default(cuid())
