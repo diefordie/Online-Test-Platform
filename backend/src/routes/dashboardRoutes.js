@@ -1,6 +1,8 @@
-const express = require('express');
-const router = express.Router();
-const dashboardController = require('../controllers/dashboardController.js');
+// src/routes/dashboardRoutes.js
+import { Router } from 'express'; // Ubah require menjadi import
+import * as dashboardController from '../controllers/dashboardController.js'; // Import semua sebagai modul ESM
+
+const router = Router();
 
 // Routes for dashboard services
 router.get('/popular-tests', dashboardController.getPopularTests);
@@ -10,4 +12,4 @@ router.get('/tests-by-category', dashboardController.getTestsByCategory);
 router.get('/popular-tests-by-category', dashboardController.getPopularTestsByCategory);
 router.get('/free-tests-by-category', dashboardController.getFreeTestsByCategory);
 
-module.exports = router;
+export default router; // Ganti module.exports dengan export default

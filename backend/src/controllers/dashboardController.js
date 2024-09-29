@@ -1,7 +1,8 @@
-const dashboardServices = require('../services/dashboardServices.js');
+// src/controllers/dashboardController.js
+import * as dashboardServices from '../services/dashboardServices.js'; // Ganti require dengan import
 
 // Get 5 most popular tests
-const getPopularTests = async (req, res) => {
+export const getPopularTests = async (req, res) => {
   try {
     const tests = await dashboardServices.getPopularTests();
     res.status(200).json(tests);
@@ -11,7 +12,7 @@ const getPopularTests = async (req, res) => {
 };
 
 // Get 5 free tests
-const getFreeTests = async (req, res) => {
+export const getFreeTests = async (req, res) => {
   try {
     const tests = await dashboardServices.getFreeTests();
     res.status(200).json(tests);
@@ -21,7 +22,7 @@ const getFreeTests = async (req, res) => {
 };
 
 // Search tests by title
-const searchTestsByTitle = async (req, res) => {
+export const searchTestsByTitle = async (req, res) => {
   const { title } = req.query;
   try {
     const tests = await dashboardServices.searchTestsByTitle(title);
@@ -32,7 +33,7 @@ const searchTestsByTitle = async (req, res) => {
 };
 
 // Get tests by category
-const getTestsByCategory = async (req, res) => {
+export const getTestsByCategory = async (req, res) => {
   const { category } = req.query;
   try {
     const tests = await dashboardServices.getTestsByCategory(category);
@@ -43,7 +44,7 @@ const getTestsByCategory = async (req, res) => {
 };
 
 // Get 5 most popular tests within a category
-const getPopularTestsByCategory = async (req, res) => {
+export const getPopularTestsByCategory = async (req, res) => {
   const { category } = req.query;
   try {
     const tests = await dashboardServices.getPopularTestsByCategory(category);
@@ -54,7 +55,7 @@ const getPopularTestsByCategory = async (req, res) => {
 };
 
 // Get 5 free tests within a category
-const getFreeTestsByCategory = async (req, res) => {
+export const getFreeTestsByCategory = async (req, res) => {
   const { category } = req.query;
   try {
     const tests = await dashboardServices.getFreeTestsByCategory(category);
@@ -62,13 +63,4 @@ const getFreeTestsByCategory = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-};
-
-module.exports = {
-  getPopularTests,
-  getFreeTests,
-  searchTestsByTitle,
-  getTestsByCategory,
-  getPopularTestsByCategory,
-  getFreeTestsByCategory,
 };

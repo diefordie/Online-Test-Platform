@@ -1,4 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
+import { PrismaClient } from '@prisma/client'; // Use import instead of require
 const prisma = new PrismaClient();
 
 // Helper function to get test details with access count and author details
@@ -24,15 +24,15 @@ const getTestDetailsWithAccessCountAndAuthor = async (testIds) => {
     accessCount: test.history.length, // Number of times this test has been accessed
     author: {
       nama: test.author.nama,
-      foto: test.author.authorPhoto
-    }
+      foto: test.author.authorPhoto,
+    },
   }));
 
   return testsWithDetails;
 };
 
 // Get 5 most popular tests based on history
-const getPopularTests = async () => {
+export const getPopularTests = async () => {
   const popularTests = await prisma.history.groupBy({
     by: ['testId'],
     _count: {
@@ -51,7 +51,7 @@ const getPopularTests = async () => {
 };
 
 // Get 5 free tests (price 0)
-const getFreeTests = async () => {
+export const getFreeTests = async () => {
   return await prisma.test.findMany({
     where: { price: 0 },
     include: {
@@ -68,7 +68,7 @@ const getFreeTests = async () => {
 };
 
 // Search tests by title
-const searchTestsByTitle = async (title) => {
+export const searchTestsByTitle = async (title) => {
   const tests = await prisma.test.findMany({
     where: {
       title: { contains: title, mode: 'insensitive' },
@@ -98,7 +98,7 @@ const searchTestsByTitle = async (title) => {
 };
 
 // Get tests by category
-const getTestsByCategory = async (category) => {
+export const getTestsByCategory = async (category) => {
   return await prisma.test.findMany({
     where: { category },
     include: {
@@ -114,14 +114,14 @@ const getTestsByCategory = async (category) => {
 };
 
 // Get 5 most popular tests within a category
-const getPopularTestsByCategory = async (category) => {
+export const getPopularTestsByCategory = async (category) => {
   const popularTests = await prisma.history.groupBy({
     by: ['testId'],
     _count: {
       testId: true,
     },
     where: {
-      test: {category: category },
+      test: { category: category },
     },
     orderBy: {
       _count: { testId: 'desc' },
@@ -134,7 +134,7 @@ const getPopularTestsByCategory = async (category) => {
 };
 
 // Get 5 free tests within a category
-const getFreeTestsByCategory = async (category) => {
+export const getFreeTestsByCategory = async (category) => {
   return await prisma.test.findMany({
     where: { category, price: 0 },
     include: {
@@ -148,13 +148,4 @@ const getFreeTestsByCategory = async (category) => {
     },
     take: 5,
   });
-};
-
-module.exports = {
-  getPopularTests,
-  getFreeTests,
-  searchTestsByTitle,
-  getTestsByCategory,
-  getPopularTestsByCategory,
-  getFreeTestsByCategory,
 };

@@ -29,13 +29,19 @@ const Login = () => {
                 throw new Error(data.message || 'Terjadi kesalahan saat login. Silakan coba lagi.');
             }
     
+            // Cek apakah akun author telah disetujui
+            if (data.isApproved === false) {
+                alert('Akun Anda belum disetujui oleh admin.');
+                return; // Hentikan eksekusi jika belum disetujui
+            }
+    
             console.log("Login berhasil");
             setShowPopup(true);
     
             setTimeout(() => {
                 setShowPopup(false);
                 const role = data.role;
-
+    
                 // Tambahkan logika untuk mencegah admin login di halaman ini
                 if (role === 'ADMIN') {
                     alert('Admin tidak dapat login di halaman ini.');
@@ -56,8 +62,6 @@ const Login = () => {
                 alert('Pengguna dengan email ini tidak ditemukan.');
             } else if (err.message === 'Kata sandi tidak valid') {
                 alert('Kata sandi yang Anda masukkan salah.');
-            } else if (err.message === 'Akun author belum disetujui.') {
-                alert('Akun Anda belum disetujui oleh admin.');
             } else {
                 alert('Tidak dapat melakukan login dengan akun ini.');
             }
