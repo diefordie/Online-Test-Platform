@@ -1,10 +1,10 @@
 import React from 'react'
-import LandingPage from '@/app/landingpage/landingpage'
+import BuatTes from '@/app/buattes/page'
 
 const page = () => {
   return (
     <div>
-      <LandingPage />
+      <BuatTes />
     </div>
   )
 }
