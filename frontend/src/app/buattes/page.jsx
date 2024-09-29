@@ -67,7 +67,6 @@ export default function BuatSoal() {
           </li>
         </ul>
       </nav>
-
       <div className='bg-white p-4'>
       {/* Konten Utama */}
       <div className="flex justify-center items-start mt-4">

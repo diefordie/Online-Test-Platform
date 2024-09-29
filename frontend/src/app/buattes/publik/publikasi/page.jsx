@@ -209,7 +209,7 @@ export default function PublikasiPage() {
       {showErrorPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
           <div className="bg-[#78AED6] p-6 rounded-lg shadow-lg text-center">
-            <div className="bg-[#0B61AA] max-widht rounded-t-lg text-white">
+            <div className="bg-[#0B61AA] p-4 rounded-t-lg text-white">
               <h2 className="text-lg font-semibold">Publikasi Gagal</h2>
             </div>
             <div className="bg-[#78AED6] p-4 text-black">
