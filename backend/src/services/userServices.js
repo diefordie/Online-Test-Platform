@@ -1,8 +1,13 @@
 import bcrypt from 'bcrypt';
 import prisma from '../../prisma/prismaClient.js';
 import adminFirebase from '../../firebase/firebaseAdmin.js';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
 
-// registrasi
+export const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_here';
+
+// Registrasi
 export const createUser = async ({ name, email, password, role }) => {
     const existingUser = await prisma.user.findUnique({ where: { email } });
 
@@ -37,7 +42,18 @@ export const createUser = async ({ name, email, password, role }) => {
                 isApproved,
             },
         });
-        return user;
+
+        // Generate JWT token after user registration
+        const token = jwt.sign(
+            { id: user.id, email: user.email, role: user.role },
+            JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
+        return {
+            user,
+            token, // Return the token along with user data
+        };
     } catch (prismaError) {
         console.error('Prisma Error:', prismaError);
         throw new Error('DATABASE_ERROR: ' + prismaError.message);
@@ -63,17 +79,25 @@ export const loginUser = async ({ email, password }) => {
             throw new Error('AUTHOR_NOT_APPROVED'); // Custom error for non-approved authors
         }
 
-                // Check if the user is an Admin
+        // Check if the user is an Admin
         if (user.role === 'ADMIN') {
             throw new Error('ADMIN_NOT_ALLOWED'); // Custom error for admin login restriction
         }
-        
+
+        // Generate JWT token
+        const token = jwt.sign(
+            { id: user.id, email: user.email, role: user.role },
+            JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
         return {
             id: user.id,
             name: user.name,
             email: user.email,
             role: user.role,
             isApproved: user.isApproved,
+            token, // Return the token
         };
     } catch (error) {
         console.error('Error logging in:', error);

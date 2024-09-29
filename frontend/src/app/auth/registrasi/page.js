@@ -14,7 +14,7 @@ const Registrasi = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:2000/auth/registrasi', {
+            const response = await fetch('http://localhost:2000/api/auth/registrasi', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

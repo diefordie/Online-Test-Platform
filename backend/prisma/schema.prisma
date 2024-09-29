@@ -12,6 +12,7 @@ datasource db {
 model Test {
   id        String       @id @default(cuid())
   authorId String
+  userId String
   category  Category
   title     String
   testDescription String
@@ -22,6 +23,7 @@ model Test {
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
   author      Author         @relation(fields: [authorId], references: [id])
+  user            User        @relation(fields: [userId], references: [id])
   multiplechoice Multiplechoice[]
   favourite      Favourite[]
   history      History[]
@@ -52,6 +54,7 @@ model User {
   result      Result[]
   testimoni      Testimoni[]
   author      Author[]
+  tests           Test[]
 }
 
 model Author {
@@ -104,9 +107,11 @@ model Result {
 
 model Detail_result {
   id       String   @id @default(cuid())
+  optionId String
   resultId String
   userAnswer String
   result      Result     @relation(fields: [resultId], references: [id])
+  option Option  @relation(fields: [optionId], references: [id])
 }
 
 model Option {
@@ -117,6 +122,7 @@ model Option {
   updatedAt DateTime @updatedAt
   isCorrect Boolean
   multiplechoice      Multiplechoice     @relation(fields: [multiplechoiceId], references: [id])
+  detail_resultresult      Detail_result[]
 }
 
 model Transaction {

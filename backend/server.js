@@ -6,6 +6,7 @@ import adminRoutes from './src/routes/adminRoutes.js';
 import userRoutes from './src/routes/userRoutes.js';
 import testRoutes from './src/routes/testRoutes.js';
 import multiplechoiceRoutes from './src/routes/multiplechoiceRoutes.js';
+import answerTest from './src/routes/answerTestRoutes.js';
 
 const app = express();
 
@@ -25,11 +26,12 @@ app.use(cors({
 }));
 
 // Routes
-app.use("/auth", userRoutes);
-app.use("/author", userRoutes);
-app.use("/admin", adminRoutes);
-app.use("/test", testRoutes);
-app.use("/multiplechoice", multiplechoiceRoutes);
+app.use("/api/auth", userRoutes);
+app.use("/api/author", userRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/tests", testRoutes);
+app.use("/api/multiplechoice", multiplechoiceRoutes);
+app.use("/api", answerTest);
 
 // Mulai server
 const PORT = process.env.PORT || 2000;
