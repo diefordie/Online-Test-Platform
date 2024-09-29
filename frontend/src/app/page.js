@@ -1,10 +1,14 @@
 import React from 'react'
-import LandingPage from '@/app/landingpage/landingpage'
+// import LandingPage from '@/app/landingpage/landingpage'
+// import GuestDashboard from '@/app/guestDashboard/page'
+import UserDashboard from '@/app/userDashboard/page'
 
 const page = () => {
   return (
     <div>
-      <LandingPage />
+      {/* <LandingPage /> */}
+      {/* <GuestDashboard /> */}
+      <UserDashboard />
     </div>
   )
 }
