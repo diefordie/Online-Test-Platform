@@ -36,7 +36,8 @@ app.use(cors({
 app.use("/api/auth", userRoutes);
 app.use("/api/author", userRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/tests", testRoutes);
+app.use("/api/tests", testRoutes);//diperbaiki lagi penamaan routesnya
+
 app.use("/api/multiplechoice", multiplechoiceRoutes);
 app.use("/api", answerTest);
 
