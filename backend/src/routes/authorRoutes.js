@@ -1,20 +1,12 @@
-import express from 'express';
-import { createAuthor } from '../controllers/authorControllers.js'; // Pastikan menggunakan ekstensi .js
+// src/routes/authorRoutes.js
+const express = require("express");
+const { createAuthor, editAuthor, getAuthor, editVerifiedAuthor } = require("../controllers/authorControllers");
 
 const router = express.Router();
 
-router.post('/create-author', createAuthor);
+router.post("/create-author", createAuthor);
+router.put("/edit-author/:id", editAuthor);
+router.patch("/edit-author/:id/status", editVerifiedAuthor);
+router.get("/get-author", getAuthor);
 
-export default router; // Menggunakan default export
-
-
-
-
-// const express = require("express");
-// const { createAuthor } = require("../controllers/authorControllers"); // Pastikan import benar
-
-// const router = express.Router();
-
-// router.post("/create-author", createAuthor);
-
-// module.exports = router;
+module.exports = router;
