@@ -10,130 +10,146 @@ datasource db {
 }
 
 model Test {
-  id        String       @id @default(cuid())
-  authorId String
-  category  Category
-  title     String
-  testDescription String
-  price     Decimal
-  similarity Decimal
-  worktime  Int
-  review    String
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  author      Author         @relation(fields: [authorId], references: [id])
-  multiplechoice Multiplechoice[]
-  favourite      Favourite[]
-  history      History[]
-  result      Result[]
+  id                String        @id @default(cuid())
+  authorId         String
+  userId           String
+  category         Category
+  title            String
+  testDescription  String
+  price            Decimal
+  similarity       Decimal
+  worktime         Int
+  review           String
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  author           Author        @relation(fields: [authorId], references: [id])
+  user             User          @relation(fields: [userId], references: [id])
+  multiplechoice   Multiplechoice[]
+  favourite        Favourite[]
+  history          History[]
+  result           Result[]
 }
 
 model History {
   id        String       @id @default(cuid())
-  testId String
-  userId String
+  testId    String
+  userId    String
   user      User         @relation(fields: [userId], references: [id])
-  test      Test     @relation(fields: [testId], references: [id])
+  test      Test         @relation(fields: [testId], references: [id])
 }
 
 model User {
-  id        String       @id @default(cuid())
-  name      String
-  email     String       @unique
-  password  String
-  role      Role         @default(USER)
-  userPhoto String?      @default("")
-  adsBalance  Decimal    @default(0)
-  isApproved Boolean     @default(true)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  favourite      Favourite[]
-  history      History[]
-  result      Result[]
-  testimoni      Testimoni[]
-  author      Author[]
+  id                String          @id @default(cuid())
+  name              String
+  email             String          @unique
+  password          String
+  role              Role            @default(USER)
+  userPhoto         String?         @default("")
+  adsBalance        Decimal         @default(0)
+  isApproved        Boolean         @default(true)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  favourite        Favourite[]
+  history          History[]
+  result           Result[]
+  testimoni        Testimoni[]
+  author           Author[]
+  tests            Test[]
+  revokedTokens    RevokedToken[]
+
 }
 
 model Author {
-  id        String       @id @default(cuid())
-  userId String
-  nama String
-  handphoneNum String    @default("")
-  authorPhoto String?    @default("")
-  bank String            @default("")
-  accountBank String     @default("")
-  profit Int             @default(0)
-  isApproved Boolean     @default(false)
-  user      User         @relation(fields: [userId], references: [id])
-  test      Test[]
+  id                String        @id @default(cuid())
+  userId           String
+  name              String
+  handphoneNum     String         @default("")
+  authorPhoto       String?       @default("")
+  bank              String         @default("")
+  accountBank      String         @default("")
+  profit           Int            @default(0)
+  isApproved        Boolean       @default(false)
+  user              User          @relation(fields: [userId], references: [id])
+  test              Test[]
 }
 
 model Favourite {
-  id        String       @id @default(cuid())
-  testId String
-  userId String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User         @relation(fields: [userId], references: [id])
-  test      Test     @relation(fields: [testId], references: [id])
+  id                String       @id @default(cuid())
+  testId           String
+  userId           String
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  user             User         @relation(fields: [userId], references: [id])
+  test             Test         @relation(fields: [testId], references: [id])
 }
 
 model Multiplechoice {
-  id       String   @id @default(cuid())
-  testId   String
-  question String
-  number   Int
+  id                String       @id @default(cuid())
+  testId           String
+  question         String
+  number           Int
   questionPhoto    String
-  weight   Int
-  discussion String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  test      Test     @relation(fields: [testId], references: [id])
-  option      Option[]
+  weight           Int
+  discussion       String
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  test             Test         @relation(fields: [testId], references: [id])
+  option           Option[]
 }
 
 model Result {
-  id       String   @id @default(cuid())
-  testId String
-  userId String
-  score Int
-  user      User         @relation(fields: [userId], references: [id])
-  test      Test     @relation(fields: [testId], references: [id])
-  detail_resultresult      Detail_result[]
+  id                String       @id @default(cuid())
+  testId           String
+  userId           String
+  score             Int
+  user             User         @relation(fields: [userId], references: [id])
+  test             Test         @relation(fields: [testId], references: [id])
+  detail_result    Detail_result[]
 }
 
 model Detail_result {
-  id       String   @id @default(cuid())
-  resultId String
-  userAnswer String
-  result      Result     @relation(fields: [resultId], references: [id])
+  id                String       @id @default(cuid())
+  optionId         String
+  resultId         String
+  userAnswer       String
+  result           Result       @relation(fields: [resultId], references: [id])
+  option           Option       @relation(fields: [optionId], references: [id])
 }
 
 model Option {
-  id       String   @id @default(cuid())
+  id                String       @id @default(cuid())
   multiplechoiceId String
   optionDescription String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  isCorrect Boolean
-  multiplechoice      Multiplechoice     @relation(fields: [multiplechoiceId], references: [id])
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  isCorrect        Boolean
+  multiplechoice    Multiplechoice @relation(fields: [multiplechoiceId], references: [id])
+  detail_result     Detail_result[]
 }
 
 model Transaction {
-  id       String   @id @default(cuid())
-  testId String
-  paymentMethod String
-  paymentTime DateTime
-  price Int
-  total Int
-  status String
+  id                String       @id @default(cuid())
+  testId           String
+  paymentMethod    String
+  paymentTime      DateTime
+  price            Int
+  total            Int
+  status           String
 }
 
 model Testimoni {
-  id       String   @id @default(cuid())
-  userId String
-  comment String
-  user      User         @relation(fields: [userId], references: [id])
+  id                String       @id @default(cuid())
+  userId           String
+  comment          String
+  user             User         @relation(fields: [userId], references: [id])
+}
+
+model RevokedToken {
+  id                Int          @id @default(autoincrement())
+  token             String       @unique
+  createdAt        DateTime      @default(now())
+  userId           String
+  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade) // Relasi ke User
 }
 
 enum Role {
@@ -145,4 +161,6 @@ enum Role {
 enum Category {
   CPNS
   UTBK
+  Pemrograman
+  Psikotes
 }

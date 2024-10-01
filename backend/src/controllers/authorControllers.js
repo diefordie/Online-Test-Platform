@@ -1,12 +1,12 @@
 // src/controllers/authorControllers.js
-const { 
+import { 
     createAuthorService, 
     editAuthorService, 
     getAuthorService, 
     updateVerificationAuthorService 
-} = require("../services/authorServices.js");
+} from '../services/authorServices.js'; // Pastikan menggunakan .js
 
-const createAuthor = async (req, res) => {
+export const createAuthor = async (req, res) => {
     try {
         const authorData = req.body;
         const author = await createAuthorService(authorData);
@@ -22,7 +22,7 @@ const createAuthor = async (req, res) => {
     }
 };
 
-const editAuthor = async (req, res) => {
+export const editAuthor = async (req, res) => {
     try {
         const authorData = req.body;
         const { id } = req.params;
@@ -40,7 +40,7 @@ const editAuthor = async (req, res) => {
     }
 };
 
-const getAuthor = async (req, res) => { 
+export const getAuthor = async (req, res) => { 
     try {
         const authors = await getAuthorService();
         res.status(200).send({
@@ -55,7 +55,7 @@ const getAuthor = async (req, res) => {
     }
 };
 
-const editVerifiedAuthor = async (req, res) => {
+export const editVerifiedAuthor = async (req, res) => {
     try {
         const authorData = req.body;
         const { id } = req.params;
@@ -72,5 +72,3 @@ const editVerifiedAuthor = async (req, res) => {
         });
     }
 };
-
-module.exports = { createAuthor, editAuthor, getAuthor, editVerifiedAuthor };

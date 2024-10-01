@@ -2,65 +2,70 @@
 import React, { useState } from "react"; 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Swal from 'sweetalert2'; 
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState(''); // Inisialisasi state error
     const [showPopup, setShowPopup] = useState(false); 
     const router = useRouter();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError(''); // Reset error sebelum mencoba login
+    
         try {
             const response = await fetch('http://localhost:2000/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    email,
-                    password,
+                body: JSON.stringify({ 
+                    email, 
+                    password 
                 }),
             });
     
+            // Dapatkan data respons
             const data = await response.json();
     
+            // Periksa apakah respons tidak ok
             if (!response.ok) {
-                throw new Error(data.message || 'Terjadi kesalahan saat login. Silakan coba lagi.');
+                // Tangani kesalahan berdasarkan status
+                if (response.status === 400) {
+                    throw new Error(data.error || 'Data yang Anda masukkan tidak valid.');
+                } else if (response.status === 401) {
+                    throw new Error('Kredensial tidak valid. Silakan coba lagi.');
+                } else if (response.status === 403) {
+                    throw new Error('Akses sebagai Author ditolak. Anda tidak memiliki hak akses, pastikan anda telah mengirimkan persyaratan yang dibutuhkan, dan tunggu sampai admin memverifikasi.');
+                } else {
+                    throw new Error('Terjadi kesalahan yang tidak diketahui. Silakan coba lagi.');
+                }
             }
     
-            console.log("Login berhasil");
-            setShowPopup(true);
-    
-            setTimeout(() => {
-                setShowPopup(false);
-                const role = data.role;
-
-                // Tambahkan logika untuk mencegah admin login di halaman ini
-                if (role === 'ADMIN') {
-                    alert('Admin tidak dapat login di halaman ini.');
-                    return;
-                }
-    
-                // Adjust routing logic for only AUTHOR and USER
-                if (role === 'AUTHOR') {
-                    router.push('/author/dashboard');
-                } else {
-                    router.push('/user/dashboard');
-                }
-            }, 3000);
+            console.log("Login berhasil:", data);
+            localStorage.setItem('token', data.token);
+            
+            // Redirect berdasarkan role
+            if (data.role === 'AUTHOR') {
+                router.push('/author/dashboard'); // Ganti dengan jalur dashboard author
+            } else {
+                router.push('/user/dashboard'); // Ganti dengan jalur dashboard user
+            }
         } catch (err) {
             console.error("Kesalahan login", err);
-            // Ganti pesan kesalahan menjadi lebih spesifik
-            if (err.message === 'Pengguna tidak ditemukan') {
-                alert('Pengguna dengan email ini tidak ditemukan.');
-            } else if (err.message === 'Kata sandi tidak valid') {
-                alert('Kata sandi yang Anda masukkan salah.');
-            } else if (err.message === 'Akun author belum disetujui.') {
-                alert('Akun Anda belum disetujui oleh admin.');
-            } else {
-                alert('Tidak dapat melakukan login dengan akun ini.');
-            }
+    
+            // Menampilkan pesan kesalahan sebagai popup
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: err.message, 
+            }).then(() => {
+                router.push('/auth/syarat');
+            });
+    
+            setError(err.message); // Simpan pesan error di state (opsional, jika perlu)
         }
     };
 
