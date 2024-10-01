@@ -1,4 +1,4 @@
 {
-  "/user/dashboard/page": "app/user/dashboard/page.js",
-  "/syarat/page": "app/syarat/page.js"
+  "/syarat/page": "app/syarat/page.js",
+  "/user/dashboard/page": "app/user/dashboard/page.js"
 }
