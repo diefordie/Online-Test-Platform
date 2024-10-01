@@ -4,7 +4,8 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 
 import adminRoutes from './src/routes/adminRoutes.js';
-import userRoutes from './src/routes/userRoutes.js';
+import authRoutes from './src/routes/authRoutes.js';
+import { startCleanupJob } from './src/jobs/schedularToken.js';
 import authorRoutes from './src/routes/authorRoutes.js';
 
 import testRoutes from './src/routes/testRoutes.js';
@@ -14,6 +15,7 @@ import dashboardRoutes from './src/routes/dashboardRoutes.js';
 
 dotenv.config();
 const app = express();
+startCleanupJob();
 
 // Middleware
 app.use(express.json()); // Parse incoming JSON requests
@@ -32,16 +34,21 @@ app.use(cors({
     credentials: true                // Jika ingin mengirimkan cookies atau auth credentials
 }));
 
-// Routes
-app.use("/api/auth", userRoutes);
-app.use("/api/author", userRoutes);
+// Routes auth
+app.use("/auth", authRoutes);
+
+// Routes admin
 app.use("/api/admin", adminRoutes);
+
+// Routes test
 app.use("/api/tests", testRoutes);//diperbaiki lagi penamaan routesnya
-
 app.use("/api/multiplechoice", multiplechoiceRoutes);
-app.use("/api", answerTest);
+app.use("/api/answer-test", answerTest);
 
+// Routes author
 app.use("/author", authorRoutes);
+
+// Routes dashboard
 app.use("/dashboard", dashboardRoutes);
 
 // Mulai server
