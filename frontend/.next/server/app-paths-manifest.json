@@ -1,8 +1,6 @@
 {
-  "/page": "app/page.js",
-  "/auth/login-admin/page": "app/auth/login-admin/page.js",
-  "/auth/login/page": "app/auth/login/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/syarat/page": "app/syarat/page.js",
   "/user/dashboard/page": "app/user/dashboard/page.js",
-  "/auth/registrasi/page": "app/auth/registrasi/page.js",
-  "/auth/syarat/page": "app/auth/syarat/page.js"
+  "/favicon.ico/route": "app/favicon.ico/route.js"
 }

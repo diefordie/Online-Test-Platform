@@ -11,30 +11,25 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/auth/login-admin/page": [
+    "/pemrograman/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/auth/login-admin/page.js"
+      "static/chunks/app/pemrograman/page.js"
     ],
-    "/auth/registrasi/page": [
+    "/syarat/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/auth/registrasi/page.js"
-    ],
-    "/auth/login/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/auth/login/page.js"
+      "static/chunks/app/syarat/page.js"
     ],
     "/user/dashboard/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/user/dashboard/page.js"
     ],
-    "/auth/syarat/page": [
+    "/_not-found/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/auth/syarat/page.js"
+      "static/chunks/app/_not-found/page.js"
     ]
   }
 }
