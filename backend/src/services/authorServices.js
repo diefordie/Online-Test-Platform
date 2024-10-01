@@ -73,8 +73,19 @@ export const updateVerificationAuthorService = async (id, authorData) => {
             },
         });
 
+        const updatedUser = await prisma.user.update({
+            where: { id: existingAuthor.userId },
+            data: {
+                isApproved: authorData.isApproved,
+            },
+        });
+
+        console.log('Author updated: ', updatedAuthor);
+        console.log('User updated: ', updatedUser);
+
         return updatedAuthor;
     } catch (error) {
+        console.error("Error in updateVerificationAuthorService: ", error);
         throw new Error("Failed to update verification author: " + error.message);
     }
 };

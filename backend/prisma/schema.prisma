@@ -41,6 +41,7 @@ model History {
 model User {
   id                String          @id @default(cuid())
   name              String
+  username          String 
   email             String          @unique
   password          String
   role              Role            @default(USER)
@@ -112,9 +113,18 @@ model Detail_result {
   optionId         String
   resultId         String
   userAnswer       String
-  result           Result       @relation(fields: [resultId], references: [id])
+  status       String   @default("draft") // menambahkan kolom ini untuk menandai status draft atau final
+  result           Result?       @relation(fields: [resultId], references: [id])
   option           Option       @relation(fields: [optionId], references: [id])
 }
+
+enum OptionLabel {
+  A
+  B
+  C
+  D
+}
+
 
 model Option {
   id                String       @id @default(cuid())

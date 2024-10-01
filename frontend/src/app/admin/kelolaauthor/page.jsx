@@ -44,7 +44,7 @@ const KelolaAuthor = () => {
   // Filter the authors based on search and selected verification status
   const filteredAuthors = users.filter(user =>
     (selectedVerification === 'all' || (user.isApproved ? 'true' : 'false') === selectedVerification) &&
-    (user.nama.toLowerCase().includes(searchQuery.toLowerCase()) || user.email.toLowerCase().includes(searchQuery.toLowerCase()))
+    (user.name.toLowerCase().includes(searchQuery.toLowerCase()) || user.email.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   return (
