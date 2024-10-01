@@ -136,7 +136,7 @@ const LandingPage = () => {
                                 Masuk
                             </button>
                         </Link>
-                        <Link href="/register">
+                        <Link href="/auth/registrasi">
                             <button className="bg-green-600 text-green py-2 px-4 rounded-md shadow-sm hover:bg-green-700">
                                 Daftar
                             </button>
