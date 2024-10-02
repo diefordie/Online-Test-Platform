@@ -3,7 +3,9 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 const createMultipleChoiceService = async (testId, questions) => {
-    // Untuk setiap soal (question) yang dikirim, kita buat Multiplechoice beserta Option-nya
+    console.log("testId:", testId);
+    console.log("questions:", questions);
+    
     const multipleChoices = await Promise.all(
         questions.map(async (question) => {
             const multiplechoice = await prisma.multiplechoice.create({

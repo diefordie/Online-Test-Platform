@@ -3,9 +3,19 @@ import { createMultipleChoice, getMultipleChoice } from '../controllers/multiple
 
 const router = express.Router();
 
+
 // Endpoint untuk menambah soal ke tes
-router.post('/add-questions', createMultipleChoice);
-router.get('/get-questions/:id', getMultipleChoice);
+router.post('/add-questions', (req, res) => {
+    console.log('Request body:', req.body);  // Debugging log
+    createMultipleChoice(req, res);
+});
+
+router.put('/update-question', updateMultipleChoice);
+
+router.get('/questions/:testId', getMultipleChoice);
+router.get('/question/:questionId', getMultipleChoiceById);
+
+router.delete('/question/:questionId', deleteMultipleChoice);
 
 export default router; // Menggunakan default export
 

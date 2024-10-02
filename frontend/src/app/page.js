@@ -1,20 +1,13 @@
 import React from 'react'
-import LandingPage from '@/app/landingpage/landingpage'
-// import GuestDashboard from '@/app/guestDashboard/page'
-// import landingpage from './src/app/user/landingpage/page'
-// import authorAgreement from '@/app/authorAgreement/page'
-import buatSoal from './author/buatSoal/page'
+// import LandingPage from '@/app/landingpage/landingpage'
+import BuatSoal from '@/app/buatSoal/page1'
 
-const page = () => {
+const page1 = () => {
   return (
     <div>
-      <LandingPage />
-      {/* <GuestDashboard /> */}
-      {/* <UserDashboard /> */}
-      
-      {/* <authorAgreement /> */}
+      <BuatSoal />
     </div>
   )
 }
 
-export default page
+export default page1
