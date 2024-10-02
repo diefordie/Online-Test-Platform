@@ -1,45 +1,17 @@
-import { createTestService } from '../services/testServices.js'; // Pastikan menggunakan ekstensi .js
+import { resultService } from 'backend/src/services/resultService.js';
 
-const createTest = async (req, res) => {
+// Controller untuk mengambil hasil tes berdasarkan userId dan testId
+const getTestResultsController = async (req, res) => {
+    const { userId, testId } = req.params;
+
     try {
-        const newTest = req.body;
-
-        const test = await createTestService(newTest);
-
-        res.status(201).send({
-            data: test,
-            message: 'Create test success',
-        });
+        const resultData = await resultService.getTestResults(userId, testId);
+        res.status(200).json(resultData);
     } catch (error) {
-        res.status(500).send({
-            message: 'Failed to create test',
-            error: error.message,
-        });
+        res.status(500).json({ message: error.message });
     }
 };
 
-export { createTest }; // Menggunakan named export
-
-
-
-// const { createTestService } = require("backend/src/services/testServices.js");
-
-// const createTest = async (req, res) => {
-//     try {
-//         const newTest = req.body;
-
-//         const test = await createTestService(newTest);
-
-//         res.status(201).send({
-//             data: test,
-//             message: "Create test success",
-//         });
-//     } catch (error) {
-//         res.status(500).send({
-//             message: "Failed to create test",
-//             error: error.message,
-//         });
-//     }
-// };
-
-// module.exports = { createTest };
+module.exports = {
+    getTestResultsController,
+};
