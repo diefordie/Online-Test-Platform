@@ -17,21 +17,20 @@ const Persyaratan = () => {
 
     return (
         <div className="relative min-h-screen flex items-center bg-white">
+             <img 
+            src="/images/polygon.png" 
+            alt="Img 1" 
+            className="w-full max-w-xs md:max-w-sm lg:max-h-screen object-contain"
+        />
             <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', padding: '20px' }}>
-                <Image
-                    alt="Persyaratan Registrasi"
-                    src={gambar1}
-                    sizes="100vw"
-                    style={{
-                        width: '40%',
-                        height: 'auto',
-                        position: 'absolute',
-                        top: '23%',
-                    }}
-                />
+            <img 
+                src="/images/mobilepassword.png" 
+                alt="mobilepassword" 
+                className="w-full max-w-xs md:max-w-sm max-w-md lg:h-max-screen object-contain"
+            />
             </div>
 
-            <div className="absolute top-1/2 left-0 transform -translate-y-1/2 w-full max-w-sm p-8 bg-secondary shadow-md rounded-3xl ml-20 flex flex-col items-center">
+            <div className="absolute lg:right-1/2  lg:top-1/2 transform lg:-translate-y-1/2 w-full  max-w-screen p-4 lg:max-w-sm lg:p-7 bg-powderBlue shadow-md rounded-3xl ml-0 lg:ml-20">
                 <h2 className="text-3xl font-bold mb-6 text-black text-center">Persyaratan</h2>
                 <p>Untuk mendaftar sebagai author, silakan lengkapi persyaratan berikut:</p>
                 <ul className="list-disc list-inside mt-4">
@@ -47,7 +46,7 @@ const Persyaratan = () => {
                         type="button"
                         onClick={handleButtonClick}
                         aria-label="Navigate to login page"
-                        className="bg-birutua text-putih py-2 px-10 rounded-2xl shadow-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+                        className="hover:bg-orange hover:text-deepBlue text-deepBlue bg-paleBlue p-2 rounded-2xl text-xs font-poppins">
                         Selesai
                     </button>
                 </div>

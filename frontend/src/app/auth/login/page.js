@@ -70,10 +70,10 @@ const Login = () => {
     };
 
     return (
-        <div className="relative min-h-screen flex items-center bg-white">
+        <div className="relative min-h-screen flex items-center bg-white ">
             <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', padding: '20px' }}></div>
 
-            <div className="absolute top-1/2 left-0 transform -translate-y-1/2 w-full max-w-sm p-8 bg-secondary shadow-md rounded-3xl ml-20">
+            <div className="absolute lg:right-1/2  lg:top-1/2 transform lg:-translate-y-1/2 w-full  max-w-screen p-4 lg:max-w-sm lg:p-8 bg-powderBlue shadow-md rounded-3xl ml-0 lg:ml-20">
                 <h2 className="text-3xl font-bold mb-6 text-black text-center">Login</h2>
                 <form className="space-y-4" onSubmit={handleSubmit}>
                     <div>
@@ -99,7 +99,7 @@ const Login = () => {
                     <div className="flex justify-center">
                         <button
                             type="submit"
-                            className="bg-birutua text-putih py-2 px-10 rounded-2xl shadow-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+                            className="bg-deepBlue text-putih py-2 px-10 rounded-2xl shadow-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
                             Login
                         </button>
                     </div>
@@ -117,6 +117,19 @@ const Login = () => {
                     </div>
                 </div>
             )}
+            {/* Img 2 - Kanan */}
+            <div className="hidden lg:block relative">
+            <img 
+                src="/images/ellipse.png" 
+                alt="elips" 
+                className="hidden lg:block lg:max-h-screen object-contain"
+            />
+            <img 
+                src="/images/mobilelock.png" 
+                alt="mobile lock" 
+                className="absolute lg:top-1/2 lg:left-1/2 lg:transform lg:-translate-x-1/2 lg:-translate-y-1/2 lg:max-h-screen object-contain top-[-10%] left-1/2 transform -translate-x-1/2 max-h-20 z-10"
+            />
+            </div>
         </div>
     );
 };
