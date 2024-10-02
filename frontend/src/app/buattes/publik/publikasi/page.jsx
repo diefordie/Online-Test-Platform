@@ -19,14 +19,40 @@ export default function PublikasiPage() {
     setAcakPertanyaan({ ...acakPertanyaan, [event.target.name]: event.target.checked });
   };
 
-  const handlePublish = () => {
-    if (namaTes && durasiTes && maksimumPercobaan && hargaTes && prediksiKemiripan) {
-      // Logic to publish the test goes here
-      setShowSuccessPopup(true);
-    } else {
-      setShowErrorPopup(true);
+  const handlePublish = async () => {
+    const [hours, minutes] = durasiTes.split(':').map(Number);
+    const totalMinutes = (hours || 0) * 60 + (minutes || 0);
+
+    const payload = {
+        price: hargaTes,                     
+        similarity: parseFloat(prediksiKemiripan), 
+        worktime: totalMinutes               
+    };
+
+    // Validasi input
+    if (!payload.price || isNaN(payload.similarity) || isNaN(payload.worktime)) {
+        alert("Semua field harus diisi untuk publikasi.");
+        return;
     }
-  };
+
+    try {
+        const response = await fetch(`http://localhost:2000/test/tests/cm1r5w67q00019ej4ufdc6nsm/publish`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            console.log('Tes berhasil disimpan!');
+        } else {
+            console.error('Gagal menyimpan tes.', await response.text()); 
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
 
   const closePopup = () => {
     setShowSuccessPopup(false);
@@ -97,15 +123,14 @@ export default function PublikasiPage() {
               />
             </div>
 
-            {/* Input Durasi Tes */}
             <div className="mb-4">
-              <input
-                type="text"
-                className="w-full border border-gray-300 p-2 rounded-full bg-white text-gray-500"
-                value={durasiTes}
-                onChange={(e) => setDurasiTes(e.target.value)}
-                placeholder="hh:mm"
-              />
+                <input
+                    type="text"
+                    className="w-full border border-gray-300 p-2 rounded-full bg-white text-gray-500"
+                    value={durasiTes}
+                    onChange={(e) => setDurasiTes(e.target.value)}
+                    placeholder="hh:mm"
+                />
             </div>
 
             {/* Checkbox Acak Pertanyaan */}
@@ -147,15 +172,14 @@ export default function PublikasiPage() {
 
             {/* Dropdown Harga Tes */}
             <div className="mb-4">
-              <select
+              <input
+                type="number"
+                step="0.01" // Mengizinkan input nilai desimal
                 className="w-full border border-gray-300 p-2 rounded-full bg-white text-gray-500"
                 value={hargaTes}
                 onChange={(e) => setHargaTes(e.target.value)}
-              >
-                <option value="" disabled>Harga Tes</option>
-                <option value="Berbayar">Berbayar</option>
-                <option value="Gratis">Gratis</option>
-              </select>
+                placeholder="Masukkan Harga Tes (dalam format desimal)"
+              />
             </div>
 
             {/* Dropdown Prediksi Kemiripan */}
@@ -166,9 +190,9 @@ export default function PublikasiPage() {
                 onChange={(e) => setPrediksiKemiripan(e.target.value)}
               >
                 <option value="" disabled>Kemiripan Soal</option>
-                <option value="45%">45%</option>
-                <option value="65%">65%</option>
-                <option value="80%">80%</option>
+                <option value="0.85">45%</option>
+                <option value="0.65">65%</option>
+                <option value="0.80">80%</option>
               </select>
             </div>
           </div>

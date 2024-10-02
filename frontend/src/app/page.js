@@ -1,5 +1,5 @@
 import React from 'react'
-import BuatTes from '@/app/buattes/page'
+import BuatTes from '@/app/buattes/publik/publikasi/page'
 
 const page = () => {
   return (
