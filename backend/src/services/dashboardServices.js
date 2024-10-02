@@ -11,7 +11,7 @@ const getTestDetailsWithAccessCountAndAuthor = async (testIds) => {
       history: true, // Include history to get access counts
       author: {
         select: {
-          nama: true,
+          name: true,
           authorPhoto: true,
         },
       },
@@ -23,7 +23,7 @@ const getTestDetailsWithAccessCountAndAuthor = async (testIds) => {
     ...test,
     accessCount: test.history.length, // Number of times this test has been accessed
     author: {
-      nama: test.author.nama,
+      name: test.author.name,
       foto: test.author.authorPhoto,
     },
   }));
@@ -58,7 +58,7 @@ export const getFreeTests = async () => {
       history: true,
       author: {
         select: {
-          nama: true,
+          name: true,
           authorPhoto: true,
         },
       },
@@ -77,7 +77,7 @@ export const searchTestsByTitle = async (title) => {
       history: true, // Include history to get access counts
       author: {
         select: {
-          nama: true,
+          name: true,
           authorPhoto: true,
         },
       },
@@ -89,7 +89,7 @@ export const searchTestsByTitle = async (title) => {
     ...test,
     accessCount: test.history.length, // Number of times this test has been accessed
     author: {
-      nama: test.author.nama,
+      name: test.author.name,
       foto: test.author.authorPhoto,
     },
   }));
@@ -105,7 +105,7 @@ export const getTestsByCategory = async (category) => {
       history: true,
       author: {
         select: {
-          nama: true,
+          name: true,
           authorPhoto: true,
         },
       },
@@ -141,7 +141,7 @@ export const getFreeTestsByCategory = async (category) => {
       history: true,
       author: {
         select: {
-          nama: true,
+          name: true,
           authorPhoto: true,
         },
       },
@@ -149,3 +149,9 @@ export const getFreeTestsByCategory = async (category) => {
     take: 5,
   });
 };
+
+
+
+
+
+

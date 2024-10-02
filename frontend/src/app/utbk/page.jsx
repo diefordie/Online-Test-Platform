@@ -209,8 +209,8 @@ export default function UTBK() {
 
               <div className="flex justify-between space-x-2 leading-relaxed mt-1">
               <div className='flex text-left leading-relaxed space-x-4 '>
-                <img src={test.author.authorPhoto} alt={test.author.nama} className="h-5 w-5 leading-relaxed " />
-                <span className="text-sm font-semibold leading-relaxed ">{test.author.nama}</span>
+                <img src={test.author.authorPhoto} alt={test.author.name} className="h-5 w-5 leading-relaxed " />
+                <span className="text-sm font-semibold leading-relaxed ">{test.author.name}</span>
               </div>
                 <span className="text-sm font-semibold">
                   {test.price ? <img src="/images/lock.png" alt="Berbayar" className="h-9/2 inline-block" /> : 'Gratis'}
@@ -274,8 +274,8 @@ export default function UTBK() {
 
               <div className="flex justify-between space-x-2 leading-relaxed mt-1">
               <div className='flex text-left leading-relaxed space-x-4 '>
-                <img src={test.author.authorPhoto} alt={test.author.nama} className="h-5 w-5 leading-relaxed " />
-                <span className="text-sm font-semibold leading-relaxed ">{test.author.nama}</span>
+                <img src={test.author.authorPhoto} alt={test.author.name} className="h-5 w-5 leading-relaxed " />
+                <span className="text-sm font-semibold leading-relaxed ">{test.author.name}</span>
               </div>
                 <span className="text-sm font-semibold">
                   {test.price ? <img src="/images/lock.png" alt="Berbayar" className="h-9/2 inline-block" /> : 'Gratis'}
@@ -336,7 +336,7 @@ export default function UTBK() {
   
                 <div className="flex justify-between space-x-2 leading-relaxed mt-1">
                 <div className="flex text-left space-x-4">
-                  <img src={test.author.authorPhoto} alt={test.author.nama} className="h-5 w-5" />
+                  <img src={test.author.authorPhoto} alt={test.author.name} className="h-5 w-5" />
                   <span className="text-sm font-semibold">{test.author}</span>
                 </div>
                   <span className="text-sm font-semibold">

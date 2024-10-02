@@ -73,36 +73,6 @@ export default function Dashboard() {
     return <div className="text-center mt-20">Loading...</div>;
   }
 
-  // Logout function
-  const handleLogout = async () => {
-    try {
-      const response = await fetch('http://localhost:2000/auth/logout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Include token if needed
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Logout failed');
-      }
-
-      // Optionally clear the token from local storage
-      localStorage.removeItem('token');
-
-      // Redirect to login page
-      window.location.href = '/auth/login';
-    } catch (error) {
-      console.error('Error during logout:', error);
-      setError(error.message);
-    }
-  };
-
-  if (loading) {
-    return <div className="text-center mt-20">Loading...</div>;
-  }
-
   return (
     <>
       <header className="bg-deepBlue text-white p-6">
@@ -159,13 +129,14 @@ export default function Dashboard() {
                 </a>
                 </Link>
                 <Link legacyBehavior href="/auth/login">
-                <a onClick={handleLogout} className="block px-4 py-1 text-deepBlue text-sm text-gray-700 hover:bg-deepBlue hover:text-white rounded-md">
+                <a className="block px-4 py-1 text-deepBlue text-sm text-gray-700 hover:bg-deepBlue hover:text-white rounded-md">
                     Logout
-                  </a>
+                </a>
                 </Link>
             </div>
             )}
             </div>
+           
         </div>
         </div>
     </header>
@@ -237,12 +208,12 @@ export default function Dashboard() {
 
               <div className="flex justify-between space-x-2 leading-relaxed mt-1">
               <div className='flex text-left leading-relaxed space-x-4 '>
-                <img src={test.author.authorPhoto} alt={test.author.nama} className="h-5 w-5 leading-relaxed " />
-                <span className="text-sm font-semibold leading-relaxed ">{test.author.nama}</span>
+                <img src={test.author.authorPhoto} alt={test.author.name} className="h-5 w-5 leading-relaxed " />
+                <span className="text-sm font-semibold leading-relaxed ">{test.author.name}</span>
               </div>
-                <span className="text-sm font-semibold">
-                  {test.price ? <img src="/images/lock.png" alt="Berbayar" className="h-9/2 inline-block" /> : 'Gratis'}
-                </span>
+              <span className="text-sm font-semibold">
+                {Number(test.price) === 0 ? 'Gratis' : <img src="/images/lock.png" alt="Berbayar" className="h-9/2 inline-block" />}
+                </span>
               </div>
             </div>
 
@@ -349,8 +320,8 @@ export default function Dashboard() {
 
               <div className="flex justify-between space-x-2 leading-relaxed mt-1">
               <div className='flex text-left leading-relaxed space-x-4 '>
-                <img src={test.author.authorPhoto} alt={test.author.nama} className="h-5 w-5 leading-relaxed " />
-                <span className="text-sm font-semibold leading-relaxed ">{test.author.nama}</span>
+                <img src={test.author.authorPhoto} alt={test.author.name} className="h-5 w-5 leading-relaxed " />
+                <span className="text-sm font-semibold leading-relaxed ">{test.author.name}</span>
               </div>
                 <span className="text-sm font-semibold">
                   {test.price ? <img src="/images/lock.png" alt="Berbayar" className="h-9/2 inline-block" /> : 'Gratis'}
@@ -414,8 +385,8 @@ export default function Dashboard() {
   
                 <div className="flex justify-between space-x-2 leading-relaxed mt-1">
                 <div className="flex text-left space-x-4">
-                  <img src={test.author.authorPhoto} alt={test.author.nama} className="h-5 w-5" />
-                  <span className="text-sm font-semibold">{test.author}</span>
+                  <img src={test.author.authorPhoto} alt={test.author.name} className="h-5 w-5" />
+                  <span className="text-sm font-semibold">{test.author.name}</span>
                 </div>
                   <span className="text-sm font-semibold">
                     {test.price ? <img src="/images/lock.png" alt="Berbayar" className="h-9/2 inline-block" /> : 'Gratis'}
