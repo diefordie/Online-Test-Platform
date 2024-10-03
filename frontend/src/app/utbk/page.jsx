@@ -204,7 +204,7 @@ export default function UTBK() {
                 <img src="/images/fav-icon.png" alt="More" className="h-7/2" />
               </div>
 
-              <p className="text-left text-sm leading-relaxed">Prediksi kemiripan {test.similarity}</p>
+              <p className="text-left text-sm leading-relaxed">Prediksi kemiripan {test.similarity}%</p>
               <p className="text-xs leading-relaxed">Dibuat Oleh :</p>
 
               <div className="flex justify-between space-x-2 leading-relaxed mt-1">
@@ -213,7 +213,7 @@ export default function UTBK() {
                 <span className="text-sm font-semibold leading-relaxed ">{test.author.nama}</span>
               </div>
                 <span className="text-sm font-semibold">
-                  {test.price ? <img src="/images/lock.png" alt="Berbayar" className="h-9/2 inline-block" /> : 'Gratis'}
+                {Number(test.price) === 0 ? 'Gratis' : <img src="/images/lock.png" alt="Berbayar" className="h-9/2 inline-block" />}
                 </span>
               </div>
             </div>
@@ -269,7 +269,7 @@ export default function UTBK() {
                 <img src="/images/fav-icon.png" alt="More" className="h-7/2" />
               </div>
 
-              <p className="text-left text-sm leading-relaxed">Prediksi kemiripan {test.similarity}</p>
+              <p className="text-left text-sm leading-relaxed">Prediksi kemiripan {test.similarity}%</p>
               <p className="text-xs leading-relaxed">Dibuat Oleh :</p>
 
               <div className="flex justify-between space-x-2 leading-relaxed mt-1">
@@ -278,7 +278,7 @@ export default function UTBK() {
                 <span className="text-sm font-semibold leading-relaxed ">{test.author.nama}</span>
               </div>
                 <span className="text-sm font-semibold">
-                  {test.price ? <img src="/images/lock.png" alt="Berbayar" className="h-9/2 inline-block" /> : 'Gratis'}
+                {Number(test.price) === 0 ? 'Gratis' : <img src="/images/lock.png" alt="Berbayar" className="h-9/2 inline-block" />}
                 </span>
               </div>
             </div>
@@ -331,16 +331,16 @@ export default function UTBK() {
                   <img src="/images/fav-icon.png" alt="More" className="h-7/2" />
                 </div>
   
-                <p className="text-left text-sm leading-relaxed">Prediksi kemiripan {test.similarity}</p>
+                <p className="text-left text-sm leading-relaxed">Prediksi kemiripan {test.similarity}%</p>
                 <p className="text-xs leading-relaxed">Dibuat Oleh :</p>
   
                 <div className="flex justify-between space-x-2 leading-relaxed mt-1">
                 <div className="flex text-left space-x-4">
                   <img src={test.author.authorPhoto} alt={test.author.nama} className="h-5 w-5" />
-                  <span className="text-sm font-semibold">{test.author}</span>
+                  <span className="text-sm font-semibold">{test.author.nama}</span>
                 </div>
                   <span className="text-sm font-semibold">
-                  {test.price ? <img src="/images/lock.png" alt="Berbayar" className="h-9/2 inline-block" /> : 'Gratis'}
+                  {Number(test.price) === 0 ? 'Gratis' : <img src="/images/lock.png" alt="Berbayar" className="h-9/2 inline-block" />}
                   </span>
                 </div>
               </div>
