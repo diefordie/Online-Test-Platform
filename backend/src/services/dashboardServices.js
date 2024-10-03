@@ -1,4 +1,6 @@
-const { PrismaClient } = require('@prisma/client');
+// src/services/dashboardServices.js
+import { PrismaClient } from '@prisma/client';
+
 const prisma = new PrismaClient();
 
 // Helper function to get test details with access count and author details
@@ -11,7 +13,7 @@ const getTestDetailsWithAccessCountAndAuthor = async (testIds) => {
       history: true, // Include history to get access counts
       author: {
         select: {
-          nama: true,
+          name: true,
           authorPhoto: true,
         },
       },
@@ -23,16 +25,16 @@ const getTestDetailsWithAccessCountAndAuthor = async (testIds) => {
     ...test,
     accessCount: test.history.length, // Number of times this test has been accessed
     author: {
-      nama: test.author.nama,
-      foto: test.author.authorPhoto
-    }
+      name: test.author.name,
+      foto: test.author.authorPhoto,
+    },
   }));
 
   return testsWithDetails;
 };
 
-// Get 5 most popular tests based on history
-const getPopularTests = async () => {
+// Get 4 most popular tests based on history
+export const getPopularTestsService = async () => {
   const popularTests = await prisma.history.groupBy({
     by: ['testId'],
     _count: {
@@ -43,32 +45,39 @@ const getPopularTests = async () => {
         testId: 'desc',
       },
     },
-    take: 5,
+    take: 4, // Adjusted to return 4 as per your original requirement
   });
 
   const testIds = popularTests.map((test) => test.testId);
   return await getTestDetailsWithAccessCountAndAuthor(testIds);
 };
 
-// Get 5 free tests (price 0)
-const getFreeTests = async () => {
-  return await prisma.test.findMany({
-    where: { price: 0 },
-    include: {
-      history: true,
-      author: {
-        select: {
-          nama: true,
-          authorPhoto: true,
-        },
+// Get 4 free tests (price 0)
+export const getFreeTestsService = async () => {
+  const freeTests = await prisma.history.groupBy({
+    by: ['testId'],
+    _count: {
+      testId: true,
+    },
+    where: {
+      test: {
+        price: 0, // Only include free tests
       },
     },
-    take: 5,
+    orderBy: {
+      _count: {
+        testId: 'desc',
+      },
+    },
+    take: 4, // Adjusted to return 4 as per your original requirement
   });
+
+  const testIds = freeTests.map((test) => test.testId);
+  return await getTestDetailsWithAccessCountAndAuthor(testIds);
 };
 
 // Search tests by title
-const searchTestsByTitle = async (title) => {
+export const searchTestsByTitleService = async (title) => {
   const tests = await prisma.test.findMany({
     where: {
       title: { contains: title, mode: 'insensitive' },
@@ -77,7 +86,7 @@ const searchTestsByTitle = async (title) => {
       history: true, // Include history to get access counts
       author: {
         select: {
-          nama: true,
+          name: true,
           authorPhoto: true,
         },
       },
@@ -89,7 +98,7 @@ const searchTestsByTitle = async (title) => {
     ...test,
     accessCount: test.history.length, // Number of times this test has been accessed
     author: {
-      nama: test.author.nama,
+      name: test.author.name,
       foto: test.author.authorPhoto,
     },
   }));
@@ -98,14 +107,14 @@ const searchTestsByTitle = async (title) => {
 };
 
 // Get tests by category
-const getTestsByCategory = async (category) => {
+export const getTestsByCategoryService = async (category) => {
   return await prisma.test.findMany({
     where: { category },
     include: {
       history: true,
       author: {
         select: {
-          nama: true,
+          name: true,
           authorPhoto: true,
         },
       },
@@ -113,48 +122,47 @@ const getTestsByCategory = async (category) => {
   });
 };
 
-// Get 5 most popular tests within a category
-const getPopularTestsByCategory = async (category) => {
+// Get 4 most popular tests within a category
+export const getPopularTestsByCategoryService = async (category) => {
   const popularTests = await prisma.history.groupBy({
     by: ['testId'],
     _count: {
       testId: true,
     },
     where: {
-      test: {category: category },
+      test: { category: category },
     },
     orderBy: {
       _count: { testId: 'desc' },
     },
-    take: 5,
+    take: 4, // Adjusted to return 4 as per your original requirement
   });
 
   const testIds = popularTests.map((test) => test.testId);
   return await getTestDetailsWithAccessCountAndAuthor(testIds);
 };
 
-// Get 5 free tests within a category
-const getFreeTestsByCategory = async (category) => {
-  return await prisma.test.findMany({
-    where: { category, price: 0 },
-    include: {
-      history: true,
-      author: {
-        select: {
-          nama: true,
-          authorPhoto: true,
-        },
+// Get 4 free tests within a category
+export const getFreeTestsByCategoryService = async (category) => {
+  const freeTestAccessCount = await prisma.history.groupBy({
+    by: ['testId'],
+    _count: {
+      testId: true,
+    },
+    where: {
+      test: {
+        category: category,
+        price: 0, // Only include free tests
       },
     },
-    take: 5,
+    orderBy: {
+      _count: {
+        testId: 'desc',
+      },
+    },
+    take: 4, // Adjusted to return 4 as per your original requirement
   });
-};
 
-module.exports = {
-  getPopularTests,
-  getFreeTests,
-  searchTestsByTitle,
-  getTestsByCategory,
-  getPopularTestsByCategory,
-  getFreeTestsByCategory,
+  const testIds = freeTestAccessCount.map((test) => test.testId);
+  return await getTestDetailsWithAccessCountAndAuthor(testIds);
 };

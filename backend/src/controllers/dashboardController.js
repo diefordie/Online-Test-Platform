@@ -1,74 +1,72 @@
-const dashboardServices = require('../services/dashboardServices.js');
+import {
+  getPopularTestsService, // Renaming to avoid conflict
+  getFreeTestsService,
+  searchTestsByTitleService,
+  getTestsByCategoryService,
+  getPopularTestsByCategoryService,
+  getFreeTestsByCategoryService
+} from '../services/dashboardServices.js';
 
-// Get 5 most popular tests
-const getPopularTests = async (req, res) => {
+// Controller for fetching popular tests
+export const getPopularTests = async (req, res) => {
   try {
-    const tests = await dashboardServices.getPopularTests();
+    const tests = await getPopularTestsService(); // Using the renamed service function
+    res.status(200).json(tests); // Send successful response with data
+  } catch (error) {
+    res.status(500).json({ error: error.message }); // Send error response if something goes wrong
+  }
+};
+
+// Controller for fetching free tests
+export const getFreeTests = async (req, res) => {
+  try {
+    const tests = await getFreeTestsService(); // Using renamed service
     res.status(200).json(tests);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// Get 5 free tests
-const getFreeTests = async (req, res) => {
+// Controller for searching tests by title
+export const searchTestsByTitle = async (req, res) => {
+  const { title } = req.query; // Get the 'title' from request query
   try {
-    const tests = await dashboardServices.getFreeTests();
+    const tests = await searchTestsByTitleService(title); // Using renamed service
     res.status(200).json(tests);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// Search tests by title
-const searchTestsByTitle = async (req, res) => {
-  const { title } = req.query;
+// Controller for fetching tests by category
+export const getTestsByCategory = async (req, res) => {
+  const { category } = req.query; // Get the 'category' from request query
   try {
-    const tests = await dashboardServices.searchTestsByTitle(title);
+    const tests = await getTestsByCategoryService(category); // Using renamed service
     res.status(200).json(tests);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// Get tests by category
-const getTestsByCategory = async (req, res) => {
-  const { category } = req.query;
+// Controller for fetching popular tests by category
+export const getPopularTestsByCategory = async (req, res) => {
+  const { category } = req.query; // Get the 'category' from request query
   try {
-    const tests = await dashboardServices.getTestsByCategory(category);
+    const tests = await getPopularTestsByCategoryService(category); // Using renamed service
     res.status(200).json(tests);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// Get 5 most popular tests within a category
-const getPopularTestsByCategory = async (req, res) => {
-  const { category } = req.query;
+// Controller for fetching free tests by category
+export const getFreeTestsByCategory = async (req, res) => {
+  const { category } = req.query; // Get the 'category' from request query
   try {
-    const tests = await dashboardServices.getPopularTestsByCategory(category);
+    const tests = await getFreeTestsByCategoryService(category); // Using renamed service
     res.status(200).json(tests);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-};
-
-// Get 5 free tests within a category
-const getFreeTestsByCategory = async (req, res) => {
-  const { category } = req.query;
-  try {
-    const tests = await dashboardServices.getFreeTestsByCategory(category);
-    res.status(200).json(tests);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-module.exports = {
-  getPopularTests,
-  getFreeTests,
-  searchTestsByTitle,
-  getTestsByCategory,
-  getPopularTestsByCategory,
-  getFreeTestsByCategory,
 };
