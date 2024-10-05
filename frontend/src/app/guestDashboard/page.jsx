@@ -1,53 +1,77 @@
-import Link from 'next/link';
+'use client';
 
-const testData = [
-  {
-    id: 1,
-    kategori : "Try Out UTBK",
-    judul : "TRY OUT UTBK 2025#1",
-    prediksi_kemiripan: "Prediksi kemiripan 45%",
-    views: 1386,
-    author: " Rania Suyati",
-    free: true,
-    imageUrl: "/images/tes.png",
-    authorProfile : " /images/authorProfile.png"
-  },
-  {
-    id: 2,
-    kategori : "Try Out PSIKOTEST",
-    judul: "TRY OUT PSIKOTEST 2025#2",
-    prediksi_kemiripan: "Prediksi kemiripan 50%",
-    views: 2000,
-    author: " Desti Nur Irawati",
-    free: false, // ubah ke false untuk tes menampilkan gambar kunci
-    imageUrl: "/images/tes.png",
-    authorProfile : " /images/authorProfile.png"
-  },
-  {
-    id: 3,
-    kategori : "Try Out PSIKOTEST",
-    judul: "TRY OUT PSIKOTEST 2025#2",
-    prediksi_kemiripan: "Prediksi kemiripan 55%",
-    views: 2000,
-    author: "Zhang Yixing",
-    free: true, // ubah ke false untuk tes menampilkan gambar kuci
-    imageUrl: "/images/tes.png",
-    authorProfile : " /images/authorProfile.png"
-  },
-  {
-    id: 4,
-    kategori : "Try Out PSIKOTEST",
-    judul: "TRY OUT PSIKOTEST 2025#2",
-    prediksi_kemiripan: "Prediksi kemiripan 70%",
-    views: 1994,
-    author: " Oh Sehun",
-    free: false, // ubah ke false untuk tes menampilkan kunci
-    imageUrl: "/images/tes.png",
-    authorProfile : " /images/authorProfile.png"
-  },
-];
+import Link from 'next/link';
+import  { useState, useEffect } from 'react';
 
 export default function Dashboard() {
+  const [popularTests, setPopularTests] = useState([]);
+  const [freeTests, setFreeTests] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchQuery, setSearchQuery] = useState (['']);
+  const [loading, setLoading] = useState([true]);
+  const [error, setError] = useState([null]);
+
+  useEffect(() => {
+    const fetchPopularTests = async () => {
+      try {
+        const response = await fetch('http://localhost:2000/dashboard/popular-tests');
+        if (!response.ok) {
+          throw new Error('Failed to fetch popular tests');
+        }
+        const data = await response.json();
+        setPopularTests(data);
+      } catch (error) {
+        console.error('Error fetching popular tests:', error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPopularTests();
+  }, []);
+
+  useEffect(() => {
+    const fetchFreeTests = async () => {
+      try {
+        const response = await fetch('http://localhost:2000/dashboard/free-tests');
+        if (!response.ok) {
+          throw new Error('Failed to fetch free tests');
+        }
+        const data = await response.json();
+        setFreeTests(data);
+      } catch (error) {
+        console.error('Error fetching free tests:', error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFreeTests();
+  }, []);
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    if (!searchQuery) return;
+
+    try {
+      const response = await fetch(`http://localhost:2000/dashboard/search-tests?title=${encodeURIComponent(searchQuery)}`);
+      if (!response.ok) {
+        throw new Error('Failed to search tests');
+      }
+      const data = await response.json();
+      setSearchResults(data);
+    } catch (error) {
+      console.error('Error searching tests:', error);
+      setError(error.message);
+    }
+  };
+
+  if (loading && !error) {
+    return <div className="text-center mt-20">Loading...</div>;
+  }
+
   return (
     <>
       <header className="bg-deepBlue text-white p-6 font-poppins ">
@@ -90,11 +114,14 @@ export default function Dashboard() {
     <section className="bg-gradient-custom p-20 font-poppins">
        {/* Search Bar */}
        <div className="container mx-auto mt-4 ">
-            <form className="flex mx-auto items-center p-1 rounded-2xl bg-white max-w-[610px] font-poppins  ">
+            <form onSubmit={handleSearch} className="flex mx-auto items-center p-1 rounded-2xl bg-white max-w-[610px] font-poppins  ">
             <input 
               type="text" 
               placeholder="Cari Tes Soal" 
-              className="flex-grow p-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-powderBlue font-poppins"/>
+              className="flex-grow p-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-powderBlue font-poppins"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              />
                <button 
                 type="submit" 
                 className="ml-auto p-2 text-deepBlue font-bold rounded-2xl hover:bg-gray-200 font-poppins">
@@ -107,6 +134,67 @@ export default function Dashboard() {
             </form>
         </div>
     </section>
+
+    {searchResults.length > 0 && (
+          <section className="bg-putih p-5 font-poppins">
+          <div className="container  mx-auto mt-5 font-bold font-poppins text-deepBlue font-poppins">
+            Hasil Pencarian
+          </div>
+          <Link href="/login"legacyBehavior >
+              <a className="">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8 font-poppins">
+                {searchResults.map((test) => (
+                  <div key={test.testId} className="bg-abumuda shadow-lg p-1 relative font-poppins ">
+                    <div className="flex justify-between items-center font-poppins">
+                      <div className="flex items-center space-x-2 font-bold text-deepBlue font-poppins">
+                        <img src="/images/eye-icon.png" alt="Views" className="h-4 w-4 font-poppins" />
+                        <span className="text-sm font-poppins">{test.accessCount}</span>
+                      </div>
+                      <div className="flex items-center space-x-2 font-poppins">
+                        <img src="/images/share-icon.png" alt="Share" className="h-3 w-3" />
+                        <img src="/images/more-icon.png" alt="More" className="h-7/2 " />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-center mt-4 bg-abumuda font-poppins ">
+                      <img src="/images/tes.png" alt={test.category} className="h-20 w-20 " />
+                    </div>
+
+                    <div className="flex justify-center mt-4 text-deepBlue font-poppins">
+                      <h3 className="text-center text-lg font-bold mt-2 font-poppins">{test.category}</h3>
+                    </div>
+
+                    <div className="bg-deepBlue text-white p-2  mt-4 font-poppins">
+                      <div className="flex items-center space-x-2 justify-between font-poppins">
+                        <h3 className="text-left text-base font-bold mt-2 font-poppins ">{test.title}</h3>
+                        <img src="/images/fav-icon.png" alt="More" className="h-7/2 " />
+                      </div>
+
+                      <p className="text-left text-sm leading-relaxed ">Prediksi kemiripan {test.similarity}</p>
+                      <p className="text-xs leading-relaxed">Dibuat Oleh :</p>
+                      
+                      <div className="flex justify-between space-x-2 justify-between leading-relaxed mt-1">
+                      <div className='flex text-left leading-relaxed space-x-4 '>
+                        <img src={test.author.authorPhoto} alt={test.author.name} className="h-5 w-5 leading-relaxed " />
+                        <span className="text-sm font-semibold leading-relaxed ">{test.author.name}</span>
+                      </div>
+
+                        <span className="text-sm font-semibold leading-relaxed">
+                          {test.price ? (
+                            <img src="/images/lock.png" alt="Berbayar" className="h-9/2 inline-block" />
+                          ) : (
+                            'Gratis'
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              </a>
+            </Link>
+        </section>
+        )}
 
       {/* Bagian Katagori */}
       <section className="p-5 text-deepBlue ">
@@ -157,19 +245,20 @@ export default function Dashboard() {
         />
 
         {/* Bagian Paling Populer */}
-        <section className="bg-putih p-5 font-poppins">
+        {popularTests.length > 0 && (
+          <section className="bg-putih p-5 font-poppins">
           <div className="container  mx-auto mt-5 font-bold font-poppins text-deepBlue font-poppins">
             Paling Populer
           </div>
           <Link href="/login"legacyBehavior >
               <a className="">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8 font-poppins">
-                {testData.map((test) => (
-                  <div key={test.id} className="bg-abumuda shadow-lg p-1 relative font-poppins ">
+                {popularTests.map((test) => (
+                  <div key={test.testId} className="bg-abumuda shadow-lg p-1 relative font-poppins ">
                     <div className="flex justify-between items-center font-poppins">
                       <div className="flex items-center space-x-2 font-bold text-deepBlue font-poppins">
                         <img src="/images/eye-icon.png" alt="Views" className="h-4 w-4 font-poppins" />
-                        <span className="text-sm font-poppins">{test.views}</span>
+                        <span className="text-sm font-poppins">{test.accessCount}</span>
                       </div>
                       <div className="flex items-center space-x-2 font-poppins">
                         <img src="/images/share-icon.png" alt="Share" className="h-3 w-3" />
@@ -178,32 +267,33 @@ export default function Dashboard() {
                     </div>
 
                     <div className="flex justify-center mt-4 bg-abumuda font-poppins ">
-                      <img src={test.imageUrl} alt={test.kategori } className="h-20 w-20 " />
+                      <img src="/images/tes.png" alt={test.category} className="h-20 w-20 " />
                     </div>
 
                     <div className="flex justify-center mt-4 text-deepBlue font-poppins">
-                      <h3 className="text-center text-lg font-bold mt-2 font-poppins">{test.kategori}</h3>
+                      <h3 className="text-center text-lg font-bold mt-2 font-poppins">{test.category}</h3>
                     </div>
 
                     <div className="bg-deepBlue text-white p-2  mt-4 font-poppins">
                       <div className="flex items-center space-x-2 justify-between font-poppins">
-                        <h3 className="text-left text-base font-bold mt-2 font-poppins ">{test.judul}</h3>
+                        <h3 className="text-left text-base font-bold mt-2 font-poppins ">{test.title}</h3>
                         <img src="/images/fav-icon.png" alt="More" className="h-7/2 " />
                       </div>
 
-                      <p className="text-left text-sm leading-relaxed ">{test.prediksi_kemiripan}</p>
+                      <p className="text-left text-sm leading-relaxed ">Prediksi kemiripan {test.similarity}</p>
                       <p className="text-xs leading-relaxed">Dibuat Oleh :</p>
                       
                       <div className="flex justify-between space-x-2 justify-between leading-relaxed mt-1">
-                        <div className='flex text-left leading-relaxed space-x-4 '>
-                          <img src={test.authorProfile} alt={test.kategori} className="h-5 w-5 leading-relaxed " />
-                          <span className="text-sm font-semibold leading-relaxed ">{test.author}</span>
-                        </div>
+                      <div className='flex text-left leading-relaxed space-x-4 '>
+                        <img src={test.author.authorPhoto} alt={test.author.name} className="h-5 w-5 leading-relaxed " />
+                        <span className="text-sm font-semibold leading-relaxed ">{test.author.name}</span>
+                      </div>
+
                         <span className="text-sm font-semibold leading-relaxed">
-                          {test.free ? (
-                            'Gratis'
-                          ) : (
+                          {test.price ? (
                             <img src="/images/lock.png" alt="Berbayar" className="h-9/2 inline-block" />
+                          ) : (
+                            'Gratis'
                           )}
                         </span>
                       </div>
@@ -214,8 +304,11 @@ export default function Dashboard() {
               </a>
             </Link>
         </section>
+        )}
+
         {/* Bagian Gratis */}
-        <section className="bg-putih p-5">
+        {freeTests.length > 0 && (
+          <section className="bg-putih p-5">
           <div className="container mx-auto font-bold font-poppins text-deepBlue">
             Gratis
           </div>
@@ -223,15 +316,12 @@ export default function Dashboard() {
             <a className="">
               <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-4 gap-4 mt-8">
             
-              {testData
-                .filter((test) => test.free) // Filter hanya data dengan free = true
-                .map((test) => (
-
-                  <div key={test.id} className="bg-abumuda shadow-lg p-1 relative">
+              {freeTests.map((test) => (
+                  <div key={test.testId} className="bg-abumuda shadow-lg p-1 relative">
                     <div className="flex justify-between items-center">
                       <div className="flex items-center space-x-2 font-bold text-deepBlue">
                         <img src="/images/eye-icon.png" alt="Views" className="h-4 w-4" />
-                        <span className="text-sm">{test.views}</span>
+                        <span className="text-sm">{test.accessCount}</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <img src="/images/share-icon.png" alt="Share" className="h-3 w-3" />
@@ -239,25 +329,25 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div className="flex justify-center mt-4">
-                      <img src={test.imageUrl} alt={test.kategori} className="h-20 w-20" />
+                      <img src="/images/tes.png" alt={test.category} className="h-20 w-20" />
                     </div>
                     <div className="flex justify-center mt-4 text-deepBlue">
-                      <h3 className="text-center text-lg font-bold mt-2">{test.kategori}</h3>
+                      <h3 className="text-center text-lg font-bold mt-2">{test.category}</h3>
                     </div>
 
                     <div className="bg-deepBlue text-white p-2 mt-4">
                       <div className="flex items-center space-x-2 justify-between">
-                        <h3 className="text-left text-base font-bold mt-2">{test.judul}</h3>
+                        <h3 className="text-left text-base font-bold mt-2">{test.title}</h3>
                         <img src="/images/fav-icon.png" alt="More" className="h-7/2" />
                       </div>
 
-                      <p className="text-left text-sm leading-relaxed">{test.prediksi_kemiripan}</p>
+                      <p className="text-left text-sm leading-relaxed">Prediksi kemiripan {test.similarity}</p>
                       <p className="text-xs leading-relaxed">Dibuat Oleh :</p>
                       
                       <div className="flex space-x-2 justify-between leading-relaxed mt-1">
                         <div className="flex text-left space-x-4">
-                          <img src={test.authorProfile} alt={test.kategori} className="h-5 w-5" />
-                          <span className="text-sm font-semibold">{test.author}</span>
+                          <img src={test.author.authorPhoto} alt={test.author.name} className="h-5 w-5" />
+                          <span className="text-sm font-semibold">{test.author.name}</span>
                         </div>
                         <span className="text-sm font-semibold">Gratis</span>
                       </div>
@@ -269,6 +359,7 @@ export default function Dashboard() {
             </a> 
           </Link>
         </section>
+        )}
       </section>
     </>
   );

@@ -1,9 +1,10 @@
 import express from 'express';
-import { createTest } from '../controllers/testControllers.js';
+import { createTest, getTest } from '../controllers/testControllers.js';
 
 const router = express.Router();
 
 router.post('/create-test', createTest);
+router.get('/get-test/:id', getTest);
 
 export default router; // Menggunakan default export
 

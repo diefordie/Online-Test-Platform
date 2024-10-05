@@ -21,6 +21,7 @@ module.exports = {
         orange :'#F8B75B',
         powderBlue : '#78AED6',
         paleBlue : '#CAE6F9',  
+        birutua: '#0B61AA'
       },
       container: {
         center: true,

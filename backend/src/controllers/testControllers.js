@@ -1,4 +1,4 @@
-import { createTestService } from '../services/testServices.js'; // Pastikan menggunakan ekstensi .js
+import { createTestService, getTestService } from '../services/testServices.js'; // Pastikan menggunakan ekstensi .js
 
 const createTest = async (req, res) => {
     try {
@@ -18,7 +18,25 @@ const createTest = async (req, res) => {
     }
 };
 
-export { createTest }; // Menggunakan named export
+const getTest = async (req, res) => {
+    try {
+        const { id } = req.params; // Ubah testId menjadi id
+        console.log('ID Test yang dicari:', id);
+        const test = await getTestService(id);
+
+        res.status(200).send({
+            data: test,
+            message: 'Get test success',
+        });
+    } catch (error) {
+        res.status(500).send({
+            message: 'Failed to get test',
+            error: error.message,
+        });
+    }
+};
+
+export { createTest , getTest}; // Menggunakan named export
 
 
 

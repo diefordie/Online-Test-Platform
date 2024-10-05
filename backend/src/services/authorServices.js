@@ -1,8 +1,8 @@
 // src/services/authorServices.js
-const { PrismaClient } = require("@prisma/client");
+import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-const createAuthorService = async (authorData) => {
+export const createAuthorService = async (authorData) => {
     return await prisma.author.create({
         data: {
             userId: authorData.userId,
@@ -17,7 +17,7 @@ const createAuthorService = async (authorData) => {
     });
 };
 
-const editAuthorService = async (id, authorData) => {
+export const editAuthorService = async (id, authorData) => {
     try {
         const existingAuthor = await prisma.author.findUnique({
             where: { id: id },
@@ -47,7 +47,7 @@ const editAuthorService = async (id, authorData) => {
     }
 };
 
-const getAuthorService = async () => {
+export const getAuthorService = async () => {
     try {
         const authors = await prisma.author.findMany();
         return authors;
@@ -56,7 +56,7 @@ const getAuthorService = async () => {
     }
 };
 
-const updateVerificationAuthorService = async (id, authorData) => {
+export const updateVerificationAuthorService = async (id, authorData) => {
     try {
         const existingAuthor = await prisma.author.findUnique({
             where: { id: id },
@@ -77,11 +77,4 @@ const updateVerificationAuthorService = async (id, authorData) => {
     } catch (error) {
         throw new Error("Failed to update verification author: " + error.message);
     }
-};
-
-module.exports = { 
-    createAuthorService, 
-    editAuthorService, 
-    getAuthorService, 
-    updateVerificationAuthorService 
 };

@@ -17,5 +17,19 @@ const createTestService = async (newTest) => {
     });
 };
 
-export { createTestService }; // Menggunakan named export
+const getTestService = async (testId) => {     
+    return await prisma.test.findUnique({
+            where: { id: testId },
+            include: {
+                author: true,
+                multiplechoice: {
+                    include: {
+                        option: true,
+                    },
+                },
+            },
+        });
+}
+
+export { createTestService, getTestService }; // Menggunakan named export
 

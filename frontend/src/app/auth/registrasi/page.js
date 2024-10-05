@@ -14,7 +14,7 @@ const Registrasi = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:2000/api/auth/registrasi', {
+            const response = await fetch('http://localhost:2000/auth/registrasi', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -62,10 +62,17 @@ const Registrasi = () => {
     };
     
     return (
-        <div className="relative min-h-screen flex items-center bg-white">
+        <div className="relative min-h-screen flex justify between items-center bg-white">
+            <img 
+                src="/images/polygon.png" 
+                alt="Img 1" 
+                className="w-full max-w-xs md:max-w-sm max-w-md lg:h-max-screen object-contain"
+            />
+            
             <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', padding: '20px' }}></div>
+            
 
-            <div className="absolute top-1/2 left-0 transform -translate-y-1/2 w-full max-w-sm p-8 bg-secondary shadow-md rounded-3xl ml-20">
+            <div className="absolute lg:right-1/2  lg:top-1/2 transform lg:-translate-y-1/2 w-full  max-w-screen p-4 lg:max-w-sm lg:p-7 bg-powderBlue shadow-md rounded-3xl ml-0 lg:ml-20">
                 <h2 className="text-3xl font-bold mb-6 text-black text-center">Daftar</h2>
                 <form className="space-y-4" onSubmit={handleSubmit}>
                     <div>
@@ -113,7 +120,7 @@ const Registrasi = () => {
                     <div className="flex justify-center">
                         <button
                             type="submit"
-                            className="bg-birutua text-putih py-2 px-10 rounded-2xl shadow-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+                            className="bg-deepBlue text-putih py-2 px-10 rounded-2xl shadow-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
                             Kirim
                         </button>
                     </div>
@@ -131,7 +138,12 @@ const Registrasi = () => {
                     </div>
                 </div>
             )}
-        </div>
+           <img 
+                src="/images/mobilepassword.png" 
+                alt="Img 2" 
+                className="w-full max-w-xs md:max-w-sm lg:max-w-md h-auto object-contain"
+            />
+         </div>
     );
 };
 

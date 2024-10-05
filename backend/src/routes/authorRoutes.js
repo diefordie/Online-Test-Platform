@@ -1,6 +1,6 @@
 // src/routes/authorRoutes.js
-const express = require("express");
-const { createAuthor, editAuthor, getAuthor, editVerifiedAuthor } = require("../controllers/authorControllers");
+import express from "express";
+import { createAuthor, editAuthor, getAuthor, editVerifiedAuthor } from "../controllers/authorControllers.js";
 
 const router = express.Router();
 
@@ -9,4 +9,4 @@ router.put("/edit-author/:id", editAuthor);
 router.patch("/edit-author/:id/status", editVerifiedAuthor);
 router.get("/get-author", getAuthor);
 
-module.exports = router;
+export default router;

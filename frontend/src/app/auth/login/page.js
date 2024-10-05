@@ -2,73 +2,79 @@
 import React, { useState } from "react"; 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Swal from 'sweetalert2'; 
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState(''); // Inisialisasi state error
     const [showPopup, setShowPopup] = useState(false); 
     const router = useRouter();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError(''); // Reset error sebelum mencoba login
+    
         try {
-            const response = await fetch('http://localhost:2000/api/auth/login', {
+            const response = await fetch('http://localhost:2000/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    email,
-                    password,
+                body: JSON.stringify({ 
+                    email, 
+                    password 
                 }),
             });
     
+            // Dapatkan data respons
             const data = await response.json();
     
+            // Periksa apakah respons tidak ok
             if (!response.ok) {
-                throw new Error(data.message || 'Terjadi kesalahan saat login. Silakan coba lagi.');
+                // Tangani kesalahan berdasarkan status
+                if (response.status === 400) {
+                    throw new Error(data.error || 'Data yang Anda masukkan tidak valid.');
+                } else if (response.status === 401) {
+                    throw new Error('Kredensial tidak valid. Silakan coba lagi.');
+                } else if (response.status === 403) {
+                    throw new Error('Akses sebagai Author ditolak. Anda tidak memiliki hak akses, pastikan anda telah mengirimkan persyaratan yang dibutuhkan, dan tunggu sampai admin memverifikasi.');
+                    router.push('/auth/syarat');
+                } else {
+                    throw new Error('Terjadi kesalahan yang tidak diketahui. Silakan coba lagi.');
+                }
             }
     
-            console.log("Login berhasil");
-            setShowPopup(true);
-    
-            setTimeout(() => {
-                setShowPopup(false);
-                const role = data.role;
-
-                // Tambahkan logika untuk mencegah admin login di halaman ini
-                if (role === 'ADMIN') {
-                    alert('Admin tidak dapat login di halaman ini.');
-                    return;
-                }
-    
-                // Adjust routing logic for only AUTHOR and USER
-                if (role === 'AUTHOR') {
-                    router.push('/author/dashboard');
-                } else {
-                    router.push('/user/dashboard');
-                }
-            }, 3000);
+            console.log("Login berhasil:", data);
+            localStorage.setItem('token', data.token);
+            
+            // Redirect berdasarkan role
+            if (data.role === 'AUTHOR') {
+                router.push('/author/dashboard'); // Ganti dengan jalur dashboard author
+            } else {
+                router.push('/userDashboard'); // Ganti dengan jalur dashboard user
+            }
         } catch (err) {
             console.error("Kesalahan login", err);
-            // Ganti pesan kesalahan menjadi lebih spesifik
-            if (err.message === 'Pengguna tidak ditemukan') {
-                alert('Pengguna dengan email ini tidak ditemukan.');
-            } else if (err.message === 'Kata sandi tidak valid') {
-                alert('Kata sandi yang Anda masukkan salah.');
-            } else if (err.message === 'Akun author belum disetujui.') {
-                alert('Akun Anda belum disetujui oleh admin.');
-            } else {
-                alert('Tidak dapat melakukan login dengan akun ini.');
-            }
+    
+            // Menampilkan pesan kesalahan sebagai popup
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: err.message, 
+            }).then(() => {
+                
+            });
+    
+            setError(err.message); // Simpan pesan error di state (opsional, jika perlu)
         }
     };
 
     return (
-        <div className="relative min-h-screen flex items-center bg-white">
+        <div className="relative min-h-screen flex items-center bg-white ">
             <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', padding: '20px' }}></div>
 
-            <div className="absolute top-1/2 left-0 transform -translate-y-1/2 w-full max-w-sm p-8 bg-secondary shadow-md rounded-3xl ml-20">
+            <div className="absolute lg:right-1/2  lg:top-1/2 transform lg:-translate-y-1/2 w-full  max-w-screen p-4 lg:max-w-sm lg:p-8 bg-powderBlue shadow-md rounded-3xl ml-0 lg:ml-20">
                 <h2 className="text-3xl font-bold mb-6 text-black text-center">Login</h2>
                 <form className="space-y-4" onSubmit={handleSubmit}>
                     <div>
@@ -94,7 +100,7 @@ const Login = () => {
                     <div className="flex justify-center">
                         <button
                             type="submit"
-                            className="bg-birutua text-putih py-2 px-10 rounded-2xl shadow-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+                            className="bg-deepBlue text-putih py-2 px-10 rounded-2xl shadow-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
                             Login
                         </button>
                     </div>
@@ -112,6 +118,19 @@ const Login = () => {
                     </div>
                 </div>
             )}
+            {/* Img 2 - Kanan */}
+            <div className="hidden lg:block relative">
+            <img 
+                src="/images/ellipse.png" 
+                alt="elips" 
+                className="hidden lg:block lg:max-h-screen object-contain"
+            />
+            <img 
+                src="/images/mobilelock.png" 
+                alt="mobile lock" 
+                className="absolute lg:top-1/2 lg:left-1/2 lg:transform lg:-translate-x-1/2 lg:-translate-y-1/2 lg:max-h-screen object-contain top-[-10%] left-1/2 transform -translate-x-1/2 max-h-20 z-10"
+            />
+            </div>
         </div>
     );
 };
