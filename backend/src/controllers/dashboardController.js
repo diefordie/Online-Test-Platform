@@ -1,5 +1,4 @@
-// src/controllers/dashboardController.js
-import * as dashboardServices from '../services/dashboardServices.js'; // Ganti require dengan import
+import * as dashboardServices from '../services/dashboardServices.js';
 
 // Get 5 most popular tests
 export const getPopularTests = async (req, res) => {
@@ -63,4 +62,13 @@ export const getFreeTestsByCategory = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+};
+
+export default {
+  getPopularTests,
+  getFreeTests,
+  searchTestsByTitle,
+  getTestsByCategory,
+  getPopularTestsByCategory,
+  getFreeTestsByCategory,
 };

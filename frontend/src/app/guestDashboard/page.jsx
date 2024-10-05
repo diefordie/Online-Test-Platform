@@ -347,7 +347,7 @@ export default function Dashboard() {
                       <div className="flex space-x-2 justify-between leading-relaxed mt-1">
                         <div className="flex text-left space-x-4">
                           <img src={test.author.authorPhoto} alt={test.author.name} className="h-5 w-5" />
-                          <span className="text-sm font-semibold">{test.author}</span>
+                          <span className="text-sm font-semibold">{test.author.name}</span>
                         </div>
                         <span className="text-sm font-semibold">Gratis</span>
                       </div>

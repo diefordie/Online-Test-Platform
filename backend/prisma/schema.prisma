@@ -12,7 +12,10 @@ datasource db {
 model Test {
   id                String        @id @default(cuid())
   authorId         String
+<<<<<<< HEAD
   userId           String
+=======
+>>>>>>> d1685bf031a7b89f5c9fb97499e8d1e044dca1cb
   category         Category
   title            String
   testDescription  String
@@ -23,7 +26,10 @@ model Test {
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
   author           Author        @relation(fields: [authorId], references: [id])
+<<<<<<< HEAD
   user             User          @relation(fields: [userId], references: [id])
+=======
+>>>>>>> d1685bf031a7b89f5c9fb97499e8d1e044dca1cb
   multiplechoice   Multiplechoice[]
   favourite        Favourite[]
   history          History[]
@@ -54,7 +60,6 @@ model User {
   result           Result[]
   testimoni        Testimoni[]
   author           Author[]
-  tests            Test[]
   revokedTokens    RevokedToken[]
 
 }
@@ -112,9 +117,26 @@ model Detail_result {
   optionId         String
   resultId         String
   userAnswer       String
+<<<<<<< HEAD
   result           Result       @relation(fields: [resultId], references: [id])
   option           Option       @relation(fields: [optionId], references: [id])
+=======
+  status       String   @default("draft") // menambahkan kolom ini untuk menandai status draft atau final
+  result       Result?  @relation(fields: [resultId], references: [id])
+  option           Option       @relation(fields: [optionId], references: [id])
+
+  @@unique([optionId, resultId])
+  
+>>>>>>> d1685bf031a7b89f5c9fb97499e8d1e044dca1cb
 }
+
+enum OptionLabel {
+  A
+  B
+  C
+  D
+}
+
 
 model Option {
   id                String       @id @default(cuid())
@@ -163,4 +185,8 @@ enum Category {
   UTBK
   Pemrograman
   Psikotes
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> d1685bf031a7b89f5c9fb97499e8d1e044dca1cb

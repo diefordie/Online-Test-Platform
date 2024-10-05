@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'; // Use import instead of require
+import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 // Helper function to get test details with access count and author details
@@ -149,9 +149,3 @@ export const getFreeTestsByCategory = async (category) => {
     take: 5,
   });
 };
-
-
-
-
-
-

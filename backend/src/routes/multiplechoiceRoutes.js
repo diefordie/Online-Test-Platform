@@ -1,10 +1,11 @@
 import express from 'express';
-import { createMultipleChoice } from '../controllers/multiplechoiceController.js';
+import { createMultipleChoice, getMultipleChoice } from '../controllers/multiplechoiceController.js';
 
 const router = express.Router();
 
 // Endpoint untuk menambah soal ke tes
 router.post('/add-questions', createMultipleChoice);
+router.get('/get-questions/:id', getMultipleChoice);
 
 export default router; // Menggunakan default export
 

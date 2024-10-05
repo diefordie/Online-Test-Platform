@@ -212,8 +212,8 @@ export default function CPNS() {
                 <img src={test.author.authorPhoto} alt={test.author.name} className="h-5 w-5 leading-relaxed " />
                 <span className="text-sm font-semibold leading-relaxed ">{test.author.name}</span>
               </div>
-                <span className="text-sm font-semibold">
-                  {test.price ? <img src="/images/lock.png" alt="Berbayar" className="h-9/2 inline-block" /> : 'Gratis'}
+              <span className="text-sm font-semibold">
+                {Number(test.price) === 0 ? 'Gratis' : <img src="/images/lock.png" alt="Berbayar" className="h-9/2 inline-block" />}
                 </span>
               </div>
             </div>
@@ -276,8 +276,8 @@ export default function CPNS() {
                 <img src={test.author.authorPhoto} alt={test.author.name} className="h-5 w-5 leading-relaxed " />
                 <span className="text-sm font-semibold leading-relaxed ">{test.author.name}</span>
               </div>
-                <span className="text-sm font-semibold">
-                  {test.price ? <img src="/images/lock.png" alt="Berbayar" className="h-9/2 inline-block" /> : 'Gratis'}
+              <span className="text-sm font-semibold">
+                {Number(test.price) === 0 ? 'Gratis' : <img src="/images/lock.png" alt="Berbayar" className="h-9/2 inline-block" />}
                 </span>
               </div>
             </div>
@@ -336,11 +336,11 @@ export default function CPNS() {
                 <div className="flex justify-between space-x-2 leading-relaxed mt-1">
                 <div className="flex text-left space-x-4">
                   <img src={test.author.authorPhoto} alt={test.author.name} className="h-5 w-5" />
-                  <span className="text-sm font-semibold">{test.author}</span>
+                  <span className="text-sm font-semibold">{test.author.name}</span>
                 </div>
-                  <span className="text-sm font-semibold">
-                  {test.price ? <img src="/images/lock.png" alt="Berbayar" className="h-9/2 inline-block" /> : 'Gratis'}
-                  </span>
+                <span className="text-sm font-semibold">
+                {Number(test.price) === 0 ? 'Gratis' : <img src="/images/lock.png" alt="Berbayar" className="h-9/2 inline-block" />}
+                </span>
                 </div>
               </div>
   

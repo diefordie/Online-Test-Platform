@@ -178,7 +178,7 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navbar */}
-      <nav className="bg-[#0B61AA] shadow-md fixed top-0 left-0 w-full z-10">
+      <nav className="bg-birutua shadow-md fixed top-0 left-0 w-full z-10">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <div className="md:hidden">
@@ -232,12 +232,12 @@ const LandingPage = () => {
           <div className="hidden md:flex space-x-4">
             <Link
               href="/auth/login"
-              className="bg-transparent text-white border border-white py-2 px-4 rounded-md shadow-sm hover:bg-white hover:text-[#0B61AA] transition duration-300"
+              className="bg-transparent text-white border border-white py-2 px-4 rounded-md shadow-sm hover:bg-white hover:text-birutua transition duration-300"
             >
               Masuk
             </Link>
             <Link
-              href="/auth/register"
+              href="/auth/registrasi"
               className="bg-birulangit text-white py-2 px-4 rounded-md shadow-sm hover:bg-opacity-80 transition duration-300"
             >
               Daftar
@@ -247,7 +247,7 @@ const LandingPage = () => {
 
         {/* Sidebar for mobile */}
         <div
-          className={`fixed top-0 left-0 h-full w-64 bg-[#0B61AA] transform ${
+          className={`fixed top-0 left-0 h-full w-64 bg-birutua transform ${
             isSidebarOpen ? "translate-x-0" : "-translate-x-full"
           } transition-transform duration-300 md:hidden z-20`}
         >
@@ -291,7 +291,7 @@ const LandingPage = () => {
             )}
             <Link
               href="/login"
-              className="bg-transparent text-white border border-white py-2 px-4 rounded-md shadow-sm hover:bg-white hover:text-[#0B61AA] text-center transition duration-300"
+              className="bg-transparent text-white border border-white py-2 px-4 rounded-md shadow-sm hover:bg-white hover:text-birutua text-center transition duration-300"
             >
               Masuk
             </Link>
@@ -458,65 +458,64 @@ const LandingPage = () => {
 
       {/* Tentang Kami Section */}
       <div id="tentang-kami" className="bg-white py-20 px-4">
-        <div className="container mx-auto text-center">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-10">
-            Keuntungan Bergabung dengan Komunitas Kami
-          </h1>
-          {[
-            {
-              title: "Tes Dibuat oleh Author",
-              desc: "Semua tes dibuat oleh author, memastikan soal yang relevan dan beragam.",
-              img: "/images/Candle.png",
-            },
-            {
-              title: "Membuat Soal",
-              desc: "Buat soal untuk membantu komunitas atau tingkatkan kemampuanmu dengan soal dari author berkualitas.",
-              img: "/images/Gift.png",
-            },
-            {
-              title: "Penilaian Otomatis",
-              desc: "Dapatkan skor secara otomatis dan pelajari pembahasan soal yang dibuat oleh author.",
-              img: "/images/Shapes.png",
-            },
-            {
-              title: "Akses Fleksibilitas",
-              desc: "Akses soal kapan saja dan di mana saja, melalui perangkat apa pun.",
-              img: "/images/Smartphone.png",
-            },
-          ].map((benefit, index) => (
-            <div
-              key={index}
-              className="flex flex-col md:flex-row items-center justify-between mb-10"
-            >
-              <div
-                className={`md:w-1/2 text-left ${
-                  index % 2 === 0 ? "order-1 md:order-1" : "order-2 md:order-2"
-                }`}
-              >
-                <h2 className="text-xl font-semibold text-gray-800">
-                  {benefit.title}
-                </h2>
-                <p className="text-gray-600 mt-2">{benefit.desc}</p>
-              </div>
-              <div
-                className={`md:w-1/2 ${
-                  index % 2 === 0
-                    ? "md:ml-10 order-2 md:order-2"
-                    : "md:mr-10 order-1 md:order-1"
-                } bg-[#CAE6F9] p-6 rounded-lg shadow-md hover:shadow-lg mt-4 md:mt-0`}
-              >
-                <Image
-                  src={benefit.img}
-                  alt={benefit.title}
-                  width={300}
-                  height={300}
-                  className="w-full h-48 object-contain"
-                />
-              </div>
-            </div>
-          ))}
+  <div className="container mx-auto text-center">
+    <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-10">
+      Keuntungan Bergabung dengan Komunitas Kami
+    </h1>
+    {[
+      {
+        title: "Tes Dibuat oleh Author",
+        desc: "Semua tes dibuat oleh author, memastikan soal yang relevan dan beragam.",
+        img: "/images/Candle.png",
+      },
+      {
+        title: "Membuat Soal",
+        desc: "Buat soal untuk membantu komunitas atau tingkatkan kemampuanmu dengan soal dari author berkualitas.",
+        img: "/images/Gift.png",
+      },
+      {
+        title: "Penilaian Otomatis",
+        desc: "Dapatkan skor secara otomatis dan pelajari pembahasan soal yang dibuat oleh author.",
+        img: "/images/Shapes.png",
+      },
+      {
+        title: "Akses Fleksibilitas",
+        desc: "Akses soal kapan saja dan di mana saja, melalui perangkat apa pun.",
+        img: "/images/Smartphone.png",
+      },
+    ].map((benefit, index) => (
+      <div
+        key={index}
+        className="flex flex-col md:flex-row items-center justify-between mb-10 md:gap-10"
+      >
+        {/* Teks di atas gambar untuk tampilan mobile */}
+        <div
+          className={`md:w-1/2 text-left sm:order-1 ${
+            index % 2 === 0 ? "md:order-1" : "md:order-2"
+          }`}
+        >
+          <h2 className="text-xl font-semibold text-gray-800">{benefit.title}</h2>
+          <p className="text-gray-600 mt-2">{benefit.desc}</p>
+        </div>
+        {/* Gambar di bawah teks untuk tampilan mobile */}
+        <div
+          className={`md:w-1/2 sm:order-2 ${
+            index % 2 === 0 ? "md:order-2" : "md:order-1"
+          } bg-[#CAE6F9] p-6 rounded-lg shadow-md hover:shadow-lg mt-4 md:mt-0`}
+        >
+          <Image
+            src={benefit.img}
+            alt={benefit.title}
+            width={300}
+            height={300}
+            className="w-full h-48 object-contain"
+          />
         </div>
       </div>
+    ))}
+  </div>
+</div>
+
 
       {/* Testimoni Section */}
       <TestimonialsSection />

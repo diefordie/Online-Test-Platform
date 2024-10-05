@@ -39,6 +39,7 @@ const Login = () => {
                     throw new Error('Kredensial tidak valid. Silakan coba lagi.');
                 } else if (response.status === 403) {
                     throw new Error('Akses sebagai Author ditolak. Anda tidak memiliki hak akses, pastikan anda telah mengirimkan persyaratan yang dibutuhkan, dan tunggu sampai admin memverifikasi.');
+                    router.push('/auth/syarat');
                 } else {
                     throw new Error('Terjadi kesalahan yang tidak diketahui. Silakan coba lagi.');
                 }
@@ -51,7 +52,7 @@ const Login = () => {
             if (data.role === 'AUTHOR') {
                 router.push('/author/dashboard'); // Ganti dengan jalur dashboard author
             } else {
-                router.push('/user/dashboard'); // Ganti dengan jalur dashboard user
+                router.push('/userDashboard'); // Ganti dengan jalur dashboard user
             }
         } catch (err) {
             console.error("Kesalahan login", err);
@@ -62,7 +63,7 @@ const Login = () => {
                 title: 'Error',
                 text: err.message, 
             }).then(() => {
-                router.push('/auth/syarat');
+                
             });
     
             setError(err.message); // Simpan pesan error di state (opsional, jika perlu)

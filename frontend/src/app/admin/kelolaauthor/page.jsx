@@ -1,30 +1,29 @@
 'use client';
 
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const KelolaAuthor = () => {
-  const [users, setUsers] = useState([]);
+  const [authors, setAuthors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedVerification, setSelectedVerification] = useState('all');
 
   // Fetch authors from the backend
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchAuthors = async () => {
       try {
         const response = await axios.get("http://localhost:2000/author/get-author");
         if (Array.isArray(response.data.data)) {
-          setUsers(response.data.data);
+          setAuthors(response.data.data);
         }
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error("Error fetching authors:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchUsers();
+    fetchAuthors();
   }, []);
 
   // Handle approval change
@@ -33,8 +32,8 @@ const KelolaAuthor = () => {
       await axios.patch(`http://localhost:2000/author/edit-author/${id}/status`, {
         isApproved: value === 'true',
       });
-      setUsers(users.map(user =>
-        user.id === id ? { ...user, isApproved: value === 'true' } : user
+      setAuthors(authors.map(author =>
+        author.id === id ? { ...author, isApproved: value === 'true' } : author
       ));
     } catch (error) {
       console.error("Error updating approval status:", error);
@@ -42,9 +41,9 @@ const KelolaAuthor = () => {
   };
 
   // Filter the authors based on search and selected verification status
-  const filteredAuthors = users.filter(user =>
-    (selectedVerification === 'all' || (user.isApproved ? 'true' : 'false') === selectedVerification) &&
-    (user.name.toLowerCase().includes(searchQuery.toLowerCase()) || user.email.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredAuthors = authors.filter(author =>
+    (selectedVerification === 'all' || (author.isApproved ? 'true' : 'false') === selectedVerification) &&
+    (author.name.toLowerCase().includes(searchQuery.toLowerCase()) || author.handphoneNum.includes(searchQuery))
   );
 
   return (
@@ -74,7 +73,7 @@ const KelolaAuthor = () => {
         <div className="mb-4 flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
           <input
             type="text"
-            placeholder="Cari berdasarkan nama atau email"
+            placeholder="Cari berdasarkan nama atau nomor HP"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full lg:w-2/3 p-3 border rounded"
@@ -97,8 +96,8 @@ const KelolaAuthor = () => {
               <tr className="bg-blue-900 text-white">
                 <th className="py-3 px-4">Id</th>
                 <th className="py-3 px-4">Nama</th>
-                <th className="py-3 px-4">Email</th>
-                <th className="py-3 px-4">Role</th>
+                <th className="py-3 px-4">Nomor HP</th>
+                <th className="py-3 px-4">Bank</th>
                 <th className="py-3 px-4">Verifikasi</th>
                 <th className="py-3 px-4">Status</th>
               </tr>
@@ -110,16 +109,16 @@ const KelolaAuthor = () => {
                 </tr>
               ) : (
                 filteredAuthors.length > 0 ? (
-                  filteredAuthors.map((user, index) => (
-                    <tr key={user.id} className="text-center border-b">
+                  filteredAuthors.map((author, index) => (
+                    <tr key={author.id} className="text-center border-b">
                       <td className="py-2 px-4">{String(index + 1).padStart(6, '0')}</td>
-                      <td className="py-2 px-4">{user.nama}</td>
-                      <td className="py-2 px-4">{user.email}</td>
-                      <td className="py-2 px-4">Author</td>
+                      <td className="py-2 px-4">{author.name}</td>
+                      <td className="py-2 px-4">{author.handphoneNum}</td>
+                      <td className="py-2 px-4">{author.bank}</td>
                       <td className="py-2 px-4">
                         <select
-                          value={user.isApproved ? 'true' : 'false'}
-                          onChange={(e) => handleApprovalChange(user.id, e.target.value)}
+                          value={author.isApproved ? 'true' : 'false'}
+                          onChange={(e) => handleApprovalChange(author.id, e.target.value)}
                           className="p-2 border rounded"
                         >
                           <option value="true">Yes</option>
@@ -127,7 +126,7 @@ const KelolaAuthor = () => {
                         </select>
                       </td>
                       <td className="py-2 px-4">
-                        {user.isApproved ? (
+                        {author.isApproved ? (
                           <span className="px-4 py-1 bg-lime-500 text-white rounded">Disetujui</span>
                         ) : (
                           <span className="px-4 py-1 bg-red-500 text-white rounded">Belum Disetujui</span>
