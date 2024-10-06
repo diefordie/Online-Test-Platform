@@ -4,9 +4,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 
 import adminRoutes from './src/routes/adminRoutes.js';
-import authRoutes from './src/routes/authRoutes.js';
 import { startCleanupJob } from './src/jobs/schedularToken.js';
-import authorRoutes from './src/routes/authorRoutes.js';
 
 import testRoutes from './src/routes/testRoutes.js';
 import multiplechoiceRoutes from './src/routes/multiplechoiceRoutes.js';
@@ -37,12 +35,12 @@ app.use(cors({
 }));
 
 // Routes
-app.use("/api/auth", userRoutes);
+// app.use("/api/auth", userRoutes);
 app.use("/author", authorRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/tests", testRoutes);
 app.use("/api/soal", multiplechoiceRoutes);
-app.use("/api", answerTest);
+app.use("/answer", answerTest);
 app.use("/auth", authRoutes);
 app.use("/dashboard", dashboardRoutes);
 

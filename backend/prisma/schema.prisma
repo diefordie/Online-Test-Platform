@@ -117,17 +117,12 @@ model Detail_result {
   optionId         String
   resultId         String
   userAnswer       String
-<<<<<<< HEAD
-  result           Result       @relation(fields: [resultId], references: [id])
-  option           Option       @relation(fields: [optionId], references: [id])
-=======
   status       String   @default("draft") // menambahkan kolom ini untuk menandai status draft atau final
   result       Result?  @relation(fields: [resultId], references: [id])
   option           Option       @relation(fields: [optionId], references: [id])
 
   @@unique([optionId, resultId])
   
->>>>>>> d1685bf031a7b89f5c9fb97499e8d1e044dca1cb
 }
 
 enum OptionLabel {
@@ -185,8 +180,4 @@ enum Category {
   UTBK
   Pemrograman
   Psikotes
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> d1685bf031a7b89f5c9fb97499e8d1e044dca1cb
