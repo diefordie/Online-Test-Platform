@@ -1,20 +1,36 @@
-import {verifyPaymentStatus} from '../services/pembayaranService'
-
 // controllers/paymentController.js
-const { verifyPaymentStatus } = require('../services/paymentService');
+import { verifyPaymentService } from '../services/pembayaranService.js';
 
-const handlePaymentCallback = async (req, res) => {
-  const { orderId, transactionStatus } = req.body;
-
+export const handlePaymentNotification = async (req, res) => {
   try {
-    // Memanggil service untuk verifikasi status pembayaran
-    const result = await verifyPaymentStatus(orderId, transactionStatus);
+    const { transactionId, status } = req.body; // Dapatkan data dari notifikasi payment gateway
 
-    // Mengirimkan response ke frontend
-    return res.status(200).json(result);
+    // Pastikan status dan transactionId diterima dengan benar
+    if (!transactionId || !status) {
+      return res.status(400).json({
+        message: "Transaction ID and status are required",
+      });
+    }
+
+    // Panggil service untuk memverifikasi dan meng-update pembayaran
+    const updatedTransaction = await verifyPaymentService(transactionId, status);
+
+    // Jika pembayaran sukses, kirim respon sukses dan munculkan pop-up di frontend
+    if (status === "paid") {
+      return res.status(200).json({
+        message: "Payment verified and updated successfully",
+        transaction: updatedTransaction
+      });
+    } else {
+      return res.status(400).json({
+        message: "Payment failed",
+        transaction: updatedTransaction
+      });
+    }
   } catch (error) {
-    return res.status(500).json({ message: 'Terjadi kesalahan pada server', error: error.message });
+    return res.status(500).json({
+      message: "Error verifying payment",
+      error: error.message
+    });
   }
 };
-
-module.exports = { handlePaymentCallback };

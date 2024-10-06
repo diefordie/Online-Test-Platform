@@ -1,4 +1,9 @@
-import { createMultipleChoiceService, getMultipleChoiceService } from '../services/multiplechoiceSevice.js';
+import { createMultipleChoiceService } from '../services/multiplechoiceSevice.js';
+import { updateMultipleChoiceService } from '../services/multiplechoiceSevice.js';
+import { getMultipleChoiceService } from '../services/multiplechoiceSevice.js';
+import { getMultipleChoiceByIdService } from '../services/multiplechoiceSevice.js';
+import { deleteMultipleChoiceService } from '../services/multiplechoiceSevice.js';
+
 
 const createMultipleChoice = async (req, res) => {
     try {
@@ -26,32 +31,128 @@ const createMultipleChoice = async (req, res) => {
     }
 };
 
+export { createMultipleChoice }; 
 
-const getMultipleChoice = async (req, res) => {
+const updateMultipleChoice = async (req, res) => {
     try {
-        const { id } = req.params; // Mengambil testId dari parameter URL
-        console.log('Test ID yang dicari:', id);
+        const { questionId, updatedData } = req.body;
 
-        // Memanggil service untuk mendapatkan pilihan ganda berdasarkan testId
-        const multipleChoices = await getMultipleChoiceService(id);
+        // Pastikan questionId dan updatedData dikirimkan
+        if (!questionId || !updatedData) {
+            return res.status(400).send({
+                message: 'questionId and updatedData are required',
+            });
+        }
 
-        // Mengembalikan respons sukses
+        // Panggil service untuk mengupdate soal beserta opsi
+        const updatedMultipleChoice = await updateMultipleChoiceService(questionId, updatedData);
+
         res.status(200).send({
-            data: multipleChoices,
-            message: 'Get multiple choice success',
+            data: updatedMultipleChoice,
+            message: 'Multiple choice question updated successfully',
         });
     } catch (error) {
-        console.error('Error fetching multiple choices:', error);
-        // Mengembalikan respons gagal
         res.status(500).send({
-            message: 'Failed to get multiple choice',
+            message: 'Failed to update multiple choice question',
             error: error.message,
         });
     }
 };
 
-export { createMultipleChoice, getMultipleChoice }; // Menggunakan named export
+export { updateMultipleChoice };
 
+const getMultipleChoice = async (req, res) => {
+    try {
+        const { testId } = req.params;  // Ambil testId dari parameter URL
+
+        // Pastikan testId ada
+        if (!testId) {
+            return res.status(400).send({
+                message: 'testId is required',
+            });
+        }
+
+        // Panggil service untuk mendapatkan soal
+        const multipleChoices = await getMultipleChoiceService(testId);
+
+        // Jika tidak ada soal ditemukan
+        if (!multipleChoices || multipleChoices.length === 0) {
+            return res.status(404).send({
+                message: 'No questions found for this test',
+            });
+        }
+
+        // Kirim response dengan daftar soal
+        res.status(200).send({
+            data: multipleChoices,
+            message: 'Questions fetched successfully',
+        });
+    } catch (error) {
+        res.status(500).send({
+            message: 'Failed to fetch questions',
+            error: error.message,
+        });
+    }
+};
+
+export { getMultipleChoice };
+
+const getMultipleChoiceById = async (req, res) => {
+    try {
+        const { questionId } = req.params;  
+
+        if (!questionId) {
+            return res.status(404).send({
+                message: 'Multiple choice question not found',
+            });
+        }
+
+        const multipleChoice = await getMultipleChoiceByIdService(questionId);
+
+        if (!multipleChoice) {
+            return res.status(404).send({
+                message: 'Multiple choice question not found',
+            });
+        }
+
+        res.status(200).send({
+            data: multipleChoice,
+            message: 'Multiple choice question retrieved successfully',
+        });
+    } catch (error) {
+        res.status(500).send({
+            message: 'Failed to retrieve multiple choice question',
+            error: error.message,
+        });
+    }
+};
+
+export { getMultipleChoiceById };
+
+const deleteMultipleChoice = async (req, res) => {
+    try {
+        const { questionId } = req.params; 
+
+        if (!questionId) {
+            return res.status(400).send({
+                message: 'Question ID is required',
+            });
+        }
+
+        await deleteMultipleChoiceService(questionId);
+
+        res.status(200).send({
+            message: 'Multiple choice question deleted successfully',
+        });
+    } catch (error) {
+        res.status(500).send({
+            message: 'Failed to delete multiple choice question',
+            error: error.message,
+        });
+    }
+};
+
+export { deleteMultipleChoice };
 
 
 // const { createMultipleChoiceService } = require("backend/src/services/multiplechoiceSevice.js");

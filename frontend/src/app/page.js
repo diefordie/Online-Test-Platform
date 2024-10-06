@@ -1,13 +1,14 @@
 import React from 'react'
 // import LandingPage from '@/app/landingpage/landingpage'
-import BuatSoal from '@/app/buatSoal/page1'
+import BuatSoal from '@/app/buatSoal/page'
+import MengerjakanKuis from '@/app/mengerjakanKuis/page'
 
-const page1 = () => {
+const page = () => {
   return (
     <div>
-      <BuatSoal />
+      <MengerjakanKuis />
     </div>
   )
 }
 
-export default page1
+export default page

@@ -1,21 +1,33 @@
 'use client';
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Link from 'next/link';
+import MembuatSoal from '../buatSoal/page1';
 
-const Halaman1 = () => {
-  const [pages, setPages] = useState([{ pageNumber: 1, questions: [1] }]);
+const KotakNomor = () => {
+  const [questions, setQuestions] = useState([]);
+  const [selectedNumber, setSelectedNumber] = useState(null);
+  const [showMembuatSoal, setShowMembuatSoal] = useState(false);
+
+  const number = Array.from({ length: questions.length + 1 }, (_, i) => i + 1);
+  
+  const handleClick = (number) => {
+    setSelectedNumber(number);
+    setShowMembuatSoal(true);
+  };
+  
+  const [pages, setPages] = useState([{ pageNumber: 1, question: [1] }]);
 
   const addQuestion = (pageIndex) => {
     const newPages = [...pages];
-    const newQuestionNumber = newPages[pageIndex].questions.length + 1;
-    newPages[pageIndex].questions.push(newQuestionNumber);
+    const newNumber = newPages[pageIndex].question.length + 1;
+    newPages[pageIndex].question.push(newNumber);
     setPages(newPages);
   };
 
   const addPage = () => {
     const newPageNumber = pages.length + 1;
-    const newPage = { pageNumber: newPageNumber, questions: [1] };
+    const newPage = { pageNumber: newPageNumber, question: [1] };
     setPages([...pages, newPage]);
   };
 
@@ -56,7 +68,10 @@ const Halaman1 = () => {
       </header>
 
       {/* Bagian Page */}
-      {pages.map((page, pageIndex) => (
+      {showMembuatSoal ? (
+        <MembuatSoal nomor={selectedNumber} />
+      ) : (
+        pages.map((page, pageIndex) => (
         <div key={page.pageNumber} className="my-4">
           <div className="flex justify-between items-center bg-[#0B61AA] text-white p-2" style={{ maxWidth: '1376px', height: '61px' }}>
             <h2 className="text-lg">Tes Potensi Skolastik {page.pageNumber}</h2>
@@ -65,20 +80,26 @@ const Halaman1 = () => {
           <div className="mt-4"></div>
 
           {/* Soal bertambah ke samping dengan layout yang lebih efisien */}
-          <div className="flex flex-row flex-wrap p-4 gap-3 justify-start border" style={{ maxWidth: '100%', padding: '0 2%' }}>
-            {page.questions.map((question, questionIndex) => (
-              <div
-                key={questionIndex}
-                className="flex flex-col items-center border border-gray-300 p-2 bg-white rounded-lg shadow-md"
-                style={{ width: '80px', height: '80px' }} // Ukuran kotak tetap kecil
-              >
-                <span className="bg-white border rounded-full w-8 h-8 flex items-center justify-center mb-2 rounded-[15px]">
-                  {question}
-                </span>
-              </div>
-            ))}
+          <div>
+            <div className="flex flex-row flex-wrap p-4 gap-3 justify-start border" style={{ maxWidth: '100%', padding: '0 2%' }}>
+              {page.question.map((number) => (
+                <button
+                  key={number}
+                  onClick={() => handleClick(number)} // Panggil goToMembuatSoal saat kotak soal diklik
+                  className="flex flex-col items-center border border-gray-300 p-2 bg-white rounded-lg shadow-md"
+                  style={{ width: '80px', height: '80px' }} // Ukuran kotak tetap kecil
+                >
+                  <span className="bg-white border rounded-full w-8 h-8 flex items-center justify-center mb-2 rounded-[15px]">
+                    {number}
+                  </span>
+                </button>
+              ))}
+            </div>
+            {selectedNumber && <MembuatSoal nomor={selectedNumber}/>}
+          </div>
 
             {/* Button tambah soal di kotak paling akhir */}
+            <div>
             <div className="flex items-center">
               <button
                 onClick={() => addQuestion(pageIndex)}
@@ -89,7 +110,7 @@ const Halaman1 = () => {
             </div>
           </div>
         </div>
-      ))}
+      )))}
 
       {/* Button Tambah Page dan Simpan */}
       <div className="flex justify-between mt-4">
@@ -111,4 +132,4 @@ const Halaman1 = () => {
   );
 };
 
-export default Halaman1;
+export default KotakNomor;

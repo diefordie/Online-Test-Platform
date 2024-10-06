@@ -8,15 +8,8 @@ import { startCleanupJob } from './src/jobs/schedularToken.js';
 
 import testRoutes from './src/routes/testRoutes.js';
 import multiplechoiceRoutes from './src/routes/multiplechoiceRoutes.js';
-import answerTest from './src/routes/answerTestRoutes.js';
-import authorRoutes from './src/routes/authorRoutes.js';
-import authRoutes from './src/routes/authRoutes.js';
-import dashboardRoutes from './src/routes/dashboardRoutes.js';
+import { handlePaymentNotification } from './src/controllers/pembayaranController.js';
 
-import timerRoutes from './src/routes/timerRoutes.js';
-import detailSoal from './src/routes/detailsoalRoutes.js';
-
-dotenv.config();
 const app = express();
 startCleanupJob();
 
@@ -35,16 +28,12 @@ app.use(cors({
 }));
 
 // Routes
-// app.use("/api/auth", userRoutes);
-app.use("/author", authorRoutes);
-app.use("/api/admin", adminRoutes);
-app.use("/api/tests", testRoutes);
-app.use("/api/soal", multiplechoiceRoutes);
-app.use("/answer", answerTest);
-app.use("/auth", authRoutes);
-app.use("/dashboard", dashboardRoutes);
-app.use('/timer', timerRoutes);
-app.use('/tes', detailSoal);
+app.use("/auth", userRoutes);
+app.use("/author", userRoutes);
+app.use("/admin", adminRoutes);
+app.use("/test", testRoutes);
+app.use("/multiplechoice", multiplechoiceRoutes);
+app.use("/transaction", handlePaymentNotification);
 
 // Mulai server
 const PORT = process.env.PORT || 2000;
