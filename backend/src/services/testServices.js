@@ -1,50 +1,40 @@
-import { PrismaClient } from '@prisma/client';
-
+// services/testResultService.js
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-// Mengambil hasil tes
-const getTestResults = async (userId, testId) => {
-    try {
-        const result = await prisma.result.findUnique({
-            where: { userId_testId: { userId, testId } },
-            include: { detail_resultresult: true }, 
-        });
+const getTestResult = async (userId) => {
+  try {
+    const latestTestResult = await prisma.result.findFirst({
+      where: { userId },
+      select: {
+        score: true, 
+        user: {
+          select: { name: true },
+        },
+        test: {
+          select: {
+            title: true,
+            multiplechoice: {
+              select: {
+                question: true,
+              },
+            },
+          },
+        },
+      },
+    });
 
-        if (!result) {
-            throw new Error('Hasil tes tidak ditemukan');
-        }
-
-        let correctAnswers = 0;
-        let wrongAnswers = 0;
-
-        for (const detail of result.detail_resultresult) {
-            const option = await prismaClient.option.findUnique({
-                where: { id: detail.userAnswer }
-            });
-
-            if (option.isCorrect) {
-                correctAnswers++;
-            } else {
-                wrongAnswers++;
-            }
-        }
-
-        return {
-            id: result.id,
-            testId: result.testId,
-            userId: result.userId,
-            score: result.score,
-            correctAnswers: correctAnswers,
-            wrongAnswers: wrongAnswers,
-            submissionDate: result.createdAt, 
-        };
-    } catch (error) {
-        throw new Error(`Gagal mengambil hasil tes: ${error.message}`);
-    }
+    return {
+      score: latestTestResult.score,
+      userName: latestTestResult.user.name,
+      testTitle: latestTestResult.test.title,
+    };
+  } catch (error) {
+    console.error('Error fetching test result:', error);
+    throw new Error('Failed to fetch test result');
+  }
 };
 
 module.exports = {
-    getTestResults,
+  getTestResult
 };
-
-

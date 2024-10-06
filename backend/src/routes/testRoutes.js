@@ -1,8 +1,10 @@
-import express from 'express';
-import { getTestResultsController } from '../controllers/resultController.js';
+// routes/testResultRoutes.js
+const express = require("express");
+const {testResultController} =  require("backend/src/controllers/testControllers.js");
 
 const router = express.Router();
 
-router.get('/results/:userId/:testId', getTestResultsController);
+// Rute untuk mengambil hasil tes terbaru user
+router.get('/test-result/:userId', testResultController.getTestResult);
 
-export default router; 
+module.exports = router;

@@ -1,17 +1,21 @@
-import { resultService } from 'backend/src/services/resultService.js';
+// controllers/testResultController.js
+const { getTestResult } = require('backend/src/services/testServices.js'); // Sesuaikan path sesuai struktur folder
 
-// Controller untuk mengambil hasil tes berdasarkan userId dan testId
-const getTestResultsController = async (req, res) => {
-    const { userId, testId } = req.params;
+const testResultController = {
+  getTestResult: async (req, res) => {
+    const { userId } = req.params;
 
     try {
-        const resultData = await resultService.getTestResults(userId, testId);
-        res.status(200).json(resultData);
+      const result = await getTestResult(userId);
+      res.status(200).json(result);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+      console.error('Error in controller:', error);
+      res.status(500).json({ message: error.message });
     }
+  },
 };
 
+
 module.exports = {
-    getTestResultsController,
+  testResultController
 };
