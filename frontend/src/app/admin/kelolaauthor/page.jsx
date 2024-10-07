@@ -6,25 +6,29 @@ import { db } from "@/app/firebase/config"; // Ensure this path is correct
 import Sidebar from "./sidebar";
 
 const KelolaAuthor = () => {
-  const [authors, setAuthors] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
   const [selectedVerification, setSelectedVerification] = useState("all");
 
   useEffect(() => {
-    const fetchAuthors = async () => {
+    const fetchUsers = async () => {
       try {
-        const response = await axios.get("http://localhost:2000/author/get-author");
-        if (Array.isArray(response.data.data)) {
-          setUsers(response.data.data);
-        }
+        const usersCollection = collection(db, "users");
+        const usersSnapshot = await getDocs(usersCollection);
+        const usersList = usersSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setUsers(usersList);
       } catch (error) {
-        console.error("Error fetching authors:", error);
+        console.error("Error fetching users:", error);
       } finally {
         setLoading(false);
       }
     };
+
     fetchUsers();
   }, []);
 
@@ -35,18 +39,24 @@ const KelolaAuthor = () => {
       await updateDoc(userRef, {
         isApproved: value === "true",
       });
-      setUsers(users.map(user =>
-        user.id === id ? { ...user, isApproved: value === 'true' } : user
-      ));
+      setUsers(
+        users.map((user) =>
+          user.id === id ? { ...user, isApproved: value === "true" } : user
+        )
+      );
     } catch (error) {
       console.error("Error updating approval status:", error);
     }
   };
 
-  // Filter the authors based on search and selected verification status
-  const filteredAuthors = users.filter(user =>
-    (selectedVerification === 'all' || (user.isApproved ? 'true' : 'false') === selectedVerification) &&
-    (user.nama.toLowerCase().includes(searchQuery.toLowerCase()) || user.email.toLowerCase().includes(searchQuery.toLowerCase()))
+  // Apply filters based on user input
+  const filteredUsers = users.filter(
+    (user) =>
+      (selectedRole === "all" || user.role === selectedRole) &&
+      (selectedVerification === "all" ||
+        (user.isApproved ? "true" : "false") === selectedVerification) &&
+      (user.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   return (
@@ -78,7 +88,7 @@ const KelolaAuthor = () => {
         <div className="mb-4 space-y-4">
           <input
             type="text"
-            placeholder="Cari berdasarkan nama atau email"
+            placeholder="Cari berdasarkan nama atau email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="p-2 border border-gray-300 rounded-lg w-full"
@@ -105,57 +115,51 @@ const KelolaAuthor = () => {
             </select>
           </div>
         </div>
-
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white rounded-lg shadow-md">
-            <thead>
-              <tr className="bg-blue-900 text-white">
-                <th className="py-3 px-4">Id</th>
-                <th className="py-3 px-4">Nama</th>
-                <th className="py-3 px-4">Email</th>
-                <th className="py-3 px-4">Role</th>
-                <th className="py-3 px-4">Verifikasi</th>
-                <th className="py-3 px-4">Status</th>
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <table className="min-w-full bg-white border border-gray-200">
+            <thead className="bg-[#696969] text-white">
+              <tr>
+                <th className="py-2 px-4 border-b border-gray-300">ID</th>
+                <th className="py-2 px-4 border-b">Nama</th>
+                <th className="py-2 px-4 border-b">Email</th>
+                <th className="py-2 px-4 border-b">Role</th>
+                <th className="py-2 px-4 border-b">Verifikasi</th>
+                <th className="py-2 px-4 border-b">Status</th>
               </tr>
             </thead>
             <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan="6" className="text-center py-4">Loading...</td>
-                </tr>
-              ) : (
-                filteredAuthors.length > 0 ? (
-                  filteredAuthors.map((user, index) => (
-                    <tr key={user.id} className="text-center border-b">
-                      <td className="py-2 px-4">{String(index + 1).padStart(6, '0')}</td>
-                      <td className="py-2 px-4">{user.nama}</td>
-                      <td className="py-2 px-4">{user.email}</td>
-                      <td className="py-2 px-4">Author</td>
-                      <td className="py-2 px-4">
-                        <select
-                          value={user.isApproved ? 'true' : 'false'}
-                          onChange={(e) => handleApprovalChange(user.id, e.target.value)}
-                          className="p-2 border rounded"
-                        >
-                          <option value="true">Yes</option>
-                          <option value="false">No</option>
-                        </select>
-                      </td>
-                      <td className="py-2 px-4">
-                        {user.isApproved ? (
-                          <span className="px-4 py-1 bg-lime-500 text-white rounded">Disetujui</span>
-                        ) : (
-                          <span className="px-4 py-1 bg-red-500 text-white rounded">Belum Disetujui</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="6" className="text-center py-4">No authors found</td>
+              {filteredUsers.length > 0 ? (
+                filteredUsers.map((user) => (
+                  <tr key={user.id}>
+                    <td className="py-2 px-4 border-b">{user.id}</td>
+                    <td className="py-2 px-4 border-b">{user.nama}</td>
+                    <td className="py-2 px-4 border-b">{user.email}</td>
+                    <td className="py-2 px-4 border-b">{user.role}</td>
+                    <td className="py-2 px-4 border-b">
+                      <select
+                        value={user.isApproved ? "true" : "false"}
+                        onChange={(e) =>
+                          handleApprovalChange(user.id, e.target.value)
+                        }
+                        className="p-2 border border-gray-300 rounded-lg"
+                      >
+                        <option value="true">Ya</option>
+                        <option value="false">Tidak</option>
+                      </select>
+                    </td>
+                    <td className="py-2 px-4 border-b">
+                      {user.isApproved ? "Diizinkan" : "Tidak Diizinkan"}
+                    </td>
                   </tr>
-                )
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="py-2 px-4 border-b text-center">
+                    No users found
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
