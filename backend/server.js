@@ -12,6 +12,7 @@ import testRoutes from './src/routes/testRoutes.js';
 import multiplechoiceRoutes from './src/routes/multiplechoiceRoutes.js';
 import answerTest from './src/routes/answerTestRoutes.js';
 import dashboardRoutes from './src/routes/dashboardRoutes.js';
+import paymentRoutes from './src/routes/paymentRoutes.js';
 
 dotenv.config();
 const app = express();
@@ -44,6 +45,8 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/tests", testRoutes);//diperbaiki lagi penamaan routesnya
 app.use("/api/multiplechoice", multiplechoiceRoutes);
 app.use("/api/answer-test", answerTest);
+app.use("/api", paymentRoutes);
+
 
 // Routes author
 app.use("/author", authorRoutes);
