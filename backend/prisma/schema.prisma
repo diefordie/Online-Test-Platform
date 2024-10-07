@@ -39,6 +39,7 @@ model History {
 model User {
   id                String          @id @default(cuid())
   name              String
+  username          String 
   email             String          @unique
   password          String
   role              Role            @default(USER)
@@ -116,6 +117,14 @@ model Detail_result {
   @@unique([optionId, resultId])
   
 }
+
+enum OptionLabel {
+  A
+  B
+  C
+  D
+}
+
 
 enum OptionLabel {
   A
