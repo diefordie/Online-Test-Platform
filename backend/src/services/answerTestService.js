@@ -11,61 +11,49 @@ export const saveDraftAnswer = async (testId, token, answers) => {
     // Verifikasi token JWT
     let decodedToken;
     try {
-        decodedToken = jwt.verify(token, process.env.JWT_SECRET); // Gunakan JWT_SECRET dari environment variable
+        decodedToken = jwt.verify(token, JWT_SECRET);
     } catch (error) {
+        console.error('JWT verification failed:', error.message);
         throw new Error('Token tidak valid atau sudah kadaluarsa');
     }
 
-    // Ambil userId dari token yang sudah ter-decode
     const userId = decodedToken.id;
 
-    // Coba temukan atau buat Result berdasarkan testId dan userId
-    let result = await prismaClient.result.findFirst({
-        where: {
-            testId: testId,
-            userId: userId,
-        },
-    });
-
-    // Jika Result tidak ditemukan, buat Result baru
-    if (!result) {
-        try {
+    let result;
+    try {
+        result = await prismaClient.result.findFirst({
+            where: { testId, userId },
+        });
+        if (!result) {
             result = await prismaClient.result.create({
-                data: {
-                    testId: testId,
-                    userId: userId,
-                    score: 0 // Misalnya score awal di-set ke 0
-                },
+                data: { testId, userId, score: 0 },
             });
-        } catch (error) {
-            throw new Error(`Gagal membuat result baru: ${error.message}`);
         }
+    } catch (error) {
+        console.error('Error fetching or creating result:', error.message);
+        throw new Error(`Gagal membuat result baru: ${error.message}`);
     }
 
-    // Proses setiap jawaban yang diberikan
     try {
         for (const answer of answers) {
-            // Cari jika Detail_result sudah ada
-            const existingDetail = await prismaClient.detail_result.findFirst({
-                where: {
-                    optionId: answer.optionId,
-                    resultId: result.id,
+            const existingDetail = await prismaClient.detail_result.findUnique({
+                where: { 
+                    optionId_resultId: {
+                        optionId: answer.optionId, 
+                        resultId: result.id 
+                    } 
                 },
             });
 
             if (existingDetail) {
-                // Jika sudah ada, lakukan update
                 await prismaClient.detail_result.update({
-                    where: {
-                        id: existingDetail.id, // Gunakan primary key untuk update
-                    },
+                    where: { id: existingDetail.id },
                     data: {
                         userAnswer: answer.selectedOption,
                         status: 'draft',
                     },
                 });
             } else {
-                // Jika belum ada, buat entry baru
                 await prismaClient.detail_result.create({
                     data: {
                         optionId: answer.optionId,
@@ -77,37 +65,55 @@ export const saveDraftAnswer = async (testId, token, answers) => {
             }
         }
     } catch (error) {
-        console.error(`Gagal menyimpan draft jawaban: ${error.message}`);
+        console.error('Error saving draft answers:', error.message);
         throw new Error(`Gagal menyimpan draft jawaban: ${error.message}`);
     }
+
+    return result.id;
 };
 
-
 // Fungsi untuk memperbarui jawaban draft
-export const updateDraftAnswer = async (resultId, optionId, newAnswer) => {
+export const updateDraftAnswer = async (resultId, oldOptionId, newOptionId, newAnswer) => {
     try {
-        // Cari entri detail_result berdasarkan kombinasi resultId dan optionId
+        console.log('Updating draft answer:', { resultId, oldOptionId, newOptionId, newAnswer });
+
+        // Mencari detail jawaban yang ada berdasarkan resultId dan oldOptionId
         const existingDetail = await prismaClient.detail_result.findFirst({
             where: {
                 resultId: resultId,
-                optionId: optionId,
+                optionId: oldOptionId,
             },
         });
 
+        // Jika tidak ditemukan, throw error
         if (!existingDetail) {
+            console.log(`Draft answer not found for resultId: ${resultId}, oldOptionId: ${oldOptionId}`);
             throw new Error('Draft jawaban tidak ditemukan.');
         }
 
-        // Perbarui entri draft yang ada dengan jawaban baru
-        await prismaClient.detail_result.update({
+        console.log(`Existing detail found:`, existingDetail);
+
+        // Memastikan optionId sebelum update
+        console.log('Before update:', existingDetail);
+
+        // Lakukan pembaruan
+        const updatedDetail = await prismaClient.detail_result.update({
             where: {
-                id: existingDetail.id, // Gunakan ID dari entri yang ditemukan
+                id: existingDetail.id,
             },
             data: {
-                userAnswer: newAnswer, // Perbarui jawaban
+                optionId: newOptionId, // Update optionId
+                userAnswer: newAnswer, // Update jawaban pengguna
+                status: 'draft', // Status draft
             },
         });
+
+        // Ambil detail yang telah diperbarui untuk memastikan pembaruan berhasil
+        console.log('Updated detail:', updatedDetail); // Melihat detail yang diperbarui
+
+        return updatedDetail.id; // Mengembalikan ID yang diperbarui
     } catch (error) {
+        console.error(`Failed to update draft answer: ${error.message}`);
         throw new Error(`Gagal memperbarui draft jawaban: ${error.message}`);
     }
 };

@@ -52,7 +52,7 @@ const Login = () => {
             if (data.role === 'AUTHOR') {
                 router.push('/author/dashboard'); // Ganti dengan jalur dashboard author
             } else {
-                router.push('/userDashboard'); // Ganti dengan jalur dashboard user
+                router.push('/user/dashboard'); // Ganti dengan jalur dashboard user
             }
         } catch (err) {
             console.error("Kesalahan login", err);

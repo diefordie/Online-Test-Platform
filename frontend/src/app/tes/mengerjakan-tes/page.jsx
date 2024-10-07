@@ -3,14 +3,15 @@ import React, { useState, useEffect } from "react";
 
 const AuthorPilgan = () => {
     const [questions, setQuestions] = useState([]); // State untuk soal
-    const [selectedoption, setSelectedoption] = useState(null);
-    const [currentoption, setCurrentoption] = useState(1);
-    const [markedreview, setMarkedreview] = useState([]);
+    const [selectedOption, setSelectedOption] = useState(null);
+    const [currentOption, setCurrentOption] = useState(1);
+    // const [question, setCurrentQuestion] = useState(1);
+    const [markedReview, setMarkedReview] = useState([]);
     const [resultId, setResultId] = useState(); // ID result untuk update draft
     const [answers, setAnswers] = useState({});
     const [title, setTitle] = useState('');
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ik16djhXRXByWW5oRWpGTDh5UVFkOTU1eDZpbzIiLCJlbWFpbCI6ImFycnJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3Mjc5NzE2NDcsImV4cCI6MTcyNzk3NTI0N30.g4FR7unXgd0Qugm1GefeocxJwMRUeHbkgLZ2Lb4rH2M'; // Sesuaikan token Anda di sini
-    const testId = 'cm1rbf0ko000awadmnc0aq289'; // Sesuaikan `testId` dengan nilai sebenarnya
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InNkYUFxT1NPcTZmUzF3ell2NHViUTdrM01lejIiLCJlbWFpbCI6InVzZXIwNEBnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImlhdCI6MTcyODMwMDk3MiwiZXhwIjoxNzI4MzA0NTcyfQ.9ywNsc3ue9rrQq9oBZaRkLtL1nfGy1VU-fX9Zyz_3aM'; // Sesuaikan token Anda di sini
+    const testId = 'cm1ta40xn0002lpkmiv6wy0nv'; // Sesuaikan `testId` dengan nilai sebenarnya
 
     //Fetch data soal saat komponen dimuat
     useEffect(() => {
@@ -45,7 +46,7 @@ const AuthorPilgan = () => {
                 }));
 
                 setQuestions(formattedQuestions); // Mengisi state `questions` dengan data yang terformat
-                setResultId(data.data.resultId || null); // Jika `resultId` ada di respons, simpan di state
+                setResultId(data.resultId || null); // Jika `resultId` ada di respons, simpan di state
             } catch (error) {
                 console.error('Gagal mengambil data soal:', error);
             }
@@ -53,34 +54,9 @@ const AuthorPilgan = () => {
         fetchQuestions();
     }, [testId]);
 
-    
-    
-
-    // Fungsi untuk menyimpan draft jawaban backup
-    // const saveDraftAnswer = async (testId, optionId, selectedOption) => {
-    //     try {
-    //         const response = await fetch(`http://localhost:2000/api/tests/${testId}/temp`, {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 'Authorization': `Bearer ${token}`,
-    //             },
-    //             body: JSON.stringify({
-    //                 testId,
-    //                 answers: [{ optionId, selectedOption }],
-    //             }),
-    //         });
-    //         if (!response.ok) {
-    //             throw new Error('Gagal menyimpan draft jawaban');
-    //         }
-    //     } catch (error) {
-    //         console.error(error.message);
-    //     }
-    // };
-
     const saveDraftAnswer = async (testId, optionId, selectedOption) => {
         try {
-            const response = await fetch(`http://localhost:2000/api/tests/${testId}/temp`, {
+            const response = await fetch(`http://localhost:2000/answer/tests/${testId}/temp`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -93,24 +69,31 @@ const AuthorPilgan = () => {
             });
     
             if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error response dari server:', errorData);
                 throw new Error('Gagal menyimpan draft jawaban');
             }
     
             const data = await response.json();
-            console.log('Response dari saveDraftAnswer:', data); // Cek apakah resultId tersedia di respons
+            console.log('Response dari saveDraftAnswer:', data);
             return data.resultId; // Pastikan resultId dikembalikan
         } catch (error) {
-            console.error(error.message);
-            throw error;
+            console.error('Kesalahan saat memperbarui draft jawaban:', error);
+            throw new Error(`Gagal memperbarui draft jawaban: ${error.message}`);
         }
+        
     };
     
-    
-
     // Fungsi untuk memperbarui draft jawaban
     const updateDraftAnswer = async (resultId, optionId, newAnswer) => {
+        console.log('testId:', testId);
         try {
-            const response = await fetch(`http://localhost:2000/api/tests/${testId}/updateTemp`, {
+            // Log resultId dan optionId sebelum pengiriman
+            console.log('Sending resultId:', resultId);
+            console.log('Sending optionId:', optionId);
+            console.log('Sending newAnswer:', newAnswer);
+    
+            const response = await fetch(`http://localhost:2000/answer/tests/${testId}/update`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -118,11 +101,12 @@ const AuthorPilgan = () => {
                 },
                 body: JSON.stringify({
                     resultId,
-                    optionId,
-                    newAnswer,
+                    oldOptionId: optionId, // Ini adalah optionId yang ingin Anda ganti
+                    newOptionId: optionId,  // Pastikan ini adalah optionId baru jika diperlukan
+                    newAnswer: String(newAnswer), // Pastikan newAnswer dikonversi menjadi string
                 }),
             });
-    
+            
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Gagal memperbarui draft jawaban');
@@ -130,91 +114,84 @@ const AuthorPilgan = () => {
     
             const responseData = await response.json();
             console.log('Jawaban berhasil diperbarui:', responseData.message);
-            console.log('Result ID dari respons:', responseData.resultId); // Cek apakah resultId dikembalikan dengan benar
-            
+            console.log('Result ID dari respons:', responseData.resultId);
+    
         } catch (error) {
             console.error(`Error: ${error.message}`);
         }
     };
     
+    const handleoption = async (optionId, optionLabel, question) => {
+        setSelectedOption(optionLabel);
     
-
-    const handleoption = (optionId, optionLabel, question) => {
-        setSelectedoption(optionLabel);
-    
-        // Cek jika jawaban sudah pernah disimpan sebelumnya
+        // Check if the answer already exists
         if (!answers[question.id]) {
-            // Jika jawaban belum pernah disimpan, simpan sebagai draft
-            saveDraftAnswer(question.testId, optionId, optionLabel)
-                .then((newResultId) => {
-                    // Simpan resultId ke state setelah draft berhasil disimpan
-                    setResultId(newResultId); 
+            try {
+                const newResultId = await saveDraftAnswer(question.testId, optionId, optionLabel);
+                setResultId(newResultId);
     
-                    // Setelah menyimpan draft dan resultId, simpan jawaban di state answers
-                    setAnswers((prevAnswers) => ({
-                        ...prevAnswers,
-                        [question.id]: { optionId, optionLabel },
-                    }));
+                // Update the answer state with the new answer
+                setAnswers((prevAnswers) => ({
+                    ...prevAnswers,
+                    [question.id]: { optionId, optionLabel, resultId: newResultId },
+                }));
     
-                    // Setelah state resultId di-set, panggil updateDraftAnswer jika diperlukan
-                    if (newResultId) {
-                        updateDraftAnswer(newResultId, optionId, optionLabel)
-                            .then(() => {
-                                console.log('Jawaban berhasil diupdate setelah menyimpan resultId');
-                            })
-                            .catch((error) => console.error('Gagal memperbarui draft setelah menyimpan resultId:', error));
-                    }
-                })
-                .catch((error) => console.error('Gagal menyimpan draft:', error));
+                if (newResultId) {
+                    // Try to update the draft after saving
+                    await updateDraftAnswer(newResultId, optionId, optionLabel);
+                }
+            } catch (error) {
+                console.error('Error saving answer:', error);
+            }
         } else {
             const previousAnswer = answers[question.id];
     
-            // Jika jawaban sudah ada dan berbeda, lakukan update
+            // If the previous answer differs from the current, update it
             if (previousAnswer.optionId !== optionId) {
-                if (resultId) {
-                    updateDraftAnswer(resultId, optionId, optionLabel)
-                        .then(() => {
-                            setAnswers((prevAnswers) => ({
-                                ...prevAnswers,
-                                [question.id]: { optionId, optionLabel },
-                            }));
-                        })
-                        .catch((error) => console.error('Gagal memperbarui draft:', error));
+                const currentResultId = previousAnswer.resultId || resultId;
+                if (currentResultId) {
+                    try {
+                        await updateDraftAnswer(currentResultId, previousAnswer.optionId, optionLabel);
+                        setAnswers((prevAnswers) => ({
+                            ...prevAnswers,
+                            [question.id]: { optionId, optionLabel, resultId: currentResultId },
+                        }));
+                    } catch (error) {
+                        console.error('Error updating answer:', error);
+                    }
                 } else {
-                    console.error('Result ID belum tersedia untuk memperbarui jawaban');
+                    console.error('Result ID is not available for updating the answer');
                 }
             }
         }
     };
-    
-    
-
-    // Fungsi untuk berpindah ke soal selanjutnya
+       
+        // Fungsi untuk berpindah ke soal selanjutnya
     const handlenextquestion = () => {
         // Berpindah ke soal berikutnya
-        setCurrentoption((prev) => prev + 1);
+        setCurrentOption((prev) => prev + 1);
         // Set jawaban yang sudah disimpan sebelumnya jika ada
-        setSelectedoption(answers[questions[currentoption]?.id] || null);
+        setSelectedOption(answers[questions[currentOption]?.id] || null);
     };
 
     // Fungsi untuk berpindah ke soal sebelumnya
     const handleprevquestion = () => {
-        if (currentoption > 1) {
-            setCurrentoption((prev) => prev - 1);
+        if (currentOption > 1) {
+            setCurrentOption((prev) => prev - 1);
             // Set jawaban yang sudah disimpan sebelumnya jika ada
-            setSelectedoption(answers[questions[currentoption - 2]?.id] || null);
+            setSelectedOption(answers[questions[currentOption - 2]?.id] || null);
         }
     };
 
     // Fungsi untuk menandai soal yang perlu ditinjau
     const handlemarkreview = () => {
-        if (!markedreview.includes(currentoption)) {
-            setMarkedreview((prev) => [...prev, currentoption]);
+        if (!markedReview.includes(currentOption)) {
+            setMarkedReview((prev) => [...prev, currentOption]);
         }
     };
 
     // Pastikan untuk hanya mengambil `currentQuestion` jika `questions` memiliki elemen
-    const currentQuestion = questions.length > 0 ? questions[currentoption - 1] : null;
+    const currentQuestion = questions.length > 0 ? questions[currentOption - 1] : null;
 
     return (
         <div className="min-h-screen flex flex-col p-6 bg-white font-sans">
@@ -229,7 +206,7 @@ const AuthorPilgan = () => {
                     <div className="flex justify-between items-center mb-4">
                         {/* Menampilkan judul test dari state `title` */}
                         <h2 className="text-xl font-bold text-white">{title}</h2>
-                        <p className="text-white font-bold">{currentoption}/{questions.length}</p>
+                        <p className="text-white font-bold">{currentOption}/{questions.length}</p>
                         <div className="bg-[#0B61AA] text-white px-4 py-2 rounded-[10px] border border-white font-bold">00:00:00</div>
                     </div>
 
@@ -249,7 +226,7 @@ const AuthorPilgan = () => {
                                         id={`option${option.label}`}
                                         name="option"
                                         value={option.label}
-                                        checked={selectedoption === option.label}
+                                        checked={selectedOption === option.label}
                                         onChange={() => handleoption(option.id, option.label, currentQuestion)}
                                         className="mr-2"
                                     />
@@ -297,8 +274,8 @@ const AuthorPilgan = () => {
                             {questions.map((_, i) => (
                                 <button
                                     key={i + 1}
-                                    className={`w-10 h-10 text-lg font-bold rounded border border-[#0B61AA] ${markedreview.includes(i + 1) ? 'bg-yellow-500 text-white' : 'bg-gray-200'} hover:bg-gray-300`}
-                                    onClick={() => setCurrentoption(i + 1)}
+                                    className={`w-10 h-10 text-lg font-bold rounded border border-[#0B61AA] ${markedReview.includes(i + 1) ? 'bg-yellow-500 text-white' : 'bg-gray-200'} hover:bg-gray-300`}
+                                    onClick={() => setCurrentOption(i + 1)}
                                 >
                                     {i + 1}
                                 </button>
@@ -312,3 +289,28 @@ const AuthorPilgan = () => {
 };
 
 export default AuthorPilgan;
+
+
+    
+
+    // Fungsi untuk menyimpan draft jawaban backup
+    // const saveDraftAnswer = async (testId, optionId, selectedOption) => {
+    //     try {
+    //         const response = await fetch(`http://localhost:2000/api/tests/${testId}/temp`, {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 'Authorization': `Bearer ${token}`,
+    //             },
+    //             body: JSON.stringify({
+    //                 testId,
+    //                 answers: [{ optionId, selectedOption }],
+    //             }),
+    //         });
+    //         if (!response.ok) {
+    //             throw new Error('Gagal menyimpan draft jawaban');
+    //         }
+    //     } catch (error) {
+    //         console.error(error.message);
+    //     }
+    // };
