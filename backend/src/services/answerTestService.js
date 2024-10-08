@@ -77,7 +77,6 @@ export const updateDraftAnswer = async (resultId, oldOptionId, newOptionId, newA
     try {
         console.log('Updating draft answer:', { resultId, oldOptionId, newOptionId, newAnswer });
 
-        // Mencari detail jawaban yang ada berdasarkan resultId dan oldOptionId
         const existingDetail = await prismaClient.detail_result.findFirst({
             where: {
                 resultId: resultId,
@@ -85,43 +84,30 @@ export const updateDraftAnswer = async (resultId, oldOptionId, newOptionId, newA
             },
         });
 
-        // Jika tidak ditemukan, throw error
         if (!existingDetail) {
             console.log(`Draft answer not found for resultId: ${resultId}, oldOptionId: ${oldOptionId}`);
             throw new Error('Draft jawaban tidak ditemukan.');
         }
 
-        console.log(`Existing detail found:`, existingDetail);
-
-        // Memastikan optionId sebelum update
-        console.log('Before update:', existingDetail);
-
-        // Lakukan pembaruan
         const updatedDetail = await prismaClient.detail_result.update({
-            where: {
-                id: existingDetail.id,
-            },
+            where: { id: existingDetail.id },
             data: {
-                optionId: newOptionId, // Update optionId
-                userAnswer: newAnswer, // Update jawaban pengguna
-                status: 'draft', // Status draft
+                optionId: newOptionId,
+                userAnswer: newAnswer,
+                status: 'draft',
             },
         });
 
-        // Ambil detail yang telah diperbarui untuk memastikan pembaruan berhasil
-        console.log('Updated detail:', updatedDetail); // Melihat detail yang diperbarui
-
-        return updatedDetail.id; // Mengembalikan ID yang diperbarui
+        console.log('Updated detail:', updatedDetail);
+        return updatedDetail.id;
     } catch (error) {
         console.error(`Failed to update draft answer: ${error.message}`);
         throw new Error(`Gagal memperbarui draft jawaban: ${error.message}`);
     }
 };
 
-
 // Fungsi untuk mengirim jawaban final
 export const submitFinalAnswers = async (testId, token) => {
-    // Verifikasi token JWT
     let decodedToken;
     try {
         decodedToken = jwt.verify(token, JWT_SECRET);
@@ -129,11 +115,9 @@ export const submitFinalAnswers = async (testId, token) => {
         throw new Error('Token tidak valid atau sudah kadaluarsa');
     }
 
-    // Dapatkan userId dari token yang ter-decode
     const userId = decodedToken.id;
 
     try {
-        // Ambil semua jawaban draft pengguna untuk testId ini
         const draftAnswers = await prismaClient.detail_result.findMany({
             where: {
                 result: {
@@ -144,7 +128,6 @@ export const submitFinalAnswers = async (testId, token) => {
             },
         });
 
-        // Ubah status semua jawaban draft menjadi final
         await prismaClient.detail_result.updateMany({
             where: {
                 result: {
@@ -154,29 +137,24 @@ export const submitFinalAnswers = async (testId, token) => {
                 status: 'draft',
             },
             data: {
-                status: 'final', // Ubah status menjadi final
+                status: 'final',
             },
         });
 
-        // Logika perhitungan skor berdasarkan jawaban yang benar
         let totalScore = 0;
         for (const draftAnswer of draftAnswers) {
-            // Dapatkan detail pilihan ganda dan opsi terkait
             const multipleChoice = await prismaClient.multiplechoice.findUnique({
                 where: { id: draftAnswer.optionId },
                 include: { option: true }
             });
 
-            // Temukan opsi yang benar
             const correctOption = multipleChoice.option.find(opt => opt.isCorrect);
 
-            // Jika jawaban benar, tambahkan weight ke total skor
             if (correctOption && correctOption.id === draftAnswer.userAnswer) {
                 totalScore += multipleChoice.weight;
             }
         }
 
-        // Buat atau perbarui entri hasil untuk pengguna dan testId ini
         const result = await prismaClient.result.upsert({
             where: {
                 userId_testId: {
@@ -200,7 +178,7 @@ export const submitFinalAnswers = async (testId, token) => {
             },
         });
 
-        return result; // Kembalikan hasil akhir
+        return result;
     } catch (error) {
         throw new Error(`Gagal mengirim jawaban final: ${error.message}`);
     }
