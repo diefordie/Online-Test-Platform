@@ -125,15 +125,6 @@ enum OptionLabel {
   D
 }
 
-
-enum OptionLabel {
-  A
-  B
-  C
-  D
-}
-
-
 model Option {
   id                String       @id @default(cuid())
   multiplechoiceId String

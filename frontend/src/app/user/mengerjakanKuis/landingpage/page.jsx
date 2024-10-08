@@ -230,12 +230,12 @@ export default function Dashboard() {
               ))}
               <div className="pl-2 flex">
                 <li>
-                  <Link href="/login" legacyBehavior>
+                  <Link href="/auth/login" legacyBehavior>
                     <a className="hover:text-orange text-xs font-poppins m-4">Masuk</a>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/registrasi" legacyBehavior>
+                  <Link href="/auth/registrasi" legacyBehavior>
                     <a className="hover:bg-orange hover:text-deepBlue text-deepBlue bg-paleBlue p-1 lg:p-2 rounded-2xl text-xs font-poppins">Daftar</a>
                   </Link>
                 </li>
