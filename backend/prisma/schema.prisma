@@ -39,6 +39,7 @@ model History {
 model User {
   id                String          @id @default(cuid())
   name              String
+  username          String 
   email             String          @unique
   password          String
   role              Role            @default(USER)
@@ -110,7 +111,7 @@ model Detail_result {
   resultId         String
   userAnswer       String
   status       String   @default("draft") // menambahkan kolom ini untuk menandai status draft atau final
-  result       Result?  @relation(fields: [resultId], references: [id])
+  result           Result?       @relation(fields: [resultId], references: [id])
   option           Option       @relation(fields: [optionId], references: [id])
 
   @@unique([optionId, resultId])
