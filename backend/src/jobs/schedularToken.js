@@ -1,5 +1,5 @@
 import { cleanupRevokedTokens } from '../services/auth/logout.js'; // Adjust the import
-import cron from 'node-cron';
+import cron from 'node-cron'; 
 
 // Set up a cron job to run every hour
 export const startCleanupJob = () => {
