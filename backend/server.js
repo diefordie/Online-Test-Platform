@@ -12,6 +12,9 @@ import answerTest from './src/routes/answerTestRoutes.js';
 import authorRoutes from './src/routes/authorRoutes.js';
 import authRoutes from './src/routes/authRoutes.js';
 import dashboardRoutes from './src/routes/dashboardRoutes.js';
+import express from 'express';
+import testRoutes from './src/routes/testRoutes.js';
+
 
 dotenv.config();
 const app = express();
@@ -44,8 +47,6 @@ app.use("/answer", answerTest);
 app.use("/auth", authRoutes);
 app.use("/dashboard", dashboardRoutes);
 
-// Mulai server
-const PORT = process.env.PORT || 2000;
 app.listen(PORT, () => {
-    console.log(`Server berjalan di http://localhost ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
