@@ -1,7 +1,8 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js",
-  "/auth/registrasi/page": "app/auth/registrasi/page.js",
-  "/auth/login/page": "app/auth/login/page.js",
-  "/user/dashboard/page": "app/user/dashboard/page.js"
+  "/buatSoal/page": "app/buatSoal/page.js",
+  "/buattes/publik/publikasi/page": "app/buattes/publik/publikasi/page.js",
+  "/buattes/publik/syarat/page": "app/buattes/publik/syarat/page.js",
+  "/buatSoal/page1/page": "app/buatSoal/page1/page.js"
 }

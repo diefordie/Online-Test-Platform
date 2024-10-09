@@ -11,30 +11,26 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/register/page": [
+    "/buatSoal/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/register/page.js"
+      "static/chunks/app/buatSoal/page.js"
     ],
-    "/auth/registrasi/page": [
+    "/buatSoal/page1/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/auth/registrasi/page.js"
+      "static/css/app/buatSoal/page1/page.css",
+      "static/chunks/app/buatSoal/page1/page.js"
     ],
-    "/auth/login/page": [
+    "/buattes/publik/syarat/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/auth/login/page.js"
+      "static/chunks/app/buattes/publik/syarat/page.js"
     ],
-    "/user/dashboard/page": [
+    "/buattes/publik/publikasi/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/user/dashboard/page.js"
-    ],
-    "/auth/syarat/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/auth/syarat/page.js"
+      "static/chunks/app/buattes/publik/publikasi/page.js"
     ],
     "/_not-found/page": [
       "static/chunks/webpack.js",

@@ -1,18 +1,18 @@
-const { createTestService, getTestsByCategory, getAllTestsService, publishTestService   } = require("backend/src/services/testServices.js");
+import { createTestService, getTestsByCategory, getAllTestsService, publishTestService } from 'backend/src/services/testServices.js';
 
 // Buat tes
 const createTestController = async (req, res, next) => {
-    const { authorId, category, title, testDescription } = req.body;
+    const { authorId, type, category, title, testDescription } = req.body;
     console.log("Data yang diterima:", req.body);
 
-    if (!authorId || !category || !title || !testDescription) {
+    if (!authorId || !type || !category || !title || !testDescription) {
         return res.status(400).json({
             message: 'Semua field harus diisi.' 
         });
     }
 
     try {
-        const newTest = await createTestService({ authorId, category, title, testDescription });
+        const newTest = await createTestService({ authorId, type, category, title, testDescription });
         res.status(201).json(newTest); 
     } catch (error) {
         next(error); 
@@ -32,12 +32,19 @@ const publishTestController = async (req, res, next) => {
     }
 
     try {
-        const updatedTest = await publishTestService(testId, { price, similarity, worktime });
+        // Mengupdate test dengan isPublished diatur menjadi true
+        const updatedTest = await publishTestService(testId, { 
+            price, 
+            similarity, 
+            worktime, 
+            isPublished: true // Ganti isPublish menjadi isPublished
+        });
         res.status(200).json(updatedTest); 
     } catch (error) {
         next(error);
     }
 };
+
 
 const getAllTests = async (req, res) => {
     try {
@@ -67,7 +74,7 @@ const fetchTestsByCategory = async (req, res, next) => {
     }
 };
 
-module.exports = { 
+export{ 
     createTestController,
     publishTestController,
     getAllTests,

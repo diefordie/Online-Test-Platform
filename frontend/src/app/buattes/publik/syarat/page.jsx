@@ -1,10 +1,32 @@
 'use client';
-import Link from 'next/link';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation'; 
+import { useState, useEffect } from 'react';
+import Link from 'next/link'; // Import Link from next/link
 
 export default function Page() {
   const [activeTab, setActiveTab] = useState('buatTes');
   const [isChecked, setIsChecked] = useState(false);
+  const [testId, setTestId] = useState(null);
+  const router = useRouter(); 
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const params = new URLSearchParams(url.search);
+    const testIdFromUrl = params.get("testId"); // Ambil testId dari URL
+    if (testIdFromUrl) {
+      setTestId(testIdFromUrl); // Set testId ke state
+    }
+  }, []);
+
+  const handleNext = () => {
+    if (isChecked) {
+      if (testId) {
+        router.push(`/buattes/publik/publikasi?testId=${testId}`); // Arahkan ke halaman publikasi dengan testId
+      } else {
+        console.error("testId is null. Cannot navigate.");
+      }
+    }
+  };
 
   return (
     <>
@@ -82,14 +104,14 @@ export default function Page() {
           <label htmlFor="setujui" className="text-black">Setujui syarat dan ketentuan publikasi soal</label>
         </div>
         <div className="flex justify-end">
-          <Link href="/publik" legacyBehavior>
-            <a
-              className={`bg-white text-black py-2 px-4 rounded-lg hover:bg-[#0B61AA] hover:text-white ${isChecked ? '' : 'opacity-50 cursor-not-allowed'}`}
-              aria-disabled={!isChecked}
-            >
-              Selanjutnya
-            </a>
-          </Link>
+          <button
+            onClick={handleNext} // Panggil handleNext saat tombol diklik
+            className={`bg-white text-black py-2 px-4 rounded-lg hover:bg-[#0B61AA] hover:text-white ${isChecked ? '' : 'opacity-50 cursor-not-allowed'}`}
+            aria-disabled={!isChecked}
+            disabled={!isChecked} // Nonaktifkan tombol jika tidak tercentang
+          >
+            Selanjutnya
+          </button>
         </div>
       </div>
     </>

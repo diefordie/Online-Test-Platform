@@ -17,13 +17,8 @@
     "react-dom": "^18.3.1",
     "react-firebase-hooks": "^5.1.1",
     "react-quill": "^2.0.0",
-<<<<<<< HEAD
     "react-router-dom": "^6.26.2",
-    "swal": "^0.1.0",
-    "sweetalert2": "^11.14.1"
-=======
-    "react-router-dom": "^6.26.2"
->>>>>>> e3cdbf2 (Tambah create dan publish tes)
+    "sanitize-html": "^2.13.1"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.25.4",

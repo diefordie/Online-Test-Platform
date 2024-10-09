@@ -1,4 +1,4 @@
-// File: D:\Semester 5\Online-Test-Platform\Online-Test-Platform\frontend\src\app\layout.js
+// File: C:\Gusti\IPPL PROJECT\Online-Test-Platform\frontend\src\app\layout.js
 import * as entry from '../../../src/app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

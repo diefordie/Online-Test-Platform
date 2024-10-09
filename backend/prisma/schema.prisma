@@ -10,27 +10,10 @@ datasource db {
 }
 
 model Test {
-<<<<<<< HEAD
-  id                String        @id @default(cuid())
-  authorId         String
-  category         Category
-  title            String
-  testDescription  String
-  price            Decimal
-  similarity       Decimal
-  worktime         Int
-  review           String
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-  author           Author        @relation(fields: [authorId], references: [id])
-  multiplechoice   Multiplechoice[]
-  favourite        Favourite[]
-  history          History[]
-  result           Result[]
-=======
   id              String       @id @default(cuid())
   authorId        String
   category        Category
+  type            Type
   title           String
   testDescription String
   price           Decimal?
@@ -45,7 +28,6 @@ model Test {
   favourite       Favourite[]
   history         History[]
   result          Result[]
->>>>>>> e3cdbf2 (Tambah create dan publish tes)
 }
 
 
@@ -193,4 +175,9 @@ enum Category {
   UTBK
   Pemrograman
   Psikotes
+}
+
+enum Type {
+  PilihanGanda
+  Essay
 }

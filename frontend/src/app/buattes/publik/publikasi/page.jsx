@@ -1,23 +1,37 @@
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
 
 export default function PublikasiPage() {
   const [namaTes, setNamaTes] = useState('');
+  const [testId, setTestId] = useState(null);
   const [durasiTes, setDurasiTes] = useState('');
-  const [acakPertanyaan, setAcakPertanyaan] = useState({
-    waktu: false,
-    acak: false,
-  });
-  const [maksimumPercobaan, setMaksimumPercobaan] = useState('');
+  // const [acakPertanyaan, setAcakPertanyaan] = useState({
+  //   waktu: false,
+  //   acak: false,
+  // });
+  // const [maksimumPercobaan, setMaksimumPercobaan] = useState('');
   const [hargaTes, setHargaTes] = useState('');
   const [prediksiKemiripan, setPrediksiKemiripan] = useState('');
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
 
-  const handleCheckboxChange = (event) => {
-    setAcakPertanyaan({ ...acakPertanyaan, [event.target.name]: event.target.checked });
-  };
+  // const handleCheckboxChange = (event) => {
+  //   setAcakPertanyaan({ ...acakPertanyaan, [event.target.name]: event.target.checked });
+  // };
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const params = new URLSearchParams(url.search);
+    const testIdFromUrl = params.get("testId");
+  
+    console.log("Fetched testId:", testIdFromUrl); // Cek nilai testId yang diambil
+  
+    if (testIdFromUrl) {
+      setTestId(testIdFromUrl);
+    }
+  }, []);
 
   const handlePublish = async () => {
     const [hours, minutes] = durasiTes.split(':').map(Number);
@@ -36,7 +50,7 @@ export default function PublikasiPage() {
     }
 
     try {
-        const response = await fetch(`http://localhost:2000/test/tests/cm1r5w67q00019ej4ufdc6nsm/publish`, {
+        const response = await fetch(`http://localhost:2000/test/tests/${testId}/publish`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -98,16 +112,16 @@ export default function PublikasiPage() {
       </nav>
 
       
-      <div className="bg-[#78AED6] p-8 rounded-md mx-auto" style={{ width: '1150px', height: '800px', marginTop: '20px' }}>
-        <div className="flex justify-between pr-9">
+      <div className="bg-[#78AED6] p-8 rounded-md mx-auto" style={{ width: '1100px', height: '750px', marginTop: '20px' }}>
+        <div className="flex justify-start pr-9">
           {/* Bagian Kiri, Teks Rata Kanan */}
-          <div className="text-right pr-5">
-            <h3 className="font-poppins text-black text-lg mb-4 mt-7">Nama Tes</h3>
-            <h3 className="font-poppins text-black text-lg mb-4 mt-7">Durasi Tes</h3>
-            <h3 className="font-poppins text-black text-lg mb-4 mt-7">Acak Pertanyaan</h3>
-            <h3 className="font-poppins text-black text-lg mb-4 mt-7">Maksimum Percobaan Kuis</h3>
-            <h3 className="font-poppins text-black text-lg mb-4 mt-7">Harga Tes</h3>
-            <h3 className="font-poppins text-black text-lg mb-4 mt-7">Prediksi Kemiripan</h3>
+          <div className="text-left pr-5">
+            <h3 className="font-poppins text-black text-lg mb-8 mt-8">Nama Tes</h3>
+            <h3 className="font-poppins text-black text-lg mb-7 mt-5">Durasi Tes</h3>
+            {/* <h3 className="font-poppins text-black text-lg mb-4 mt-5">Acak Pertanyaan</h3> */}
+            {/* <h3 className="font-poppins text-black text-lg mb-4 mt-5">Maksimum Percobaan Kuis</h3> */}
+            <h3 className="font-poppins text-black text-lg mb-7 mt-5">Harga Tes</h3>
+            <h3 className="font-poppins text-black text-lg mb-4 mt-5">Prediksi Kemiripan</h3>
           </div>
 
           {/* Bar putih di samping */}
@@ -134,7 +148,7 @@ export default function PublikasiPage() {
             </div>
 
             {/* Checkbox Acak Pertanyaan */}
-            <div className="mb-4">
+            {/* <div className="mb-4">
               <div className="flex items-center">
                 <input
                   type="checkbox"
@@ -157,9 +171,9 @@ export default function PublikasiPage() {
                 />
                 <label htmlFor="acak" className="text-gray-700">Pertanyaan akan ditampilkan secara acak kepada setiap responden.</label>
               </div>
-            </div>
+            </div> */}
 
-            {/* Input Maksimum Percobaan Kuis */}
+            {/* Input Maksimum Percobaan Kuis
             <div className="mb-4">
               <input
                 type="text"
@@ -168,7 +182,7 @@ export default function PublikasiPage() {
                 onChange={(e) => setMaksimumPercobaan(e.target.value)}
                 placeholder="Maksimum Percobaan Kuis"
               />
-            </div>
+            </div> */}
 
             {/* Dropdown Harga Tes */}
             <div className="mb-4">
@@ -198,7 +212,7 @@ export default function PublikasiPage() {
           </div>
         </div>
 
-        <div className='pt-10 flex justify-end pr-10'>
+        <div className='pt-4 flex justify-end pr-10'>
           <button
             onClick={handlePublish}
             className="bg-white text-black py-2 px-4 rounded-lg hover:bg-[#0B61AA] hover:text-white"

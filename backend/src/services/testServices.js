@@ -1,4 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
+import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 // Fungsi untuk membuat tes baru
@@ -6,7 +6,8 @@ const createTestService = async (newTest) => {
     try {
         return await prisma.test.create({
             data: {
-                authorId: "cm1yhu3600001lxdxnpm9t9k7",
+                authorId: "cm1z3ear80001btsebyuiqcza",
+                type: newTest.type,
                 category: newTest.category,
                 title: newTest.title,
                 testDescription: newTest.testDescription,
@@ -20,21 +21,22 @@ const createTestService = async (newTest) => {
 
 const publishTestService = async (testId, updateData) => {
     try {
-        console.log('Updating test with ID:', testId);
-        console.log('Update data:', updateData); // Cek data yang akan diperbarui
-
-        return await prisma.test.update({
+        // Tambahkan isPublish ke data yang akan diperbarui
+        const updatedTest = await prisma.test.update({
             where: { id: testId },
             data: {
-                price: updateData.price,
-                similarity: updateData.similarity,
-                worktime: updateData.worktime,
-                isPublished: true
+                ...updateData, // Data yang ingin diupdate
+                isPublished: true, // Set kolom isPublish menjadi true
             },
         });
+        return updatedTest;
     } catch (error) {
-        console.error('Error during update:', error); // Cek error yang terjadi
-        throw new Error('Gagal mempublish tes');
+        if (error.code === 'P2025') {
+            console.error('Gagal mempublish tes: Rekaman tidak ditemukan dengan ID', testId);
+        } else {
+            console.error('Kesalahan tidak terduga:', error);
+        }
+        throw error; // Anda dapat melempar ulang kesalahan untuk penanganan lebih lanjut jika perlu
     }
 };
 
@@ -53,7 +55,7 @@ const getTestsByCategory = async (category) => {
     });
 };
 
-module.exports = { 
+export { 
     createTestService,
     publishTestService,
     getAllTestsService,
