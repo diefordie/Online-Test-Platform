@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import  { useState, useEffect } from 'react';
+// import Detailtest from '@/app/test/detail-tes';
 
 export default function Dashboard() {
   const [popularTests, setPopularTests] = useState([]);
@@ -212,15 +213,15 @@ export default function Dashboard() {
                 <img src={test.author.authorPhoto} alt={test.author.name} className="h-5 w-5 leading-relaxed " />
                 <span className="text-sm font-semibold leading-relaxed ">{test.author.name}</span>
               </div>
-                <span className="text-sm font-semibold">
+              <span className="text-sm font-semibold">
                 {Number(test.price) === 0 ? 'Gratis' : <img src="/images/lock.png" alt="Berbayar" className="h-9/2 inline-block" />}
-                </span>
+              </span>
               </div>
             </div>
 
             {/* Tombol yang berada di bagian paling bawah */}
             <div className="absolute bottom-5 left-0 right-0 flex justify-center space-x-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 p-2">
-              <a href="/user/mengerjakanKuis/detailsoal" className="bg-paleBlue text-deepBlue text-bold px-7 py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue">Mulai</a>
+              <a href={`/user/mengerjakanKuis/${test.id}`} className="bg-paleBlue text-deepBlue text-bold px-7 py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue">Mulai</a>
               <a href="/topScore" className="bg-paleBlue text-deepBlue text-bold px-4 py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue">Top Score</a>
               </div>
           </div>
@@ -332,7 +333,7 @@ export default function Dashboard() {
 
             {/* Tombol yang berada di bagian paling bawah */}
             <div className="absolute bottom-5 left-0 right-0 flex justify-center space-x-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 p-2">
-              <a href="/user/mengerjakanKuis/detailsoal" className="bg-paleBlue text-deepBlue text-bold px-7 py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue">Mulai</a>
+              <a href={`/user/mengerjakanKuis/${test.id}`} className="bg-paleBlue text-deepBlue text-bold px-7 py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue">Mulai</a>
               <a href="/topScore" className="bg-paleBlue text-deepBlue text-bold px-4 py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue">Top Score</a>
               </div>
           </div>
@@ -397,7 +398,7 @@ export default function Dashboard() {
   
               {/* Tombol yang berada di bagian paling bawah */}
               <div className="absolute bottom-5 left-0 right-0 flex justify-center space-x-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 p-2">
-              <a href="/user/mengerjakanKuis/detailsoal" className="bg-paleBlue text-deepBlue text-bold px-7 py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue">Mulai</a>
+              <a href={`/user/mengerjakanKuis/${test.id}`} className="bg-paleBlue text-deepBlue text-bold px-7 py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue">Mulai</a>
               <a href="/topScore" className="bg-paleBlue text-deepBlue text-bold px-4 py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue">Top Score</a>
             </div>
   

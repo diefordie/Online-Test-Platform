@@ -36,7 +36,22 @@ const getTest = async (req, res) => {
     }
 };
 
-export { createTest , getTest}; // Menggunakan named export
+const testResultController = {
+    getTestResult: async (req, res) => {
+      const { userId } = req.params;
+  
+      try {
+        const result = await getTestResult(userId);
+        res.status(200).json(result);
+      } catch (error) {
+        console.error('Error in controller:', error);
+        res.status(500).json({ message: error.message });
+      }
+    },
+  };
+  
+
+export { createTest , getTest, testResultController}; // Menggunakan named export
 
 
 
