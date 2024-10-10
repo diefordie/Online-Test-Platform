@@ -13,7 +13,81 @@ const MengerjakanTes = () => {
     const [resultId, setResultId] = useState(null);
     const [answers, setAnswers] = useState({});
     const [title, setTitle] = useState('');
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ik16djhXRXByWW5oRWpGTDh5UVFkOTU1eDZpbzIiLCJlbWFpbCI6ImFycnJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3Mjg0NDEwODEsImV4cCI6MTcyODQ0NDY4MX0.KTu1uunUbR2unsLdNsEpKV-L49ahgYmOH2Fy6a6Jwok'; // Ganti dengan token yang sesuai
+    const [remainingTime, setRemainingTime] = useState(0);
+    const [workTime, setWorkTime] = useState(0); 
+    const [timerActive, setTimerActive] = useState(false);
+
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkJXbTg5aGpxTzhoTTE2R05YY0F5Z0RieG5pVjIiLCJlbWFpbCI6InVzZXIxNEBnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImlhdCI6MTcyODU2OTM4OCwiZXhwIjoxNzI4NTcyOTg4fQ.bsOCRTG7Ljg6qEFzYTwRMhKMv5ghDBYWIemA_rsbr_Y'; // Ganti dengan token yang sesuai
+
+    useEffect(() => {
+        const fetchWorkTime = async () => {
+            try {
+                const response = await fetch(`http://localhost:2000/timer/${testId}/worktime`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                if (!response.ok) throw new Error('Failed to fetch worktime');
+
+                const data = await response.json();
+                console.log('Fetched worktime:', data); // Log the full response
+
+                const { hours, minutes, seconds } = data; // Destructure the response
+
+                // Convert total time to seconds for remaining time calculation
+                const totalWorkTimeInSeconds = hours * 3600 + minutes * 60 + seconds;
+
+                // Set remaining time only if it's greater than zero
+                if (totalWorkTimeInSeconds > 0) {
+                    setRemainingTime(totalWorkTimeInSeconds);
+                    setTimerActive(true); // Activate the timer if there is time remaining
+                } else {
+                    setRemainingTime(0); // Ensure remainingTime is set to 0
+                    alert("Waktu sudah habis!"); // Alert if the time is already zero
+                }
+            } catch (error) {
+                console.error('Failed to fetch worktime:', error);
+                alert("Gagal mengambil waktu kerja."); // Add an alert for fetch error
+            }
+        };
+
+        fetchWorkTime();
+    }, [testId]);
+
+    const formatRemainingTime = (timeInSeconds) => {
+        if (typeof timeInSeconds !== 'number' || isNaN(timeInSeconds) || timeInSeconds < 0) {
+            return '00:00:00'; // Fallback to default format
+        }
+
+        const hours = Math.floor(timeInSeconds / 3600);
+        const minutes = Math.floor((timeInSeconds % 3600) / 60);
+        const seconds = timeInSeconds % 60;
+
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    };
+
+    // Format waktu yang tersisa untuk ditampilkan
+    const remainingTimeFormatted = formatRemainingTime(remainingTime);
+
+    // Timer countdown effect
+    useEffect(() => {
+        let timer;
+        if (timerActive && remainingTime > 0) {
+            timer = setInterval(() => {
+                setRemainingTime((prevTime) => {
+                    if (prevTime <= 1) {
+                        clearInterval(timer);
+                        alert("Waktu habis!"); // Show alert when time is up
+                        setTimerActive(false); // Stop the timer
+                        return 0; // Ensure remainingTime does not go below 0
+                    }
+                    return prevTime - 1;
+                });
+            }, 1000);
+        }
+
+        return () => clearInterval(timer); // Cleanup function
+    }, [timerActive, remainingTime]);
 
     useEffect(() => {
         if (!testId) return; // Tunggu hingga testId tersedia dari URL path
@@ -311,7 +385,7 @@ const MengerjakanTes = () => {
                         <div className="flex items-center justify-center space-x-2 flex-grow">
                             <p className="text-white font-bold lg:text-lg md:text-lg text-sm">{currentOption}/{questions.length}</p>
                         </div>
-                        <div className="bg-[#0B61AA] text-white px-4 sm:px-2 py-2 sm:py-1 rounded-[10px] border border-white font-bold lg:text-lg md:text-lg text-xs">00:00:00</div>
+                        <div className="bg-[#0B61AA] text-white px-4 sm:px-2 py-2 sm:py-1 rounded-[10px] border border-white font-bold lg:text-lg md:text-lg text-xs">Waktu Tersisa: {remainingTimeFormatted}</div>
                     </div>
 
                     {/* Soal dan Opsi */}
@@ -393,8 +467,13 @@ const MengerjakanTes = () => {
                             {Array.from({ length: questions.length }, (_, i) => (
                                 <button
                                     key={i + 1}
-                                    className={`w-10 h-10 text-lg font-bold rounded border border-[#0B61AA] ${markedReview[i] ? 'bg-yellow-500 text-white' : 'bg-gray-200'} hover:bg-gray-300`}
-                                    onClick={() => setCurrentOption(i + 1)}>
+                                    className={`w-10 h-10 text-lg font-bold rounded border border-[#0B61AA] 
+                                        ${markedReview[i] ? 'bg-yellow-500 text-white' : 'bg-gray-200'} 
+                                        ${currentOption === i + 1 ? 'bg-[#0B61AA] text-white' : ''} 
+                                        hover:bg-gray-300 transition duration-200`}
+                                    onClick={() => setCurrentOption(i + 1)}
+                                    aria-label={`Question ${i + 1}`}
+                                    title={`Go to Question ${i + 1}`}>
                                     {i + 1}
                                 </button>
                             ))}

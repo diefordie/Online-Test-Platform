@@ -101,7 +101,7 @@ export default function Home() {
               <span>{testDetails.numQuestions}</span>
             </span>
             </div>
-            <Link href={`/user/mengerjakanKuis`}>
+            <Link href={`/user/mengerjakanKuis/${testId}`}>
           <button className="startButton">Mulai Try Out Sekarang</button>
           </Link>
         </div>
