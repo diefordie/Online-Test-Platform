@@ -118,6 +118,7 @@ export const submitFinalAnswers = async (testId, token) => {
     const userId = decodedToken.id;
 
     try {
+        // Ambil jawaban draft dari detail_result berdasarkan testId dan userId
         const draftAnswers = await prismaClient.detail_result.findMany({
             where: {
                 result: {
@@ -126,8 +127,12 @@ export const submitFinalAnswers = async (testId, token) => {
                 },
                 status: 'draft',
             },
+            include: {
+                option: true, // Include untuk mendapatkan data option
+            },
         });
 
+        // Ubah status draft menjadi final
         await prismaClient.detail_result.updateMany({
             where: {
                 result: {
@@ -142,44 +147,89 @@ export const submitFinalAnswers = async (testId, token) => {
         });
 
         let totalScore = 0;
+
+        // Loop untuk menghitung total skor
         for (const draftAnswer of draftAnswers) {
             const multipleChoice = await prismaClient.multiplechoice.findUnique({
-                where: { id: draftAnswer.optionId },
-                include: { option: true }
+                where: {
+                    id: draftAnswer.option.multiplechoiceId,
+                },
+                include: {
+                    option: true, // Include untuk mendapatkan semua opsi terkait
+                },
             });
-
-            const correctOption = multipleChoice.option.find(opt => opt.isCorrect);
-
-            if (correctOption && correctOption.id === draftAnswer.userAnswer) {
+        
+            if (!multipleChoice) {
+                throw new Error(`Soal dengan multipleChoiceId ${draftAnswer.option.multiplechoiceId} tidak ditemukan.`);
+            }
+        
+            // Temukan opsi yang benar dari soal tersebut
+            const correctOption = multipleChoice.option.find((opt) => opt.isCorrect);
+        
+            // Periksa apakah jawaban pengguna benar dengan membandingkan optionId dari jawaban dengan correctOption.id
+            if (correctOption && correctOption.id === draftAnswer.optionId) {
                 totalScore += multipleChoice.weight;
             }
         }
 
-        const result = await prismaClient.result.upsert({
+
+        // Perbarui atau buat entri di tabel `result` dengan skor total
+        const result = await prismaClient.result.findFirst({
             where: {
-                userId_testId: {
-                    userId,
-                    testId,
-                },
-            },
-            update: {
-                score: totalScore,
-            },
-            create: {
-                testId,
-                userId,
-                score: totalScore,
-                detail_resultresult: {
-                    create: draftAnswers.map(draftAnswer => ({
-                        optionId: draftAnswer.optionId,
-                        userAnswer: draftAnswer.userAnswer,
-                    })),
-                },
+                userId: userId,
+                testId: testId,
             },
         });
+        
+        if (result) {
+            // Jika result ditemukan, update skor
+            const updatedResult = await prismaClient.result.update({
+                where: { id: result.id },
+                data: {
+                    score: totalScore,
+                },
+            });
+            return updatedResult;
+        } else {
+            // Jika result tidak ditemukan, buat entri baru
+            const newResult = await prismaClient.result.create({
+                data: {
+                    testId: testId,
+                    userId: userId,
+                    score: totalScore,
+                    detail_result: {
+                        create: draftAnswers.map((draftAnswer) => ({
+                            optionId: draftAnswer.optionId,
+                            userAnswer: draftAnswer.userAnswer,
+                            status: 'final',
+                        })),
+                    },
+                },
+            });
+            return newResult;
+        }
+        
 
         return result;
     } catch (error) {
         throw new Error(`Gagal mengirim jawaban final: ${error.message}`);
+    }
+};
+
+
+
+export const getAnswersByResultId = async (resultId) => {
+    try {
+        const answers = await prismaClient.detail_result.findMany({
+            where: { resultId },
+            include: {
+                option: true,  // Including the related option details
+            },
+        });
+
+        return answers;
+    } catch (error) {
+        console.error('Error fetching answers by result ID:', error.message);
+        throw new Error(`Gagal mendapatkan jawaban untuk resultId ${resultId}: ${error.message}`);
     }
 };
