@@ -2,8 +2,10 @@
 import React, { useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { useEffect } from 'react';
 import sanitizeHtml from 'sanitize-html';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const MembuatSoal = () => {
   const [testId, setTestId] = useState('');
@@ -30,7 +32,7 @@ const MembuatSoal = () => {
 
   const cleanHtml = (html) => {
     return sanitizeHtml(html, {
-      allowedTags: [], // Kosongkan jika tidak ingin ada tag
+      allowedTags: [], 
       allowedAttributes: {},
     });
   };
@@ -41,18 +43,17 @@ const handleJawabanBenarChange = (index) => {
   setJawabanBenar(index);
 };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const data = {
       testId: 'cm1rb82i20002atqkcil4ub2z',
       questions: [
         {
-          question: cleanHtml(question), // Ambil dari input
-          number: parseInt(number), // Pastikan menjadi integer
+          question: cleanHtml(question), 
+          number: parseInt(number), 
           questionPhoto: questionPhoto || "",
-          weight: parseInt(weight), // Pastikan menjadi integer
-          discussion: cleanHtml(discussion), // Ambil dari input
+          weight: parseInt(weight), 
+          discussion: cleanHtml(discussion), 
           options 
         }
       ]
@@ -89,6 +90,10 @@ const handleJawabanBenarChange = (index) => {
 
   const modules = {
     toolbar: toolbarOptions,
+  };
+
+  const handleBack = () => {
+    router.back(); 
   };
 
   return (
@@ -239,6 +244,11 @@ const handleJawabanBenarChange = (index) => {
               </div>
               <div className="flex justify-end space-x-2">
                   <button type="submit" className="bg-[#E8F4FF] border border-black px-4 py-2 hover:text-white font-poppins rounded-[15px]">Simpan</button>
+                  <button
+                  onClick={handleBack}
+                  className="bg-[#A6D0F7] border border-black px-4 py-2 hover:text-white font-poppins rounded-[15px]">
+                    Kembali
+                  </button>
               </div>  
             </div>
       </div>

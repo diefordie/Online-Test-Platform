@@ -70,8 +70,8 @@ const KotakNomor = () => {
   };
 
   const handleRename = (pageIndex) => {
-    setIsRenaming(pageIndex); // Mengaktifkan mode rename untuk page yang dipilih
-    setRenameValue(pages[pageIndex].title); // Set nilai input dengan judul yang ada
+    setIsRenaming(pageIndex); 
+    setRenameValue(pages[pageIndex].title); 
   };
 
   const saveRename = (pageIndex) => {
@@ -84,7 +84,7 @@ const KotakNomor = () => {
           });
           return updatedPages;
       });
-      setIsRenaming(null); // Menonaktifkan mode rename
+      setIsRenaming(null); 
   };
 
   const deletePage = (pageIndex) => {
@@ -95,7 +95,7 @@ const KotakNomor = () => {
 
   const handleQuestionSelect = (questionNumber) => {
     setSelectedNumber(questionNumber);
-    router.push(`/buatSoal/page1?nomor=${questionNumber}`);
+    router.push(`/author/buatSoal/buatPilgan?nomor=${questionNumber}`);
   };
 
   return (

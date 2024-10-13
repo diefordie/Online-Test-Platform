@@ -5,7 +5,6 @@ import bodyParser from 'body-parser';
 
 import adminRoutes from './src/routes/adminRoutes.js';
 import { startCleanupJob } from './src/jobs/schedularToken.js';
-
 import testRoutes from './src/routes/testRoutes.js';
 import multiplechoiceRoutes from './src/routes/multiplechoiceRoutes.js';
 import { handlePaymentNotification } from './src/controllers/pembayaranController.js';
@@ -28,8 +27,6 @@ app.use(cors({
 }));
 
 // Routes
-app.use("/auth", userRoutes);
-app.use("/author", userRoutes);
 app.use("/admin", adminRoutes);
 app.use("/test", testRoutes);
 app.use("/multiplechoice", multiplechoiceRoutes);
