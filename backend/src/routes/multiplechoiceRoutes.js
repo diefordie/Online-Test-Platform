@@ -7,16 +7,15 @@ import { deleteMultipleChoice } from '../controllers/multiplechoiceController.js
 
 const router = express.Router();
 
-// Endpoint untuk menambah soal ke tes
 router.post('/add-questions', (req, res) => {
-    console.log('Request body:', req.body);  // Debugging log
+    console.log('Request body:', req.body); 
     createMultipleChoice(req, res);
 });
 
 router.put('/update-question', updateMultipleChoice);
 
 router.get('/questions/:testId', getMultipleChoice);
-router.get('/question/:questionId', getMultipleChoiceById);
+router.get('/get-question/:number', getMultipleChoiceById);
 
 router.delete('/question/:questionId', deleteMultipleChoice);
 

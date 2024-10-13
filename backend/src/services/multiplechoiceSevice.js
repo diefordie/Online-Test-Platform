@@ -94,10 +94,10 @@ const getMultipleChoiceService = async (testId) => {
 
 export { getMultipleChoiceService };
 
-const getMultipleChoiceByIdService = async (questionId) => {
+const getMultipleChoiceByIdService = async (number) => {
     const multipleChoice = await prisma.multiplechoice.findUnique({
         where: {
-            id: questionId,  // Pastikan menggunakan kolom id dari database
+            number: number,  
         },
         include: {
             option: true,  // Sertakan opsi jawaban
