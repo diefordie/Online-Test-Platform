@@ -15,7 +15,7 @@ export const loginUser = async ({ email, password }) => {
             throw new Error('USER_NOT_FOUND');
         }
 
-        // Validasi password
+        // Validasi passworda
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             throw new Error('INVALID_PASSWORD');

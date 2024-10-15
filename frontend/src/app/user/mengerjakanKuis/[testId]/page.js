@@ -2,6 +2,8 @@
 
 import { useParams } from 'next/navigation';
 import React, { useState, useEffect } from "react";
+import { useRouter } from 'next/navigation';
+import  Swal from 'sweetalert2';
 
 const MengerjakanTes = () => {
     const { testId } = useParams(); // Ambil testId dari URL path
@@ -13,7 +15,17 @@ const MengerjakanTes = () => {
     const [resultId, setResultId] = useState(null);
     const [answers, setAnswers] = useState({});
     const [title, setTitle] = useState('');
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ik16djhXRXByWW5oRWpGTDh5UVFkOTU1eDZpbzIiLCJlbWFpbCI6ImFycnJAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3Mjg0NDEwODEsImV4cCI6MTcyODQ0NDY4MX0.KTu1uunUbR2unsLdNsEpKV-L49ahgYmOH2Fy6a6Jwok'; // Ganti dengan token yang sesuai
+    const [token, setToken] = useState('');
+
+    const router = useRouter();
+
+
+    useEffect(() => {
+        const storedToken = localStorage.getItem('token');
+        if (storedToken) {
+            setToken(storedToken);
+        }
+    }, []);
 
     useEffect(() => {
         if (!testId) return; // Tunggu hingga testId tersedia dari URL path
@@ -60,7 +72,7 @@ const MengerjakanTes = () => {
         };
 
         fetchQuestionsAndAnswers();
-    }, [testId]);
+    }, [testId, token]);
 
     const fetchAnswersByResultId = async (resultId) => {
         try {
@@ -170,7 +182,6 @@ const MengerjakanTes = () => {
             }
 
             const data = await response.json();
-            alert('Jawaban final berhasil dikirimkan. Skor Anda: ' + data.result.score);
         } catch (error) {
             console.error('Error saat mengirim jawaban final:', error);
             alert('Terjadi kesalahan saat mengirim jawaban final: ' + error.message);
@@ -254,9 +265,33 @@ const MengerjakanTes = () => {
 
     // Panggil `submitFinalAnswers` ketika tombol "Submit" diklik
     const handleSubmit = async () => {
-        const confirmSubmit = window.confirm('Apakah Anda yakin ingin mengirim jawaban akhir?');
-        if (confirmSubmit) {
-            await submitFinalAnswers();
+        const confirmSubmit = await Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Anda tidak dapat mengubah jawaban setelah mengirim!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, kirim jawaban!',
+            cancelButtonText: 'Batal'
+        });
+    
+        if (confirmSubmit.isConfirmed) {
+            try {
+                await submitFinalAnswers();
+                
+                // Navigasi ke halaman hasil tes setelah berhasil submit
+                router.push(`/user/mengerjakanKuis/hasil-tes/${resultId}`);
+            } catch (error) {
+                console.error('Error submitting final answers:', error);
+    
+                Swal.fire({
+                    title: 'Terjadi Kesalahan!',
+                    text: 'Terjadi kesalahan saat mengirim jawaban. Silakan coba lagi.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
         }
     };
 

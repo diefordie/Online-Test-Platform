@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post('/create-test', createTest);
 router.get('/get-test/:id', getTest);
-router.get('/test-result/:userId', testResultController.getTestResult);
+router.get('/test-result/:resultId', testResultController);
 
 export default router; // Menggunakan default export
 
