@@ -138,7 +138,6 @@ export default function Dashboard() {
             </div>
             )}
             </div>
-           
         </div>
         </div>
     </header>
@@ -154,7 +153,7 @@ export default function Dashboard() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               />
-               <button 
+              <button 
                 type="submit" 
                 className="ml-auto p-2 text-deepBlue font-bold rounded-2xl hover:bg-gray-200 font-poppins">
                 <img 

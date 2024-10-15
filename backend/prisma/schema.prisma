@@ -115,7 +115,6 @@ model Detail_result {
   result       Result?  @relation(fields: [resultId], references: [id])
   option           Option       @relation(fields: [optionId], references: [id])
 
-  @@unique([optionId, resultId])
   
 }
 

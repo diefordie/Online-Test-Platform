@@ -1,4 +1,4 @@
-import { createTestService, getTestService } from '../services/testServices.js'; // Pastikan menggunakan ekstensi .js
+import { createTestService, getTestService, getTestResult } from '../services/testServices.js'; // Pastikan menggunakan ekstensi .js
 
 const createTest = async (req, res) => {
     try {
@@ -36,19 +36,18 @@ const getTest = async (req, res) => {
     }
 };
 
-const testResultController = {
-    getTestResult: async (req, res) => {
-      const { userId } = req.params;
+const testResultController = async (req, res) => {
+    const { resultId } = req.params;
   
-      try {
-        const result = await getTestResult(userId);
-        res.status(200).json(result);
-      } catch (error) {
-        console.error('Error in controller:', error);
+    try {
+      const result = await getTestResult(resultId);
+      res.status(200).json(result);
+    } catch (error) {
+      console.error('Error in controller:', error);
         res.status(500).json({ message: error.message });
-      }
-    },
+    }
   };
+  
   
 
 export { createTest , getTest, testResultController}; // Menggunakan named export
