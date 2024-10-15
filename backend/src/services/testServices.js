@@ -19,3 +19,17 @@ const createTestService = async (newTest) => {
 
 export { createTestService }; // Menggunakan named export
 
+export const getTestDetailById = async (testId) => {
+    try {
+        const test = await prisma.test.findUnique({
+            where: {
+                id: testId,
+            },
+        });
+
+        return test; // Mengembalikan data test jika ditemukan
+    } catch (error) {
+        console.error("Error fetching test detail from database:", error);
+        throw new Error('Database error'); // Melempar kesalahan untuk ditangani di controller
+    }
+};

@@ -2,7 +2,11 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 
 function App() {
-  const [testId, setTestId] = useState('cm28h8tp70002o02ae6f0v4ir');
+  const [testId, setTestId] = useState('cm2af2s9e0000rrppow3g25bb');
+  const [testTitle, setTestTitle] = useState('');
+  const [testSimilarity, setTestSimilarity] = useState();
+  const [testPrice, setTestPrice] = useState();
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const snapScript = "https://app.sandbox.midtrans.com/snap/snap.js"
@@ -20,8 +24,25 @@ function App() {
   }, []);
 
   useEffect(() => {
-
-  }, []);
+    const fetchTestDetail = async () => {
+      try {
+        const response = await fetch(`http://localhost:2000/api/tests/test-detail/cm2af2s9e0000rrppow3g25bb`);
+        if (!response.ok) {
+          const errorMessage = await response.text();
+          throw new Error(`Error: ${response.status} - ${errorMessage}`)
+        }
+        const data = await response.json();
+        console.log('Data fetched:', data);
+        setTestTitle(data.title);
+        setTestSimilarity(data.similarity);
+        setTestPrice(data.price);
+      } catch (error) {
+        console.error('Failed to fetch test details:', error);
+        setError('Terjadi kesalahan: ' + error.message);
+      }
+    };
+      fetchTestDetail(); // Memanggil API ketika testId ada
+  }, [testId]);
 
   const handlePayment = async () => {
     if (testId) {
@@ -111,10 +132,10 @@ const PaymentBox = () => {
         />
 
         {/* Header */}
-        <h1 className="text-2xl font-bold mb-2">Try Out CPNS 2025 #2</h1>
+        <h1 className="text-2xl font-bold mb-2">{testTitle}</h1>
 
         {/* Sub-header */}
-        <h2 className="text-lg text-gray-500 mb-4">prediksi kemiripan 75%</h2>
+        <h2 className="text-lg text-gray-500 mb-4">Prediksi Kemiripan: {testSimilarity}%</h2>
 
         {/* Bullet List */}
         <ul className="text-left text-gray-700 list-disc list-inside space-y-2 mb-6">
@@ -125,7 +146,7 @@ const PaymentBox = () => {
         </ul>
 
         {/* Harga */}
-        <div className="text-right text-2xl font-bold text-gray-800 mb-8">Rp.50.000,-</div>
+        <div className="text-right text-2xl font-bold text-gray-800 mb-8">{testPrice}</div>
 
         {/* Button Beli */}
         <button className="absolute bottom-4 right-4 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
