@@ -228,7 +228,6 @@ const MengerjakanTes = () => {
         }
     };
 
-
     const handleOption = async (optionId, optionLabel, question) => {
         setSelectedOption(optionLabel);
         const previousAnswer = answers[question.id];
@@ -269,8 +268,6 @@ const MengerjakanTes = () => {
             }
         }
     };
-    
-    
 
     const handlenextquestion = () => {
         if (currentOption < questions.length) {

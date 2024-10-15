@@ -26,6 +26,7 @@ model Test {
   favourite        Favourite[]
   history          History[]
   result           Result[]
+  transacrion      Transaction[]
 }
 
 model History {
@@ -141,10 +142,11 @@ model Transaction {
   id                String       @id @default(cuid())
   testId           String
   paymentMethod    String
-  paymentTime      DateTime
-  price            Int
+  paymentTime      DateTime      @default(now())
   total            Int
   status           String
+  test              Test         @relation(fields: [testId], references: [id])
+
 }
 
 model Testimoni {
