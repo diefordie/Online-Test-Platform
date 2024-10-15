@@ -1,10 +1,10 @@
 import React from 'react'
-import BuatTes from '@/app/buattes/page'
+import BuatSoal from '@/app/buatSoal/page'
 
 const page = () => {
   return (
     <div>
-      <BuatTes/>
+      <BuatSoal/>
     </div>
   )
 }

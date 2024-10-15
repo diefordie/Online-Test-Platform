@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 
 const KotakNomor = () => {
   const router = useRouter();
-  const [pages, setPages] = useState([{ pageNumber: 1, questions: [1], title: "Beri Nama TES" }]);
+  const [pages, setPages] = useState([{ pageNumber: 1, questions: [1], testName: "Beri Nama TES" }]);
   const [testId, setTestId] = useState(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [selectedNumber, setSelectedNumber] = useState(null);
@@ -71,7 +71,7 @@ const KotakNomor = () => {
     const newPage = { 
       pageNumber: newPageNumber, 
       questions: [lastQuestionNumber + 1],
-      title: "Beri Nama TES", 
+      testName: "Beri Nama TES", 
       isDropdownOpen: false 
     };
     setPages([...pages, newPage]);
@@ -87,17 +87,17 @@ const KotakNomor = () => {
       });
     });
   };
-
+  
   const handleRename = (pageIndex) => {
     setIsRenaming(pageIndex); // Mengaktifkan mode rename untuk page yang dipilih
-    setRenameValue(pages[pageIndex].title); // Set nilai input dengan judul yang ada
+    setRenameValue(pages[pageIndex].testName); // Set nilai input dengan judul yang ada
   };
 
   const saveRename = (pageIndex) => {
       setPages((prevPages) => {
           const updatedPages = prevPages.map((page, index) => {
               if (index === pageIndex) {
-                  return { ...page, title: renameValue };
+                  return { ...page, testName: renameValue };
               }
               return page;
           });
@@ -112,15 +112,15 @@ const KotakNomor = () => {
     }
   };
 
-  const handleQuestionSelect = (questionNumber) => {
+  const handleQuestionSelect = (questionNumber, namaTes) => {
   if (!testId) {
     console.error("testId is null. Cannot navigate.");
     return; // Cegah navigasi jika testId belum tersedia
   }
 
   setSelectedNumber(questionNumber);
-  router.push(`/buatSoal/page1?testId=${testId}&nomor=${questionNumber}`);
-};
+  router.push(`/buatSoal/page1?testId=${testId}&nomor=${questionNumber}&namaTes=${encodeURIComponent(namaTes)}`);
+  };
 
 const handleSave = () => {
   if (!testId) {
@@ -131,8 +131,6 @@ const handleSave = () => {
   // Masukkan testId ke dalam URL saat navigasi
   router.push(`/buattes/publik/syarat?testId=${testId}`);
 };
-
-
 
   return (
     <div className="w-full p-4">
@@ -188,7 +186,7 @@ const handleSave = () => {
                 </button>
               </div>
             ) : (
-              <h2 className="text-lg">{page.title}</h2>
+              <h2 className="text-lg">{page.testName}</h2>
             )}
 
             <div className="relative">
