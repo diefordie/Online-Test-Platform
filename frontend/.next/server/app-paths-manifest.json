@@ -2,7 +2,5 @@
   "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js",
   "/buatSoal/page": "app/buatSoal/page.js",
-  "/buattes/publik/publikasi/page": "app/buattes/publik/publikasi/page.js",
-  "/buattes/publik/syarat/page": "app/buattes/publik/syarat/page.js",
   "/buatSoal/page1/page": "app/buatSoal/page1/page.js"
 }

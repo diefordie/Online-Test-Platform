@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 
 const KotakNomor = () => {
   const router = useRouter();
-  const [pages, setPages] = useState([{ pageNumber: 1, questions: [1] }]);
+  const [pages, setPages] = useState([{ pageNumber: 1, questions: [1], title: "Beri Nama TES" }]);
   const [testId, setTestId] = useState(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [selectedNumber, setSelectedNumber] = useState(null);
@@ -68,7 +68,12 @@ const KotakNomor = () => {
   const addPage = () => {
     const lastQuestionNumber = pages.reduce((acc, curr) => acc + curr.questions.length, 0);
     const newPageNumber = pages.length + 1;
-    const newPage = { pageNumber: newPageNumber, questions: [lastQuestionNumber + 1], isDropdownOpen: false };
+    const newPage = { 
+      pageNumber: newPageNumber, 
+      questions: [lastQuestionNumber + 1],
+      title: "Beri Nama TES", 
+      isDropdownOpen: false 
+    };
     setPages([...pages, newPage]);
   };
 

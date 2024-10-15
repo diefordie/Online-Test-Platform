@@ -22,16 +22,6 @@
       "static/css/app/buatSoal/page1/page.css",
       "static/chunks/app/buatSoal/page1/page.js"
     ],
-    "/buattes/publik/syarat/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/buattes/publik/syarat/page.js"
-    ],
-    "/buattes/publik/publikasi/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/buattes/publik/publikasi/page.js"
-    ],
     "/_not-found/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
