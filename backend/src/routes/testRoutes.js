@@ -1,8 +1,9 @@
 import express from 'express';
-import { createTest } from '../controllers/testControllers.js';
+import { createTestController, fetchTestsByCategory, getAllTests, publishTestController } from 'backend/src/controllers/testControllers.js';
 
 const router = express.Router();
 
+<<<<<<< HEAD
 // router.post('/create-test', createTest);
 
 router.post('/create-test', async (req, res) => {
@@ -27,16 +28,14 @@ router.post('/create-test', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' }); // Menangani kesalahan
     }
 });
+=======
+router.post('/tests', createTestController);
+>>>>>>> 0982b85c08b9e2ca0483c68c1299aba757bb0056
 
-export default router; // Menggunakan default export
+router.put('/tests/:testId/publish', publishTestController);
 
+router.get('/category/:category', fetchTestsByCategory);
 
+router.get('/get-test', getAllTests);
 
-// const express = require("express");
-// const { createTest } = require("backend/src/controllers/testControllers.js");
-
-// const router = express.Router();
-
-// router.post("/create-test", createTest);
-
-// module.exports = router;
+export default router;

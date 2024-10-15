@@ -3,6 +3,8 @@ import { updateMultipleChoiceService } from '../services/multiplechoiceSevice.js
 import { getMultipleChoiceService } from '../services/multiplechoiceSevice.js';
 import { getMultipleChoiceByIdService } from '../services/multiplechoiceSevice.js';
 import { deleteMultipleChoiceService } from '../services/multiplechoiceSevice.js';
+import { getQuestionsByTestId } from '../services/multiplechoiceSevice.js';
+import { getMultipleChoiceByQuestionNumber } from '../services/multiplechoiceSevice.js';
 
 
 const createMultipleChoice = async (req, res) => {
@@ -99,88 +101,15 @@ export { getMultipleChoice };
 
 const getMultipleChoiceById = async (req, res) => {
     try {
-        const { questionId } = req.params;  
-
-        if (!questionId) {
-            return res.status(404).send({
-                message: 'Multiple choice question not found',
-            });
-        }
-
-        const multipleChoice = await getMultipleChoiceByIdService(questionId);
-
-        if (!multipleChoice) {
-            return res.status(404).send({
-                message: 'Multiple choice question not found',
-            });
-        }
-
-        res.status(200).send({
-            data: multipleChoice,
-            message: 'Multiple choice question retrieved successfully',
-        });
+        const { id } = req.params;  
+        const multipleChoice = await getMultipleChoiceByIdService(id);
+        console.log("Multiple choice fetched:", multipleChoice);
+        res.status(200).json(multipleChoice);
     } catch (error) {
-        res.status(500).send({
-            message: 'Failed to retrieve multiple choice question',
-            error: error.message,
-        });
+        console.error("Error fetching multiple choice:", error.message);
+        res.status(404).json({ error: error.message });
     }
 };
 
 export { getMultipleChoiceById };
 
-const deleteMultipleChoice = async (req, res) => {
-    try {
-        const { questionId } = req.params; 
-
-        if (!questionId) {
-            return res.status(400).send({
-                message: 'Question ID is required',
-            });
-        }
-
-        await deleteMultipleChoiceService(questionId);
-
-        res.status(200).send({
-            message: 'Multiple choice question deleted successfully',
-        });
-    } catch (error) {
-        res.status(500).send({
-            message: 'Failed to delete multiple choice question',
-            error: error.message,
-        });
-    }
-};
-
-export { deleteMultipleChoice };
-
-
-// const { createMultipleChoiceService } = require("backend/src/services/multiplechoiceSevice.js");
-
-// const createMultipleChoice = async (req, res) => {
-//     try {
-//         const { testId, questions } = req.body;
-
-//         // Pastikan testId dan questions dikirimkan
-//         if (!testId || !questions) {
-//             return res.status(400).send({
-//                 message: "testId and questions are required",
-//             });
-//         }
-
-//         // Panggil service untuk membuat soal beserta opsi
-//         const multipleChoices = await createMultipleChoiceService(testId, questions);
-
-//         res.status(201).send({
-//             data: multipleChoices,
-//             message: "Multiple choice questions created successfully",
-//         });
-//     } catch (error) {
-//         res.status(500).send({
-//             message: "Failed to create multiple choice questions",
-//             error: error.message,
-//         });
-//     }
-// };
-
-// module.exports = { createMultipleChoice };

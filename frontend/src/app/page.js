@@ -1,5 +1,8 @@
 import React from 'react'
-import BuatTes from '@/app/buattes/page'
+// import LandingPage from '@/app/landingpage/landingpage'
+// import BuatSoal from '@/app/author/buatSoal/page'
+// import MengerjakanKuis from '@/app/mengerjakanKuis/page'
+import BuatTes from '@/app/author/buattes/page'
 
 const page = () => {
   return (

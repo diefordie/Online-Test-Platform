@@ -1,12 +1,12 @@
 // src/services/authorServices.js
-const { PrismaClient } = require("@prisma/client");
+import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-const createAuthorService = async (authorData) => {
+export const createAuthorService = async (authorData) => {
     return await prisma.author.create({
         data: {
             userId: authorData.userId,
-            nama: authorData.nama,
+            name: authorData.name,
             handphoneNum: authorData.handphoneNum,
             authorPhoto: authorData.authorPhoto,
             bank: authorData.bank,
@@ -17,7 +17,7 @@ const createAuthorService = async (authorData) => {
     });
 };
 
-const editAuthorService = async (id, authorData) => {
+export const editAuthorService = async (id, authorData) => {
     try {
         const existingAuthor = await prisma.author.findUnique({
             where: { id: id },
@@ -31,7 +31,7 @@ const editAuthorService = async (id, authorData) => {
             where: { id: id },
             data: {
                 userId: authorData.userId,
-                nama: authorData.nama,
+                name: authorData.name,
                 handphoneNum: authorData.handphoneNum,
                 authorPhoto: authorData.authorPhoto,
                 bank: authorData.bank,
@@ -47,7 +47,7 @@ const editAuthorService = async (id, authorData) => {
     }
 };
 
-const getAuthorService = async () => {
+export const getAuthorService = async () => {
     try {
         const authors = await prisma.author.findMany();
         return authors;
@@ -56,7 +56,7 @@ const getAuthorService = async () => {
     }
 };
 
-const updateVerificationAuthorService = async (id, authorData) => {
+export const updateVerificationAuthorService = async (id, authorData) => {
     try {
         const existingAuthor = await prisma.author.findUnique({
             where: { id: id },
@@ -73,15 +73,19 @@ const updateVerificationAuthorService = async (id, authorData) => {
             },
         });
 
+        const updatedUser = await prisma.user.update({
+            where: { id: existingAuthor.userId },
+            data: {
+                isApproved: authorData.isApproved,
+            },
+        });
+
+        console.log('Author updated: ', updatedAuthor);
+        console.log('User updated: ', updatedUser);
+
         return updatedAuthor;
     } catch (error) {
+        console.error("Error in updateVerificationAuthorService: ", error);
         throw new Error("Failed to update verification author: " + error.message);
     }
-};
-
-module.exports = { 
-    createAuthorService, 
-    editAuthorService, 
-    getAuthorService, 
-    updateVerificationAuthorService 
 };
