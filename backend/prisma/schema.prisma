@@ -10,15 +10,17 @@ datasource db {
 }
 
 model Test {
-  id                String        @id @default(cuid())
+  id               String        @id @default(cuid())
   authorId         String
   category         Category
+  type             Type
   title            String
   testDescription  String
-  price            Decimal
-  similarity       Decimal
-  worktime         Int
-  review           String
+  price            Decimal?
+  similarity       Decimal?
+  worktime         Int?
+  review           String?
+  isPubblished     Boolean       @default(false)
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
   author           Author        @relation(fields: [authorId], references: [id])
@@ -173,4 +175,9 @@ enum Category {
   UTBK
   Pemrograman
   Psikotes
+}
+
+enum Type {
+  PilihanGanda
+  Essay
 }

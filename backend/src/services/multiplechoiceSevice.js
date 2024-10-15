@@ -80,7 +80,7 @@ const updateMultipleChoiceService = async (questionId, updatedData) => {
 export { updateMultipleChoiceService };
 
 const getMultipleChoiceService = async (testId) => {
-    const multipleChoices = await prisma.multiplechoice.findMany({
+    const multipleChoices = await prisma.Multiplechoice.findMany({
         where: {
             testId: testId,
         },
@@ -94,17 +94,21 @@ const getMultipleChoiceService = async (testId) => {
 
 export { getMultipleChoiceService };
 
-const getMultipleChoiceByIdService = async (number) => {
+const getMultipleChoiceByIdService = async (id) => {
+    try {
     const multipleChoice = await prisma.multiplechoice.findUnique({
-        where: {
-            number: number,  
-        },
+        where: { id: id },
         include: {
-            option: true,  // Sertakan opsi jawaban
+            option: true, 
         },
     });
-    
+    if (!multipleChoice) {
+        throw new Error('Multiple choice not found');
+    }
     return multipleChoice;
+    } catch (error) {
+        throw error;
+    }
 };
 
 export { getMultipleChoiceByIdService };
@@ -119,3 +123,41 @@ const deleteMultipleChoiceService = async (multiplechoiceId) => {
 };
 
 export { deleteMultipleChoiceService };
+
+const getQuestionsByTestId = async (testId) => {
+  try {
+      const questions = await prisma.question.findMany({
+          where: {
+              testId: testId, // Filter berdasarkan testId
+            },
+        });
+        return questions; // Mengembalikan data yang ditemukan
+    } catch (error) {
+        throw new Error('Error fetching questions: ' + error.message);
+    }
+};
+
+export { getQuestionsByTestId };
+
+
+const getMultipleChoiceByQuestionNumber = async (testId, number) => {
+    console.log("Fetching multiple choice with testId:", testId, "and number:", number);
+
+    try {
+        const multipleChoice = await prisma.Multiplechoice.findFirst({
+            where: {
+                testId: testId,
+                number: number,
+            },
+        });
+
+        console.log("Result:", multipleChoice);
+
+        return multipleChoice ? multipleChoice.id : null; // Kembalikan ID atau null jika tidak ditemukan
+    } catch (error) {
+        console.error("Error fetching multiple choice:", error);
+        throw error;
+    }
+};
+
+export { getMultipleChoiceByQuestionNumber };

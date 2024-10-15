@@ -1,68 +1,63 @@
 import { PrismaClient } from '@prisma/client';
-
 const prisma = new PrismaClient();
 
+// Fungsi untuk membuat tes baru
 const createTestService = async (newTest) => {
-    return await prisma.test.create({
-        data: {
-            authorId: newTest.authorId, 
-            category: newTest.category,
-            title: newTest.title,
-            testDescription: newTest.testDescription,
-            price: newTest.price,
-            similarity: newTest.similarity,
-            worktime: newTest.worktime,
-            review: newTest.review,
-        },
+    try {
+        return await prisma.test.create({
+            data: {
+                authorId: "cm2a8djpa00012txt3oughdrl",
+                type: newTest.type,
+                category: newTest.category,
+                title: newTest.title,
+                testDescription: newTest.testDescription,
+            },
+        });
+    } catch (error) {
+        console.error("Error saat membuat tes:", error);
+        throw new Error('Gagal membuat tes');
+    }
+};
+
+const publishTestService = async (testId, updateData) => {
+    try {
+        // Tambahkan isPublish ke data yang akan diperbarui
+        const updatedTest = await prisma.test.update({
+            where: { id: testId },
+            data: {
+                ...updateData, // Data yang ingin diupdate
+                isPublished: true, // Set kolom isPublish menjadi true
+            },
+        });
+        return updatedTest;
+    } catch (error) {
+        if (error.code === 'P2025') {
+            console.error('Gagal mempublish tes: Rekaman tidak ditemukan dengan ID', testId);
+        } else {
+            console.error('Kesalahan tidak terduga:', error);
+        }
+        throw error; // Anda dapat melempar ulang kesalahan untuk penanganan lebih lanjut jika perlu
+    }
+};
+
+const getAllTestsService = async () => {
+    return await prisma.test.findMany({
+        select: {
+            title: true,
+            similarity: true
+        }
     });
 };
 
-const getTestService = async (testId) => {     
-    return await prisma.test.findUnique({
-            where: { id: testId },
-            include: {
-                author: true,
-                multiplechoice: {
-                    include: {
-                        option: true,
-                    },
-                },
-            },
-        });
-}
+const getTestsByCategory = async (category) => {
+    return await prisma.test.findMany({
+        where: { category },
+    });
+};
 
-const getTestResult = async (userId) => {
-    try {
-        const latestTestResult = await prisma.result.findFirst({
-        where: { userId },
-        select: {
-            score: true, 
-            user: {
-            select: { name: true },
-            },
-          test: {
-            select: {
-              title: true,
-              multiplechoice: {
-                select: {
-                  question: true,
-                },
-              },
-            },
-          },
-        },
-      });
-  
-      return {
-        score: latestTestResult.score,
-        userName: latestTestResult.user.name,
-        testTitle: latestTestResult.test.title,
-      };
-    } catch (error) {
-      console.error('Error fetching test result:', error);
-      throw new Error('Failed to fetch test result');
-    }
-  };
-
-export { createTestService, getTestService, getTestResult }; // Menggunakan named export
-
+export { 
+    createTestService,
+    publishTestService,
+    getAllTestsService,
+    getTestsByCategory
+};

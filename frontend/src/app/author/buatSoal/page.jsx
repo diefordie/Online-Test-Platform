@@ -1,17 +1,37 @@
 'use client';
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 const KotakNomor = () => {
   const router = useRouter();
-  const [pages, setPages] = useState([{ pageNumber: 1, questions: [1] }]);
+  const [pages, setPages] = useState([{ pageNumber: 1, questions: [1], title: "Beri Nama TES" }]);
+  const [testId, setTestId] = useState(null);
+  const [multiplechoiceId, setMultiplechoiceId] = useState('');
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [selectedNumber, setSelectedNumber] = useState(null);
   const [isRenaming, setIsRenaming] = useState(null); 
-  const [renameValue, setRenameValue] = useState(''); 
+  const [renameValue, setRenameValue] = useState('');
 
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const params = new URLSearchParams(url.search);
+    const testIdFromUrl = params.get("testId");
+    const multiplechoiceIdFromUrl = params.get("multiplechoiceId");
+
+    console.log("Fetched testId:", testIdFromUrl); // Cek nilai testId yang diambil
+    console.log("Fetched multiplechoiceId:", multiplechoiceIdFromUrl); // Cek nilai multiplechoiceId yang diambil
+
+    if (testIdFromUrl) {
+      setTestId(testIdFromUrl);
+    }
+    if (multiplechoiceIdFromUrl) {
+      setMultiplechoiceId(multiplechoiceIdFromUrl); // Menyimpan multiplechoiceId ke dalam state
+    }
+  }, []);
+  
+  
   const addQuestion = (pageIndex) => {
     setPages((prevPages) => {
       const updatedPage = {
@@ -54,7 +74,12 @@ const KotakNomor = () => {
   const addPage = () => {
     const lastQuestionNumber = pages.reduce((acc, curr) => acc + curr.questions.length, 0);
     const newPageNumber = pages.length + 1;
-    const newPage = { pageNumber: newPageNumber, questions: [lastQuestionNumber + 1], isDropdownOpen: false };
+    const newPage = { 
+      pageNumber: newPageNumber, 
+      questions: [lastQuestionNumber + 1],
+      title: "Beri Nama TES", 
+      isDropdownOpen: false 
+    };
     setPages([...pages, newPage]);
   };
 
@@ -70,8 +95,8 @@ const KotakNomor = () => {
   };
 
   const handleRename = (pageIndex) => {
-    setIsRenaming(pageIndex); 
-    setRenameValue(pages[pageIndex].title); 
+    setIsRenaming(pageIndex); // Mengaktifkan mode rename untuk page yang dipilih
+    setRenameValue(pages[pageIndex].title); // Set nilai input dengan judul yang ada
   };
 
   const saveRename = (pageIndex) => {
@@ -84,7 +109,7 @@ const KotakNomor = () => {
           });
           return updatedPages;
       });
-      setIsRenaming(null); 
+      setIsRenaming(null); // Menonaktifkan mode rename
   };
 
   const deletePage = (pageIndex) => {
@@ -94,9 +119,26 @@ const KotakNomor = () => {
   };
 
   const handleQuestionSelect = (questionNumber) => {
-    setSelectedNumber(questionNumber);
-    router.push(`/author/buatSoal/buatPilgan?nomor=${questionNumber}`);
-  };
+  if (!testId) {
+    console.error("testId is null. Cannot navigate.");
+    return; // Cegah navigasi jika testId belum tersedia
+  }
+
+  setSelectedNumber(questionNumber);
+  router.push(`/author/buatSoal/page1?testId=${testId}&multiplechoiceId=${multiplechoiceId}&nomor=${questionNumber}`);
+};
+
+const handleSave = () => {
+  if (!testId) {
+    console.error("testId is null. Cannot navigate.");
+    return; // Cegah navigasi jika testId belum tersedia
+  }
+
+  // Masukkan testId ke dalam URL saat navigasi
+  router.push(`/buattes/publik/syarat?testId=${testId}`);
+};
+
+
 
   return (
     <div className="w-full p-4">
@@ -222,12 +264,14 @@ const KotakNomor = () => {
         >
           + Tambah Page
         </button>
+        
         <div className="flex justify-end space-x-2 mr-4">
-          <Link href="/simpan" legacyBehavior>
-            <a className="bg-[#E8F4FF] border border-black flex items-center space-x-2 px-4 py-2 hover:text-black font-poppins rounded-[15px] shadow-lg">
-              Simpan
-            </a>
-          </Link>
+          <button
+            onClick={handleSave} // Memanggil fungsi handleSave saat tombol diklik
+            className="bg-[#E8F4FF] border border-black flex items-center space-x-2 px-4 py-2 hover:text-black font-poppins rounded-[15px] shadow-lg"
+          >
+            Simpan
+          </button>
         </div>
       </div>
     </div>

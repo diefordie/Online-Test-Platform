@@ -1,78 +1,82 @@
-import { createTestService, getTestService } from '../services/testServices.js'; // Pastikan menggunakan ekstensi .js
+import { createTestService, getTestsByCategory, getAllTestsService, publishTestService } from 'backend/src/services/testServices.js';
 
-const createTest = async (req, res) => {
+// Buat tes
+const createTestController = async (req, res, next) => {
+    const { authorId, type, category, title, testDescription } = req.body;
+    console.log("Data yang diterima:", req.body);
+
+    if (!authorId || !type || !category || !title || !testDescription) {
+        return res.status(400).json({
+            message: 'Semua field harus diisi.' 
+        });
+    }
+
     try {
-        const newTest = req.body;
-
-        const test = await createTestService(newTest);
-
-        res.status(201).send({
-            data: test,
-            message: 'Create test success',
-        });
+        const newTest = await createTestService({ authorId, type, category, title, testDescription });
+        res.status(201).json(newTest); 
     } catch (error) {
-        res.status(500).send({
-            message: 'Failed to create test',
-            error: error.message,
-        });
+        next(error); 
     }
 };
 
-const getTest = async (req, res) => {
-    try {
-        const { id } = req.params; // Ubah testId menjadi id
-        console.log('ID Test yang dicari:', id);
-        const test = await getTestService(id);
+// Publish Tes
+const publishTestController = async (req, res, next) => {
+    const { testId } = req.params;
+    const { price, similarity, worktime } = req.body;
 
-        res.status(200).send({
-            data: test,
-            message: 'Get test success',
+    // Validasi input
+    if (!price || !similarity || !worktime) {
+        const error = new Error('Semua field harus diisi untuk publikasi.');
+        error.status = 400; 
+        return next(error);
+    }
+
+    try {
+        // Mengupdate test dengan isPublished diatur menjadi true
+        const updatedTest = await publishTestService(testId, { 
+            price, 
+            similarity, 
+            worktime, 
+            isPublished: true // Ganti isPublish menjadi isPublished
         });
+        res.status(200).json(updatedTest); 
     } catch (error) {
-        res.status(500).send({
-            message: 'Failed to get test',
-            error: error.message,
-        });
+        next(error);
     }
 };
 
-const testResultController = {
-    getTestResult: async (req, res) => {
-      const { userId } = req.params;
-  
-      try {
-        const result = await getTestResult(userId);
-        res.status(200).json(result);
-      } catch (error) {
-        console.error('Error in controller:', error);
-        res.status(500).json({ message: error.message });
-      }
-    },
-  };
-  
 
-export { createTest , getTest, testResultController}; // Menggunakan named export
+const getAllTests = async (req, res) => {
+    try {
+        const tests = await getAllTestsService();
+        res.status(200).json(tests);
+    } catch (error) {
+        console.error('Error fetching tests:', error);
+        res.status(500).json({ message: 'Failed to fetch tests', error: error.message });
+    }
+};
 
+const fetchTestsByCategory = async (req, res, next) => {
+    const { category } = req.params;
 
+    try {
+        const tests = await getTestsByCategory(category);
+        
+        if (!tests.length) {
+            const error = new Error('No tests found for this category');
+            error.status = 404;
+            return next(error);
+        }
 
-// const { createTestService } = require("backend/src/services/testServices.js");
+        res.status(200).json(tests);
+    } catch (error) {
+        next(error); 
+    }
+};
 
-// const createTest = async (req, res) => {
-//     try {
-//         const newTest = req.body;
-
-//         const test = await createTestService(newTest);
-
-//         res.status(201).send({
-//             data: test,
-//             message: "Create test success",
-//         });
-//     } catch (error) {
-//         res.status(500).send({
-//             message: "Failed to create test",
-//             error: error.message,
-//         });
-//     }
-// };
-
-// module.exports = { createTest };
+export{ 
+    createTestController,
+    publishTestController,
+    getAllTests,
+    fetchTestsByCategory
+};

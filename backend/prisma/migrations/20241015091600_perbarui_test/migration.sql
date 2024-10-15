@@ -1,0 +1,9 @@
+-- AlterTable
+ALTER TABLE "Test" ADD COLUMN     "isPubblished" BOOLEAN NOT NULL DEFAULT false,
+ALTER COLUMN "price" DROP NOT NULL,
+ALTER COLUMN "similarity" DROP NOT NULL,
+ALTER COLUMN "worktime" DROP NOT NULL,
+ALTER COLUMN "review" DROP NOT NULL;
+
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "username" DROP NOT NULL;
