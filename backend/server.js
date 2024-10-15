@@ -5,7 +5,7 @@ import bodyParser from 'body-parser';
 
 import adminRoutes from './src/routes/adminRoutes.js';
 import authRoutes from './src/routes/authRoutes.js';
-import { startCleanupJob } from './src/jobs/schedularToken.js';
+// import { startCleanupJob } from './src/jobs/schedularToken.js';
 import authorRoutes from './src/routes/authorRoutes.js';
 
 import testRoutes from './src/routes/testRoutes.js';
@@ -16,7 +16,7 @@ import paymentRoutes from './src/routes/paymentRoutes.js';
 
 dotenv.config();
 const app = express();
-startCleanupJob();
+// startCleanupJob();
 
 // Middleware
 app.use(express.json()); // Parse incoming JSON requests
@@ -45,7 +45,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/tests", testRoutes);//diperbaiki lagi penamaan routesnya
 app.use("/api/multiplechoice", multiplechoiceRoutes);
 app.use("/api/answer-test", answerTest);
-app.use("/api", paymentRoutes);
+app.use("/api/payment", paymentRoutes);
 
 
 // Routes author
