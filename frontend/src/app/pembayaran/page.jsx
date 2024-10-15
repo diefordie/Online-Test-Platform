@@ -19,6 +19,10 @@ function App() {
     }
   }, []);
 
+  useEffect(() => {
+
+  }, []);
+
   const handlePayment = async () => {
     if (testId) {
       try {
