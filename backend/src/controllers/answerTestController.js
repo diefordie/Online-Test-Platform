@@ -74,6 +74,7 @@ export const updateDraft = async (req, res) => {
     }
 };
 
+
 export const getAnswersByResultIdController = async (req, res) => {
     const { resultId } = req.params;
 

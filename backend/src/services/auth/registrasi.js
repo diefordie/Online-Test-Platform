@@ -47,7 +47,7 @@ export const createUser = async ({ name, email, password, role }) => {
 
     let user;
     try {
-        // Simpan data pengguna di PostgreSQL (tabel `user`)
+        // Simpan data pengguna di PostgreSQL (tabel user)
         user = await prisma.user.create({
             data: {
                 id: userRecord.uid,
@@ -59,11 +59,11 @@ export const createUser = async ({ name, email, password, role }) => {
             },
         });
 
-        // Jika role adalah 'AUTHOR', simpan data ke tabel `author`
+        // Jika role adalah 'AUTHOR', simpan data ke tabel author
         if (role.toUpperCase() === 'AUTHOR') {
             await prisma.author.create({
                 data: {
-                    userId: user.id,  // Hubungkan dengan ID dari tabel `user`
+                    userId: user.id,  // Hubungkan dengan ID dari tabel user
                     name,
                 },
             });

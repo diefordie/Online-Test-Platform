@@ -12,6 +12,8 @@ import answerTest from './src/routes/answerTestRoutes.js';
 import authorRoutes from './src/routes/authorRoutes.js';
 import authRoutes from './src/routes/authRoutes.js';
 import dashboardRoutes from './src/routes/dashboardRoutes.js';
+import detailSoal from './src/routes/detailsoalRoutes.js';
+import timerRoutes from './src/routes/timerRoutes.js';
 
 dotenv.config();
 const app = express();
@@ -43,6 +45,8 @@ app.use("/api/soal", multiplechoiceRoutes);
 app.use("/answer", answerTest);
 app.use("/auth", authRoutes);
 app.use("/dashboard", dashboardRoutes);
+app.use('/tes', detailSoal);
+app.use('/timer', timerRoutes);
 
 // Mulai server
 const PORT = process.env.PORT || 2000;

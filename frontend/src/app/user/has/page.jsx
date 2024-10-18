@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
@@ -11,34 +10,14 @@ export default function Pemrograman() {
   const [isModalOpen, setModalOpen] = useState(true);
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState("");
-  const {resultId, testId } = useParams();
-  const [workTime, setWorkTime] = useState(0);
+  const resultId  = 'cm2aoegg2000xdotpuar2gacp';
   const [userData, setUserData] = useState({
-    
     score: 0, // score sebagai angka
     userName: '',
     testTitle: '',
     correctAnswers: 0,
     wrongAnswers: 0,
   });
-
-  useEffect(() => {
-    if (!resultId) return;  // Pastikan resultId tersedia sebelum melakukan apa pun
-
-    // Ambil workTime dari localStorage berdasarkan resultId
-    const savedWorkTime = localStorage.getItem(`workTime_${resultId}`);
-    if (savedWorkTime) {
-      setWorkTime(parseInt(savedWorkTime)); // Konversi ke angka dan simpan di state
-    }
-  }, [resultId]); // Efek ini dijalankan ulang setiap kali resultId berubah
-
-
-  const formatTime = (seconds) => {
-    const minutes = Math.floor(seconds / 60); // Menghitung menit
-    const remainingSeconds = seconds % 60;    // Menghitung detik sisa
-    return `${minutes} menit ${remainingSeconds} detik`;
-  };
-
 
   const user = [
     {
@@ -53,7 +32,6 @@ export default function Pemrograman() {
       rank: 114,
     }
   ];
-  
 
   useEffect(() => {
     const fetchTestData = async () => {
@@ -185,7 +163,7 @@ export default function Pemrograman() {
               <nav className="mt-0 lg:mt-1">
                 <ol className="list-reset flex space-x-2">
                   <li>
-                    <Link href="/user/dasboard" legacyBehavior>
+                    <Link href="/userDashboard" legacyBehavior>
                       <a className="text-[0.6rem] lg:text-sm hover:text-orange font-poppins font-bold">Home</a>
                     </Link>
                   </li>
@@ -293,7 +271,7 @@ export default function Pemrograman() {
                   <div className="text-black mt-2 flex items-center gap-4">
                     <div className="text-sm lg:text-2xl bg-white p-2 font-semibold rounded-lg">
                       <ul>
-                        <li><i className="fa-solid fa-clock text-grey "></i> {formatTime(workTime)} </li>
+                        <li><i className="fa-solid fa-clock text-grey"></i> {user.time} </li>
                         <li> Waktu</li>
                       </ul>
                     </div>

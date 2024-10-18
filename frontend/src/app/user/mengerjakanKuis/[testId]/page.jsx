@@ -16,9 +16,74 @@ const MengerjakanTes = () => {
     const [answers, setAnswers] = useState({});
     const [title, setTitle] = useState('');
     const [token, setToken] = useState('');
+    const [remainingTime, setRemainingTime] = useState(0);
+    const [workTime, setWorkTime] = useState(0); 
+    const [timerActive, setTimerActive] = useState(false);
+    
 
     const router = useRouter();
 
+    useEffect(() => {
+        const handleBeforeUnload = (event) => {
+            event.preventDefault(); // Mencegah tindakan default
+            event.returnValue = ''; // Mengharuskan browser menampilkan dialog konfirmasi default
+        };
+    
+        window.addEventListener('beforeunload', handleBeforeUnload);  // Tambah event listener
+    
+        // Cleanup listener ketika komponen unmount
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);  // Hapus event listener
+        };
+    }, []);
+    
+
+    useEffect(() => {
+        const storedAnswers = localStorage.getItem('answers');
+        if (storedAnswers) {
+            const parsedAnswers = JSON.parse(storedAnswers);
+            setAnswers(parsedAnswers);  // Isi state answers dengan jawaban dari localStorage
+            const currentQuestionId = questions[currentOption - 1]?.id;
+            if (parsedAnswers[currentQuestionId]) {
+                setSelectedOption(parsedAnswers[currentQuestionId].optionValue);  // Atur opsi terpilih dari jawaban yang disimpan
+            }
+        }
+    
+        // Event listener untuk sebelum halaman di-refresh atau ditutup
+        const handleBeforeUnload = (event) => {
+            event.preventDefault();  // Mencegah refresh otomatis
+            event.returnValue = '';  // Mengharuskan browser menampilkan dialog konfirmasi default
+        };
+
+    
+    
+        window.addEventListener('beforeunload', handleBeforeUnload);  // Tambahkan event listener
+    
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);  // Hapus event listener ketika komponen unmount
+        };
+    }, [questions, currentOption]);
+
+    // use efect untuk worktime
+    useEffect(() => {
+        if (!resultId) return;  // Pastikan resultId tersedia
+    
+        const storedWorkTime = localStorage.getItem(`workTime_${resultId}`);
+        if (storedWorkTime) {
+            setWorkTime(parseInt(storedWorkTime));  // Ambil workTime dari localStorage berdasarkan resultId
+        }
+    
+        const interval = setInterval(() => {
+            setWorkTime(prevWorkTime => {
+                const newWorkTime = prevWorkTime + 1;  // Tambah 1 detik
+                localStorage.setItem(`workTime_${resultId}`, newWorkTime);  // Simpan workTime ke localStorage berdasarkan resultId
+                return newWorkTime;
+            });
+        }, 1000);  // Setiap 1 detik
+    
+        return () => clearInterval(interval);  // Bersihkan interval saat komponen unmount
+    }, [resultId]);
+    
 
     useEffect(() => {
         const storedToken = localStorage.getItem('token');
@@ -103,12 +168,88 @@ const MengerjakanTes = () => {
 
     useEffect(() => {
         const currentQuestionId = questions[currentOption - 1]?.id;
+    
+        // Cek apakah ada jawaban yang tersimpan untuk pertanyaan saat ini
         if (currentQuestionId && answers[currentQuestionId]) {
-            setSelectedOption(answers[currentQuestionId].optionLabel);
+            setSelectedOption(answers[currentQuestionId].optionLabel);  // Set jawaban yang sudah tersimpan
+            console.log(`Jawaban ditemukan untuk pertanyaan ${currentQuestionId}: ${answers[currentQuestionId].optionLabel}`);
         } else {
-            setSelectedOption(null);
+            setSelectedOption(null);  // Jika tidak ada jawaban, kosongkan pilihan
         }
     }, [currentOption, answers, questions]);
+    
+
+    useEffect(() => {
+        const fetchWorkTime = async () => {
+            try {
+                const response = await fetch(`http://localhost:2000/timer/${testId}/worktime`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                if (!response.ok) throw new Error('Failed to fetch worktime');
+    
+                const data = await response.json();
+                console.log('Fetched worktime:', data);
+    
+                const { hours, minutes, seconds } = data;
+    
+                const totalWorkTimeInSeconds = hours * 3600 + minutes * 60 + seconds;
+    
+                if (totalWorkTimeInSeconds > 0) {
+                    setRemainingTime(totalWorkTimeInSeconds);
+                    setTimerActive(true); // Aktifkan timer jika ada waktu tersisa
+                } else {
+                    setRemainingTime(0); // Set waktu tersisa menjadi 0 jika sudah habis
+                    alert("Waktu sudah habis!"); // Peringatkan jika waktu sudah habis
+                }
+            } catch (error) {
+                console.error('Failed to fetch worktime:', error);
+                alert("Gagal mengambil waktu kerja."); // Tambahkan alert untuk kesalahan pengambilan data
+            }
+        };
+    
+        fetchWorkTime();
+    }, [testId]); 
+
+    const formatRemainingTime = (timeInSeconds) => {
+        if (typeof timeInSeconds !== 'number' || isNaN(timeInSeconds) || timeInSeconds < 0) {
+            return '00:00:00'; // Fallback to default format
+        }
+
+        const hours = Math.floor(timeInSeconds / 3600);
+        const minutes = Math.floor((timeInSeconds % 3600) / 60);
+        const seconds = timeInSeconds % 60;
+
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    };
+
+    // Format waktu yang tersisa untuk ditampilkan
+    const remainingTimeFormatted = formatRemainingTime(remainingTime);
+
+    // Timer countdown effect
+    useEffect(() => {
+        let timer;
+    
+        if (timerActive && remainingTime > 0) {
+            timer = setInterval(() => {
+                setRemainingTime((prevTime) => {
+                    const newTime = prevTime - 1;
+    
+                    if (newTime <= 0) {
+                        clearInterval(timer);
+                        setTimerActive(false);
+                        alert('Waktu habis!');
+                    }
+    
+                    localStorage.setItem(`remainingTime_${resultId}`, newTime);  // Simpan waktu tersisa ke localStorage berdasarkan resultId
+                    return newTime;
+                });
+            }, 1000);
+        }
+    
+        return () => clearInterval(timer);  // Bersihkan interval saat komponen unmount
+    }, [timerActive, remainingTime, resultId]);
 
 
     const saveDraftAnswer = async (testId, optionId, selectedOption) => {
@@ -196,34 +337,40 @@ const MengerjakanTes = () => {
         let currentResultId = resultId || localStorage.getItem('resultId');  // Ambil resultId dari localStorage jika tidak tersedia
     
         if (previousAnswer) {
-            // Jika jawaban sebelumnya ada dan jawaban baru berbeda
             if (previousAnswer.optionId !== optionId || previousAnswer.optionLabel !== optionLabel) {
                 if (currentResultId) {
                     try {
-                        // Memperbarui jawaban yang sudah ada dengan resultId yang valid
                         await updateDraftAnswer(currentResultId, previousAnswer.optionId, optionId, optionLabel);
-                        setAnswers((prevAnswers) => ({
-                            ...prevAnswers,
+                        const updatedAnswers = {
+                            ...answers,
                             [question.id]: { optionId, optionLabel },
-                        }));
+                        };
+                        setAnswers(updatedAnswers);
+    
+                        // Simpan jawaban ke localStorage
+                        localStorage.setItem('answers', JSON.stringify(updatedAnswers));
+    
                         console.log('Jawaban berhasil diperbarui');
                     } catch (error) {
                         console.error('Gagal memperbarui draft:', error);
                     }
-                } else {
-                    console.error('Result ID belum tersedia, tidak bisa memperbarui jawaban');
                 }
             }
         } else {
-            // Jika ini adalah pertama kali menjawab soal
             try {
-                const newResultId = await saveDraftAnswer(testId, optionId, optionLabel);  // Menyimpan draft jawaban pertama kali
-                setResultId(newResultId);  // Simpan resultId dari respons backend
-                localStorage.setItem('resultId', newResultId);  // Simpan ke localStorage
-                setAnswers((prevAnswers) => ({
-                    ...prevAnswers,
+                const newResultId = await saveDraftAnswer(testId, optionId, optionLabel);
+                setResultId(newResultId);
+                localStorage.setItem('resultId', newResultId);
+    
+                const updatedAnswers = {
+                    ...answers,
                     [question.id]: { optionId, optionLabel },
-                }));
+                };
+                setAnswers(updatedAnswers);
+    
+                // Simpan jawaban baru ke localStorage
+                localStorage.setItem('answers', JSON.stringify(updatedAnswers));
+    
                 console.log('Jawaban disimpan sebagai draft baru dengan resultId:', newResultId);
             } catch (error) {
                 console.error('Gagal menyimpan draft:', error);
@@ -232,7 +379,35 @@ const MengerjakanTes = () => {
     };
     
     
+    
+    const saveRemainingTimeToLocalStorage = (time) => {
+        localStorage.setItem('remainingTime', time);
+        console.log('Saving remaining time to localStorage:', time);
+    };
 
+    // Mengambil waktu tersimpan dari localStorage dan melanjutkan timer
+    useEffect(() => {
+        const storedRemainingTime = localStorage.getItem(`remainingTime_${resultId}`);
+        console.log('Stored remaining time from localStorage:', storedRemainingTime);
+    
+        if (storedRemainingTime) {
+            const time = Number(storedRemainingTime);
+            if (!isNaN(time)) {
+                setRemainingTime(time);  // Set waktu tersisa dari localStorage berdasarkan resultId
+                setTimerActive(true);    // Aktifkan timer jika ada waktu tersisa
+            } else {
+                console.error('Invalid time format in localStorage.');
+            }
+        }
+    }, [resultId]);
+
+    // Mengurangi waktu tersisa dan menyimpannya ke localStorage setiap detik
+    
+    
+    
+    
+    
+    
     const handlenextquestion = () => {
         if (currentOption < questions.length) {
             setCurrentOption((prev) => prev + 1);
@@ -279,8 +454,11 @@ const MengerjakanTes = () => {
         if (confirmSubmit.isConfirmed) {
             try {
                 await submitFinalAnswers();
-                
-                // Navigasi ke halaman hasil tes setelah berhasil submit
+    
+                // Bersihkan localStorage setelah submit
+                localStorage.removeItem('answers');
+                localStorage.removeItem('resultId');
+    
                 router.push(`/user/mengerjakanKuis/hasil-tes/${resultId}`);
             } catch (error) {
                 console.error('Error submitting final answers:', error);
@@ -294,6 +472,17 @@ const MengerjakanTes = () => {
             }
         }
     };
+    
+    useEffect(() => {
+        const storedAnswers = localStorage.getItem('answers');
+        
+        if (storedAnswers) {
+            const parsedAnswers = JSON.parse(storedAnswers);
+            setAnswers(parsedAnswers);  // Isi state answers dengan jawaban dari localStorage
+            console.log('Loaded answers from localStorage:', parsedAnswers);
+        }
+    }, []);
+    
 
     const currentQuestion = questions.length > 0 ? questions[currentOption - 1] : null;
 
@@ -346,7 +535,7 @@ const MengerjakanTes = () => {
                         <div className="flex items-center justify-center space-x-2 flex-grow">
                             <p className="text-white font-bold lg:text-lg md:text-lg text-sm">{currentOption}/{questions.length}</p>
                         </div>
-                        <div className="bg-[#0B61AA] text-white px-4 sm:px-2 py-2 sm:py-1 rounded-[10px] border border-white font-bold lg:text-lg md:text-lg text-xs">00:00:00</div>
+                        <div className="bg-[#0B61AA] text-white px-4 sm:px-2 py-2 sm:py-1 rounded-[10px] border border-white font-bold lg:text-lg md:text-lg text-xs">Waktu Tersisa: {remainingTimeFormatted}</div>
                     </div>
 
                     {/* Soal dan Opsi */}
@@ -355,21 +544,22 @@ const MengerjakanTes = () => {
                             <div className="mb-6 sm:mb-4 bg-white p-4 sm:p2 rounded-[15px] shadow">
                                 <p className="text-lg mb-6 sm:mb-4">{currentQuestion.questionText}</p>
                             </div>
-
                             {currentQuestion.options.map((option) => (
-                                <div key={option.id} className="mb-4 sm:mb-2 bg-white p-4 sm:p-2 rounded-lg shadow-lg">
-                                    <input
-                                        type="radio"
-                                        id={option.id}
-                                        name="option"
-                                        value={option.value}
-                                        checked={selectedOption === option.label}  // Opsi terpilih sesuai jawaban dari backend
-                                        onChange={() => handleOption(option.id, option.label, currentQuestion)}
-                                        className="mr-2"
-                                    />
-                                    <label htmlFor={option.id} className="text-lg">{option.label}</label>
-                                </div>
-                            ))}
+                            <div key={option.id} className="mb-4 sm:mb-2 bg-white p-4 sm:p-2 rounded-lg shadow-lg">
+                                <input
+                                    type="radio"
+                                    id={option.id}
+                                    name={`question-${currentQuestion.id}`}  // Beri nama unik per pertanyaan
+                                    value={option.value}
+                                    checked={selectedOption === option.value}  // Bandingkan dengan option.value yang unik
+                                    onChange={() => handleOption(option.id, option.value, currentQuestion)}  // Gunakan option.value saat set jawaban
+                                    className="mr-2"
+                                />
+                                <label htmlFor={option.id} className="text-lg">{option.label}</label>
+                            </div>
+                        ))
+                        
+                    }
                         </>
                     )}
 

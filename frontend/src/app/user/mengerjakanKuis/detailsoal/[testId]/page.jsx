@@ -1,8 +1,45 @@
 'use client'
 
 import Head from "next/head";
+import { useEffect, useState } from "react";
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 export default function Home() {
+  const [testDetails, setTestDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { testId } = useParams(); 
+  
+
+  // Fetch data from the backend
+  useEffect(() => {
+    const fetchTestDetails = async () => {
+      try {
+        const response = await fetch(`http://localhost:2000/tes/${testId}/detail`); // Ganti ID test dengan dinamis jika diperlukan
+        if (!response.ok) {
+          throw new Error('Failed to fetch test details');
+        }
+        const data = await response.json();
+        setTestDetails(data);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchTestDetails();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
     <>
       <Head>
@@ -11,64 +48,65 @@ export default function Home() {
       <div className="container">
         <header className="header">
           <div className="header-left">
-          <h1 className="header-title" style={{ fontSize: '25px' }}>Detail Soal</h1>
+            <h1 className="header-title" style={{ fontSize: '25px' }}>Detail Soal</h1>
             <div className="breadcrumb">
               <a href="#">Home</a> / <a href="#">Latihan Tes UTBK</a> / <a href="#">Detail Soal</a>
             </div>
           </div>
           <div className="header-right">
-  <a className="logo">
-    <img src="/image/logo.png" alt="Logo" className="h-auto mb-4" style={{ width: '150px', height: 'auto' }}/>
-  </a>
-  <div className="profileIcon">
-  <img src="/image/userpic.png" alt="Profile Icon" className="h-auto mb-4" style={{ width: '40px', height: 'auto', marginRight: "10px"}}/>
-  </div>
-</div>
+            <a className="logo">
+              <img src="/image/logo.png" alt="Logo" className="h-auto mb-4" style={{ width: '150px', height: 'auto' }}/>
+            </a>
+            <div className="profileIcon">
+              <img src="/image/userpic.png" alt="Profile Icon" className="h-auto mb-4" style={{ width: '40px', height: 'auto', marginRight: "10px"}}/>
+            </div>
+          </div>
         </header>
 
         <main className="main">
           <section className="content">
             <h2>Detail Soal</h2>
-            <h3>TRY OUT UTBK 2025 #1</h3>
-            </section>
-            </main>
+            <h3>{testDetails.title}</h3>
+          </section>
+        </main>
 
-            <div className="card">
-              <div className="testItem">
-                <p style={{ color: 'gray' }}>Tes Potensi Skolastik</p>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'gray' }}>
-                <img src="/image/clock.png" alt="Clock Icon" style={{ width: '20px', height: '20px' }} /> 
-                <span>90 menit</span>
-                |
-                <img src="/image/paper.png" alt="Paper Icon" style={{ width: '20px', height: '20px' }} />
-                <span>90 soal</span>
-              </span>
-              </div>
-              <hr className="divider" />
-              <div className="testItem">
-                <p style={{ color: 'gray' }}>Tes Literasi Bahasa</p>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'gray' }}>
-                <img src="/image/clock.png" alt="Clock Icon" style={{ width: '20px', height: '20px' }} /> 
-                <span>47 menit</span>
-                |
-                <img src="/image/paper.png" alt="Paper Icon" style={{ width: '20px', height: '20px' }} />
-                <span>45 soal</span>
-              </span>
-              </div>
-              <hr className="divider" />
-              <div className="testItem">
-                <p style={{ color: 'gray' }}>Tes Penalaran Matematika</p>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'gray' }}>
-                <img src="/image/clock.png" alt="Clock Icon" style={{ width: '20px', height: '20px' }} /> 
-                <span>37 menit</span>
-                |
-                <img src="/image/paper.png" alt="Paper Icon" style={{ width: '20px', height: '20px' }} />
-                <span>20 soal</span>
-              </span>
-              </div>
-              <button className="startButton" onClick={() => alert('Are You Sure?')}>Mulai Try Out Sekarang</button>
+        <div className="card">
+          <div className="testItem">
+            <p style={{ color: 'gray' }}>Tes Potensi Skolastik</p>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'gray' }}>
+              <img src="/image/clock.png" alt="Clock Icon" style={{ width: '20px', height: '20px' }} /> 
+              <span>90 menit</span>
+              |
+              <img src="/image/paper.png" alt="Paper Icon" style={{ width: '20px', height: '20px' }} />
+              <span>90 soal</span>
+            </span>
+          </div>
+          <hr className="divider" />
+          <div className="testItem">
+            <p style={{ color: 'gray' }}>Tes Literasi Bahasa</p>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'gray' }}>
+              <img src="/image/clock.png" alt="Clock Icon" style={{ width: '20px', height: '20px' }} /> 
+              <span>47 menit</span>
+              |
+              <img src="/image/paper.png" alt="Paper Icon" style={{ width: '20px', height: '20px' }} />
+              <span>45 soal</span>
+            </span>
+          </div>
+          <hr className="divider" />
+          <div className="testItem">
+            <p style={{ color: 'gray' }}>Tes Penalaran Matematika</p>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'gray' }}>
+              <img src="/image/clock.png" alt="Clock Icon" style={{ width: '20px', height: '20px' }} /> 
+              <span>{testDetails.duration} jam</span>
+              |
+              <img src="/image/paper.png" alt="Paper Icon" style={{ width: '20px', height: '20px' }} />
+              <span>{testDetails.numQuestions}</span>
+            </span>
             </div>
-          
+            <Link href={`/user/mengerjakanKuis/${testId}`}>
+          <button className="startButton">Mulai Try Out Sekarang</button>
+          </Link>
+        </div>
 
         <style jsx>{`
           .container {
@@ -140,16 +178,11 @@ export default function Home() {
             text-align: left;
             margin-top: 20px; 
           }
-          .p {
-            color: #666; 
-          }
 
           .testItem {
             display: flex;
             justify-content: space-between;
             padding: 15px;
-            background-color: none;
-            border-radius: 8px;
             margin-bottom: 15px;
           }
 
