@@ -1,12 +1,11 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-// Fungsi untuk membuat tes baru
 const createTestService = async (newTest) => {
     try {
         return await prisma.test.create({
             data: {
-                authorId: "cm2a8djpa00012txt3oughdrl",
+                authorId: "cm2al8bjw0001yjs1i7h0grm3",
                 type: newTest.type,
                 category: newTest.category,
                 title: newTest.title,
@@ -21,12 +20,11 @@ const createTestService = async (newTest) => {
 
 const publishTestService = async (testId, updateData) => {
     try {
-        // Tambahkan isPublish ke data yang akan diperbarui
         const updatedTest = await prisma.test.update({
             where: { id: testId },
             data: {
-                ...updateData, // Data yang ingin diupdate
-                isPublished: true, // Set kolom isPublish menjadi true
+                ...updateData,
+                isPublished: true, 
             },
         });
         return updatedTest;
@@ -36,7 +34,7 @@ const publishTestService = async (testId, updateData) => {
         } else {
             console.error('Kesalahan tidak terduga:', error);
         }
-        throw error; // Anda dapat melempar ulang kesalahan untuk penanganan lebih lanjut jika perlu
+        throw error; 
     }
 };
 

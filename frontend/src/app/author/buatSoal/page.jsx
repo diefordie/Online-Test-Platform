@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 
 const KotakNomor = () => {
   const router = useRouter();
-  const [pages, setPages] = useState([{ pageNumber: 1, questions: [1], title: "Beri Nama TES" }]);
+  const [pages, setPages] = useState([{ questions: [] }]);
   const [testId, setTestId] = useState(null);
   const [multiplechoiceId, setMultiplechoiceId] = useState('');
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -20,52 +20,47 @@ const KotakNomor = () => {
     const testIdFromUrl = params.get("testId");
     const multiplechoiceIdFromUrl = params.get("multiplechoiceId");
 
-    console.log("Fetched testId:", testIdFromUrl); // Cek nilai testId yang diambil
-    console.log("Fetched multiplechoiceId:", multiplechoiceIdFromUrl); // Cek nilai multiplechoiceId yang diambil
+    console.log("Fetched testId:", testIdFromUrl);
+    console.log("Fetched multiplechoiceId:", multiplechoiceIdFromUrl);
 
     if (testIdFromUrl) {
       setTestId(testIdFromUrl);
+      // Load pages for this specific testId
+      if (typeof window !== 'undefined') {
+        const savedPages = localStorage.getItem(`pages_${testIdFromUrl}`);
+        if (savedPages) {
+          setPages(JSON.parse(savedPages));
+        } else {
+          setPages([{ questions: [] }]);
+        }
+      }
     }
     if (multiplechoiceIdFromUrl) {
-      setMultiplechoiceId(multiplechoiceIdFromUrl); // Menyimpan multiplechoiceId ke dalam state
+      setMultiplechoiceId(multiplechoiceIdFromUrl);
     }
   }, []);
-  
-  
+
+  useEffect(() => {
+    if (testId && typeof window !== 'undefined') {
+      localStorage.setItem(`pages_${testId}`, JSON.stringify(pages));
+    }
+  }, [pages, testId]);
+
   const addQuestion = (pageIndex) => {
     setPages((prevPages) => {
+      const currentQuestions = prevPages[pageIndex].questions;
+      const newQuestionNumber = currentQuestions.length > 0 
+          ? Math.max(...currentQuestions) + 1
+          : 1;
+
       const updatedPage = {
-        ...prevPages[pageIndex],
-        questions: [...prevPages[pageIndex].questions, prevPages[pageIndex].questions.length + prevPages[pageIndex].questions[0]]
+          ...prevPages[pageIndex],
+          questions: [...currentQuestions, newQuestionNumber],
       };
 
-      let newPages = prevPages.map((page, index) => {
-        if (index === pageIndex) {
-          return updatedPage;
-        } else if (index > pageIndex) {
-          const previousPage = index === 0 ? updatedPage : prevPages[index - 1];
-          const firstQuestionNumber = previousPage.questions[previousPage.questions.length - 1] + 1;
-          const updatedQuestions = page.questions.map((_, questionIndex) => firstQuestionNumber + questionIndex);
-          return {
-            ...page,
-            questions: updatedQuestions
-          };
-        }
-        return page;
-      });
-
-      newPages = newPages.map((page, index) => {
-        if (index > pageIndex) {
-          const previousPage = newPages[index - 1];
-          const previousLastQuestion = previousPage.questions[previousPage.questions.length - 1];
-          const updatedQuestions = page.questions.map((_, questionIndex) => previousLastQuestion + 1 + questionIndex);
-          return {
-            ...page,
-            questions: updatedQuestions
-          };
-        }
-        return page;
-      });
+      const newPages = prevPages.map((page, index) => 
+          index === pageIndex ? updatedPage : page
+      );
 
       return newPages;
     });
@@ -95,8 +90,8 @@ const KotakNomor = () => {
   };
 
   const handleRename = (pageIndex) => {
-    setIsRenaming(pageIndex); // Mengaktifkan mode rename untuk page yang dipilih
-    setRenameValue(pages[pageIndex].title); // Set nilai input dengan judul yang ada
+    setIsRenaming(pageIndex);
+    setRenameValue(pages[pageIndex].title);
   };
 
   const saveRename = (pageIndex) => {
@@ -109,7 +104,7 @@ const KotakNomor = () => {
           });
           return updatedPages;
       });
-      setIsRenaming(null); // Menonaktifkan mode rename
+      setIsRenaming(null); 
   };
 
   const deletePage = (pageIndex) => {
@@ -118,27 +113,53 @@ const KotakNomor = () => {
     }
   };
 
-  const handleQuestionSelect = (questionNumber) => {
-  if (!testId) {
-    console.error("testId is null. Cannot navigate.");
-    return; // Cegah navigasi jika testId belum tersedia
-  }
+  const fetchMultipleChoiceId = async (testId, number) => {
+    try {
+      const response = await fetch(`http://localhost:2000/api/multiplechoice/${testId}/${number}`);
+  
+      if (response.status === 404) {
+        console.warn('No multiplechoiceId found. It may not be created yet.');
+        return null; 
+      }
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const data = await response.json();
+      return data.id; 
+    } catch (error) {
+      console.error('Error fetching multiplechoiceId:', error);
+      return null; 
+    }
+  };  
 
-  setSelectedNumber(questionNumber);
-  router.push(`/author/buatSoal/page1?testId=${testId}&multiplechoiceId=${multiplechoiceId}&nomor=${questionNumber}`);
-};
-
+  const handleQuestionSelect = async (questionNumber) => {
+    if (!testId) {
+      console.error("testId is null. Cannot navigate.");
+      return; 
+    }
+  
+    const multiplechoiceId = await fetchMultipleChoiceId(testId, questionNumber);
+  
+    if (multiplechoiceId === null) {
+      console.log("multiplechoiceId not found. You can create a new one.");
+      router.push(`/author/buatSoal/page1?testId=${testId}&multiplechoiceId=${multiplechoiceId}&nomor=${questionNumber}`);
+    }
+  
+    setSelectedNumber(questionNumber);
+    
+    router.push(`/author/buatSoal/page1?testId=${testId}&multiplechoiceId=${multiplechoiceId}&nomor=${questionNumber}`);
+  };  
+  
 const handleSave = () => {
   if (!testId) {
     console.error("testId is null. Cannot navigate.");
-    return; // Cegah navigasi jika testId belum tersedia
+    return; 
   }
 
-  // Masukkan testId ke dalam URL saat navigasi
-  router.push(`/buattes/publik/syarat?testId=${testId}`);
+  router.push(`/author/buattes/publik/syarat?testId=${testId}`);
 };
-
-
 
   return (
     <div className="w-full p-4">

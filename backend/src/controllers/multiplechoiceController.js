@@ -1,24 +1,15 @@
-import { createMultipleChoiceService } from '../services/multiplechoiceSevice.js';
-import { updateMultipleChoiceService } from '../services/multiplechoiceSevice.js';
-import { getMultipleChoiceService } from '../services/multiplechoiceSevice.js';
-import { getMultipleChoiceByIdService } from '../services/multiplechoiceSevice.js';
-import { deleteMultipleChoiceService } from '../services/multiplechoiceSevice.js';
-import { getQuestionsByTestId } from '../services/multiplechoiceSevice.js';
-import { getMultipleChoiceByQuestionNumber } from '../services/multiplechoiceSevice.js';
-
+import { createMultipleChoiceService, updateMultipleChoiceService, getMultipleChoiceService, getMultipleChoiceByIdService, deleteMultipleChoiceService, getQuestionsByTestId, fetchMultipleChoiceByNumberAndTestId } from '../services/multiplechoiceSevice.js';
 
 const createMultipleChoice = async (req, res) => {
     try {
         const { testId, questions } = req.body;
 
-        // Pastikan testId dan questions dikirimkan
         if (!testId || !questions) {
             return res.status(400).send({
                 message: 'testId and questions are required',
             });
         }
 
-        // Panggil service untuk membuat soal beserta opsi
         const multipleChoices = await createMultipleChoiceService(testId, questions);
 
         res.status(201).send({
@@ -39,14 +30,12 @@ const updateMultipleChoice = async (req, res) => {
     try {
         const { questionId, updatedData } = req.body;
 
-        // Pastikan questionId dan updatedData dikirimkan
         if (!questionId || !updatedData) {
             return res.status(400).send({
                 message: 'questionId and updatedData are required',
             });
         }
 
-        // Panggil service untuk mengupdate soal beserta opsi
         const updatedMultipleChoice = await updateMultipleChoiceService(questionId, updatedData);
 
         res.status(200).send({
@@ -65,26 +54,22 @@ export { updateMultipleChoice };
 
 const getMultipleChoice = async (req, res) => {
     try {
-        const { testId } = req.params;  // Ambil testId dari parameter URL
+        const { testId } = req.params;  
 
-        // Pastikan testId ada
         if (!testId) {
             return res.status(400).send({
                 message: 'testId is required',
             });
         }
 
-        // Panggil service untuk mendapatkan soal
         const multipleChoices = await getMultipleChoiceService(testId);
 
-        // Jika tidak ada soal ditemukan
         if (!multipleChoices || multipleChoices.length === 0) {
             return res.status(404).send({
                 message: 'No questions found for this test',
             });
         }
 
-        // Kirim response dengan daftar soal
         res.status(200).send({
             data: multipleChoices,
             message: 'Questions fetched successfully',
@@ -112,4 +97,67 @@ const getMultipleChoiceById = async (req, res) => {
 };
 
 export { getMultipleChoiceById };
+
+const deleteMultipleChoice = async (req, res) => {
+    try {
+        const { multiplechoiceId } = req.params; 
+
+        if (!multiplechoiceId) {
+            return res.status(400).send({
+                message: 'multiplechoiceId is required',
+            });
+        }
+
+        await deleteMultipleChoiceService(multiplechoiceId);
+
+        res.status(200).send({
+            message: 'Multiple choice question deleted successfully',
+        });
+    } catch (error) {
+        res.status(500).send({
+            message: 'Failed to delete multiple choice question',
+            error: error.message,
+        });
+    }
+};
+
+export { deleteMultipleChoice };
+
+const getQuestions = async (req, res) => {
+    const { testId } = req.params; 
+    try {
+        const questions = await getQuestionsByTestId(testId);
+        if (questions.length === 0) {
+            return res.status(404).json({ message: 'Questions not found.' });
+        }
+        res.status(200).json(questions); 
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export { getQuestions };
+
+
+const getMultipleChoiceByNumberAndTestId = async (req, res) => {
+    const { testId, number } = req.params;
+
+    try {
+        const multipleChoice = await fetchMultipleChoiceByNumberAndTestId(testId, parseInt(number));
+
+        if (!multipleChoice) {
+            return res.status(404).json({ message: 'Multiplechoice not found' });
+        }
+
+        return res.json(multipleChoice);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+export{
+    getMultipleChoiceByNumberAndTestId,
+};
+
 

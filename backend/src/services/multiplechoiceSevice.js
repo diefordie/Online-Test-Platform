@@ -13,9 +13,9 @@ const createMultipleChoiceService = async (testId, questions) => {
                     testId: testId,
                     question: question.question,
                     number: question.number,
-                    questionPhoto: question.questionPhoto || null,  // Bisa opsional
+                    questionPhoto: question.questionPhoto || null, 
                     weight: question.weight,
-                    discussion: question.discussion || "",  // Bisa opsional
+                    discussion: question.discussion || "",  
                     option: {
                         create: question.options.map((option) => ({
                             optionDescription: option.optionDescription,
@@ -24,7 +24,7 @@ const createMultipleChoiceService = async (testId, questions) => {
                     },
                 },
                 include: {
-                    option: true, // Include related options in the result
+                    option: true, 
                 },
             });
             return multiplechoice;
@@ -114,12 +114,24 @@ const getMultipleChoiceByIdService = async (id) => {
 export { getMultipleChoiceByIdService };
 
 const deleteMultipleChoiceService = async (multiplechoiceId) => {
-    const deletedQuestion = await prisma.multiplechoice.delete({
-        where: {
-            id: multiplechoiceId, 
-        },
-    });
-    return deletedQuestion;
+    try {
+        await prisma.option.deleteMany({
+            where: {
+                multiplechoiceId: multiplechoiceId
+            }
+        });
+
+        const deletedQuestion = await prisma.multiplechoice.delete({
+            where: {
+                id: multiplechoiceId, 
+            },
+        });
+
+        return deletedQuestion;
+    } catch (error) {
+        console.error('Error in deleteMultipleChoiceService:', error);
+        throw error;
+    }
 };
 
 export { deleteMultipleChoiceService };
@@ -128,10 +140,10 @@ const getQuestionsByTestId = async (testId) => {
   try {
       const questions = await prisma.question.findMany({
           where: {
-              testId: testId, // Filter berdasarkan testId
+              testId: testId, 
             },
         });
-        return questions; // Mengembalikan data yang ditemukan
+        return questions; 
     } catch (error) {
         throw new Error('Error fetching questions: ' + error.message);
     }
@@ -139,24 +151,14 @@ const getQuestionsByTestId = async (testId) => {
 
 export { getQuestionsByTestId };
 
-const getMultipleChoiceByQuestionNumber = async (testId, number) => {
-    console.log("Fetching multiple choice with testId:", testId, "and number:", number);
-
-    try {
-        const multipleChoice = await prisma.Multiplechoice.findFirst({
-            where: {
-                testId: testId,
-                number: number,
-            },
-        });
-
-        console.log("Result:", multipleChoice);
-
-        return multipleChoice ? multipleChoice.id : null; // Kembalikan ID atau null jika tidak ditemukan
-    } catch (error) {
-        console.error("Error fetching multiple choice:", error);
-        throw error;
-    }
+const fetchMultipleChoiceByNumberAndTestId = async (testId, number) => {
+    return await prisma.multiplechoice.findFirst({
+        where: {
+            testId: testId,
+            number: number,
+        },
+    });
 };
 
-export { getMultipleChoiceByQuestionNumber };
+export {fetchMultipleChoiceByNumberAndTestId};
+

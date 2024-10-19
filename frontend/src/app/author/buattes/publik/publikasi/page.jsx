@@ -7,19 +7,11 @@ export default function PublikasiPage() {
   const [namaTes, setNamaTes] = useState('');
   const [testId, setTestId] = useState(null);
   const [durasiTes, setDurasiTes] = useState('');
-  // const [acakPertanyaan, setAcakPertanyaan] = useState({
-  //   waktu: false,
-  //   acak: false,
-  // });
-  // const [maksimumPercobaan, setMaksimumPercobaan] = useState('');
   const [hargaTes, setHargaTes] = useState('');
   const [prediksiKemiripan, setPrediksiKemiripan] = useState('');
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
 
-  // const handleCheckboxChange = (event) => {
-  //   setAcakPertanyaan({ ...acakPertanyaan, [event.target.name]: event.target.checked });
-  // };
 
   useEffect(() => {
     const url = new URL(window.location.href);
@@ -38,9 +30,9 @@ export default function PublikasiPage() {
     const totalMinutes = (hours || 0) * 60 + (minutes || 0);
 
     const payload = {
-        price: hargaTes,                     
-        similarity: parseFloat(prediksiKemiripan), 
-        worktime: totalMinutes               
+        price: hargaTes,
+        similarity: parseFloat(prediksiKemiripan),
+        worktime: totalMinutes
     };
 
     // Validasi input
@@ -60,11 +52,17 @@ export default function PublikasiPage() {
 
         if (response.ok) {
             console.log('Tes berhasil disimpan!');
+            setShowSuccessPopup(true); 
+            setShowErrorPopup(false);   
         } else {
-            console.error('Gagal menyimpan tes.', await response.text()); 
+            console.error('Gagal menyimpan tes.', await response.text());
+            setShowErrorPopup(true);   
+            setShowSuccessPopup(false);  
         }
     } catch (error) {
         console.error('Error:', error);
+        setShowErrorPopup(true);      
+        setShowSuccessPopup(false);     
     }
 };
 
@@ -222,47 +220,45 @@ export default function PublikasiPage() {
         </div>
       </div>
 
-      {/* Success Popup */}
-      {showSuccessPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-          <div className="bg-[#2E8EC5] p-6 rounded-lg shadow-lg text-center">
-            <div className="bg-[#78AED6] p-4 rounded-t-lg text-white ">
-              <h2 className="text-lg font-semibold">Tes Berhasil Di Publikasikan</h2>
-            </div>
-            <div className="bg-[#2E8EC5] p-4 text-black">
-              <p>Tes kamu sekarang bisa diakses oleh peserta.</p>
-            </div>
-            <button
-              onClick={closePopup}
-              className="bg-white text-black py-2 px-4 rounded-lg mt-4"
-              style={{ border: '1px solid #2E8EC5' }}
-            >
-              Oke
-            </button>
-          </div>
+        {/* Pop-up Sukses */}
+        {showSuccessPopup && (
+      <div className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 flex items-center justify-center z-50  text-sm sm:text-lg">
+        <div className="w-[90%] max-w-[619px] bg-[#78AED6] text-black p-4 rounded-lg text-center  text-sm sm:text-lg">
+          <h2 className="font-bold bg-[#0B61AA] text-white p-4 rounded-t-lg">
+            Tes Berhasil Di Publikasikan
+          </h2>
+          <p className="my-4">
+            Tes kamu sekarang bisa diakses oleh peserta
+          </p>
+          <button
+            className="bg-white text-black px-4 py-2 rounded-md mt-4"
+            onClick={closePopup}
+          >
+            Oke
+          </button>
         </div>
-      )}
+      </div>
+    )}
 
-      {/* Error Popup */}
-      {showErrorPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-          <div className="bg-[#78AED6] p-6 rounded-lg shadow-lg text-center">
-            <div className="bg-[#0B61AA] p-4 rounded-t-lg text-white">
-              <h2 className="text-lg font-semibold">Publikasi Gagal</h2>
-            </div>
-            <div className="bg-[#78AED6] p-4 text-black">
-              <p>Pastikan semua data telah terisi dengan lengkap.</p>
-            </div>
-            <button
-              onClick={closePopup}
-              className="bg-white text-black py-2 px-4 rounded-lg mt-4"
-              style={{ border: '1px solid #2E8EC5' }}
-            >
-              Oke
-            </button>
-          </div>
+    {/* Pop-up Gagal */}
+    {showErrorPopup && (
+      <div className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 flex items-center justify-center z-50  text-sm sm:text-lg">
+        <div className="w-[90%] max-w-[619px] bg-[#78AED6] text-black p-4 rounded-lg text-center  text-sm sm:text-lg">
+          <h2 className="font-bold bg-[#0B61AA] text-white p-4 rounded-t-lg">
+            Publikasi Gagal
+          </h2>
+          <p className="my-4">
+            Pastikan semua data telah diisi dengan lengkap
+          </p>
+          <button
+            className="bg-white text-black px-4 py-2 rounded-md mt-4"
+            onClick={closePopup}
+          >
+            Oke
+          </button>
         </div>
-      )}
-    </div>
+      </div>
+    )}
+      </div>
   );
 }
