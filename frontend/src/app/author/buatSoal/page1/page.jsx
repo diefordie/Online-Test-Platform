@@ -194,7 +194,7 @@ const MembuatSoal = () => {
         <div className="bg-[#FFFFFF] p-4 rounded-lg shadow-md w-full mb-6 " >
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="mb-4">
-              <label htmlFor="soal">Nomor {number}</label>
+              <label htmlFor="soal">Nomor </label>
               <input
                 type="number"
                 value={number}

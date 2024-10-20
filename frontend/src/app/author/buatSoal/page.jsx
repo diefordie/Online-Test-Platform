@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 const KotakNomor = () => {
   const router = useRouter();
   const [pages, setPages] = useState([{ pageNumber: 1, questions: [1], title: "Beri Nama TES" }]);
-  const [testId, setTestId] = useState(null);
+  const [testId, setTestId] = useState("cm2g51a9200024ke06vjrg0po");
   const [multiplechoiceId, setMultiplechoiceId] = useState('');
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [selectedNumber, setSelectedNumber] = useState(null);
@@ -137,8 +137,6 @@ const handleSave = () => {
   // Masukkan testId ke dalam URL saat navigasi
   router.push(`/buattes/publik/syarat?testId=${testId}`);
 };
-
-
 
   return (
     <div className="w-full p-4">
