@@ -6,9 +6,10 @@ import bodyParser from 'body-parser';
 import adminRoutes from './src/routes/adminRoutes.js';
 // import userRoutes from './src/routes/userRoutes.js';
 import testRoutes from './src/routes/testRoutes.js';
-import multiplechoiceRoutes from './src/routes/multiplechoiceRoutes.js';
+// import multipleChoiceRoutes from './src/routes/multiplechoiceRoutes.js';
 import { handlePaymentNotification } from './src/controllers/pembayaranController.js';
 import { startCleanupJob } from './src/jobs/schedularToken.js';
+import multiplechoiceRoutes from './src/routes/multiplechoiceRoutes.js';
 
 const app = express();
 dotenv.config();
@@ -23,7 +24,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({
     origin: 'http://localhost:3000', 
-    methods: ['GET', 'POST', 'PATCH', 'PUT'],        
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],        
     credentials: true                // Jika ingin mengirimkan cookies atau auth credentials
 }));
 
@@ -32,8 +33,9 @@ app.use(cors({
 // app.use("/author", userRoutes);
 app.use("/admin", adminRoutes);
 app.use("/test", testRoutes);
-app.use("/multiplechoice", multiplechoiceRoutes);
+// app.use('/multiplechoice', multipleChoiceRoutes);
 app.use("/transaction", handlePaymentNotification);
+app.use('/api/multiplechoice', multiplechoiceRoutes);
 
 // Mulai server
 const PORT = process.env.PORT || 2000;

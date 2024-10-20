@@ -21,7 +21,7 @@ export default function Page() {
   const handleNext = () => {
     if (isChecked) {
       if (testId) {
-        router.push(`/buattes/publik/publikasi?testId=${testId}`); // Arahkan ke halaman publikasi dengan testId
+        router.push(`/author/buattes/publik/publikasi?testId=${testId}`); // Arahkan ke halaman publikasi dengan testId
       } else {
         console.error("testId is null. Cannot navigate.");
       }

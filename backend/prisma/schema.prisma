@@ -20,7 +20,7 @@ model Test {
   similarity       Decimal?
   worktime         Int?
   review           String?
-  isPubblished     Boolean       @default(false)
+  isPublished     Boolean       @default(false)
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
   author           Author        @relation(fields: [authorId], references: [id])
@@ -84,17 +84,17 @@ model Favourite {
 }
 
 model Multiplechoice {
-  id       String   @id @default(cuid())
-  testId   String
-  question String
-  number   Int
-  questionPhoto    String?
-  weight   Int
-  discussion String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  test      Test     @relation(fields: [testId], references: [id])
-  option      Option[]
+  id          String    @id @default(cuid())
+  testId      String
+  question    String
+  number      Int
+  questionPhoto String?
+  weight      Int
+  discussion  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  test        Test @relation(fields: [testId], references: [id], onDelete: Cascade)
+  option      Option[] 
 }
 
 model Result {
@@ -130,13 +130,13 @@ enum OptionLabel {
 
 model Option {
   id                String       @id @default(cuid())
-  multiplechoiceId String
+  multiplechoiceId  String
   optionDescription String
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
-  isCorrect        Boolean
-  multiplechoice    Multiplechoice @relation(fields: [multiplechoiceId], references: [id])
-  detail_result     Detail_result[]
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  isCorrect         Boolean
+  multiplechoice    Multiplechoice @relation(fields: [multiplechoiceId], references: [id], onDelete: Cascade)
+  detail_result     Detail_result[] 
 }
 
 model Transaction {
