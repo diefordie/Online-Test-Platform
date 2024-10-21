@@ -1,30 +1,35 @@
-import { PrismaClient } from '@prisma/client';
-
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 class LeaderboardService {
   async getLeaderboard() {
-    const leaderboard = await prisma.leaderboard.findMany({
-      orderBy: { totalScore: 'desc' },
+    const leaderboard = await prisma.result.findMany({
       select: {
-        id: true,
-        name: true,
-        correct: true,
-        incorrect: true,
-        totalScore: true,
-        date: true,
+        user: {
+          select: {
+            name: true,
+          },
+        },
+        score: true,
+        test: {
+          select: {
+            title: true,
+          },
+        },
       },
+      orderBy: {
+        score: 'desc',
+      },
+      take: 10, // Limit to top 10 results
     });
 
     return leaderboard.map((entry, index) => ({
       ranking: index + 1,
-      date: entry.date.toISOString().split('T')[0],  // Formatting the date
-      name: entry.name,
-      correct: entry.correct,
-      incorrect: entry.incorrect,
-      totalScore: entry.totalScore,
+      name: entry.user.name,
+      score: entry.score,
+      testTitle: entry.test.title,
     }));
   }
 }
 
-export default LeaderboardService;
+module.exports = new LeaderboardService();

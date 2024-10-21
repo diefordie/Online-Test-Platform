@@ -1,16 +1,15 @@
-import LeaderboardService from '../services/leaderboardService';
+const leaderboardService = require('../services/leaderboardService');
 
 class LeaderboardController {
   async getLeaderboard(req, res) {
-    const leaderboardService = new LeaderboardService();
-
     try {
       const leaderboard = await leaderboardService.getLeaderboard();
-      res.status(200).json(leaderboard);
+      res.json(leaderboard);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch leaderboard' });
+      console.error('Error fetching leaderboard:', error);
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 }
 
-export default LeaderboardController;
+module.exports = new LeaderboardController();
