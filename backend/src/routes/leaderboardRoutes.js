@@ -1,8 +1,9 @@
-const express = require('express');
-const leaderboardController = require('../controllers/leaderboardController');
+// routes/topScoreRoutes.js
+import express from 'express';
+import { getTopScores } from '../leaderboardController';
 
 const router = express.Router();
 
-router.get('/', leaderboardController.getLeaderboard);
+router.get('/Result', getTopScores);
 
-module.exports = router;
+export default router;
