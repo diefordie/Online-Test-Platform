@@ -306,28 +306,34 @@ const MengerjakanTes = () => {
     };
 
     // Fungsi untuk submit jawaban akhir
-    const submitFinalAnswers = async () => {
+    const submitFinalAnswers = async (resultId, token) => {
         try {
             // Kirim permintaan ke endpoint backend untuk submit jawaban final
-            const response = await fetch(`http://localhost:2000/answer/tests/${testId}/submit`, {
+            const response = await fetch(`http://localhost:2000/answer/results/${resultId}/submit`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`, // Sertakan token di header Authorization
                 },
             });
-
+    
             // Cek apakah respons berhasil
             if (!response.ok) {
-                throw new Error('Gagal mengirim jawaban final');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Gagal mengirim jawaban final');
             }
-
+    
             const data = await response.json();
+            console.log('Jawaban final berhasil disimpan:', data);
+    
+            // Beri notifikasi ke pengguna bahwa jawaban berhasil disimpan
+            alert('Jawaban final berhasil disimpan!');
         } catch (error) {
             console.error('Error saat mengirim jawaban final:', error);
             alert('Terjadi kesalahan saat mengirim jawaban final: ' + error.message);
         }
     };
+    
 
 
 
@@ -457,7 +463,7 @@ const MengerjakanTes = () => {
     
                 // Bersihkan localStorage setelah submit
                 localStorage.removeItem('answers');
-                localStorage.removeItem('resultId');
+                //localStorage.removeItem('resultId');
     
                 router.push(`/user/mengerjakanKuis/hasil-tes/${resultId}`);
             } catch (error) {

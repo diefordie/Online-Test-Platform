@@ -91,13 +91,13 @@ export default function Dashboard() {
         <div  className="flex items-center space-x-5">
             {/* Navigation Bar */}
                 <nav className="space-x-5">
-                <Link href="/userDashboard" legacyBehavior>
+                <Link href="/user/dashboard" legacyBehavior>
                 <a className="hover:text-orange font-bold font-poppins mb-8 ">Home</a>
                 </Link>
                 <Link href="/favorite" legacyBehavior >
                     <a className="hover:text-orange font-bold font-poppins mb-8">Favorit</a>
                 </Link>
-                <Link href="/transaction"legacyBehavior>
+                <Link href="/user/riwayat/riwayattransaksi"legacyBehavior>
                     <a className="hover:text-orange font-bold font-poppins mb-8 ">Transaksi</a>
                 </Link>
                 <Link href="/faq"legacyBehavior>
@@ -219,7 +219,7 @@ export default function Dashboard() {
 
             {/* Tombol yang berada di bagian paling bawah */}
             <div className="absolute bottom-5 left-0 right-0 flex justify-center space-x-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 p-2">
-              <a href={`/user/mengerjakanKuis/detailsoal/${test.id}`} className="bg-paleBlue text-deepBlue text-bold px-7 py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue">Mulai</a>
+              <a href={`/tes/detailsoal/${test.id}`} className="bg-paleBlue text-deepBlue text-bold px-7 py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue">Mulai</a>
               <a href="/topScore" className="bg-paleBlue text-deepBlue text-bold px-4 py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue">Top Score</a>
               </div>
           </div>
@@ -331,7 +331,7 @@ export default function Dashboard() {
 
             {/* Tombol yang berada di bagian paling bawah */}
             <div className="absolute bottom-5 left-0 right-0 flex justify-center space-x-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 p-2">
-              <a href={`/user/mengerjakanKuis/detailsoal/${test.id}`} className="bg-paleBlue text-deepBlue text-bold px-7 py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue">Mulai</a>
+              <a href={`/tes/detailsoal/${test.id}`} className="bg-paleBlue text-deepBlue text-bold px-7 py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue">Mulai</a>
               <a href="/topScore" className="bg-paleBlue text-deepBlue text-bold px-4 py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue">Top Score</a>
               </div>
           </div>
@@ -396,7 +396,7 @@ export default function Dashboard() {
   
               {/* Tombol yang berada di bagian paling bawah */}
               <div className="absolute bottom-5 left-0 right-0 flex justify-center space-x-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 p-2">
-              <a href={`/user/mengerjakanKuis/detailsoal/${test.id}`} className="bg-paleBlue text-deepBlue text-bold px-7 py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue">Mulai</a>
+              <a href={`/tes/detailsoal/${test.id}`} className="bg-paleBlue text-deepBlue text-bold px-7 py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue">Mulai</a>
               <a href="/topScore" className="bg-paleBlue text-deepBlue text-bold px-4 py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue">Top Score</a>
             </div>
   

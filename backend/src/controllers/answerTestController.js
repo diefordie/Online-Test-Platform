@@ -1,8 +1,8 @@
 import { submitFinalAnswers, saveDraftAnswer, updateDraftAnswer, getAnswersByResultId} from '../services/answerTestService.js';
 
 export const submitFinal = async (req, res) => {
-    const { testId } = req.params;
-    const token = req.headers.authorization?.split(" ")[1];
+    const { resultId } = req.params; // Ambil resultId dari parameter request
+    const token = req.headers.authorization?.split(" ")[1]; // Ambil token dari header
 
     try {
         // Periksa apakah token diberikan
@@ -10,25 +10,44 @@ export const submitFinal = async (req, res) => {
             return res.status(401).json({ message: 'Token tidak diberikan' });
         }
 
-        // Panggil fungsi untuk mengirim jawaban final dan menghitung skor
-        const result = await submitFinalAnswers(testId, token);
-        
-        // Jika berhasil, kirim respons dengan status 200
-        return res.status(200).json({ message: 'Jawaban final berhasil disimpan', result });
+        try {
+            // Panggil fungsi untuk mengirim jawaban final dan menghitung skor
+            const result = await submitFinalAnswers(resultId, token);
+
+            // Jika berhasil, kirim respons dengan status 200
+            return res.status(200).json({
+                message: 'Jawaban final berhasil disimpan',
+                result,
+            });
+        } catch (error) {
+            console.error('Error saat memproses jawaban final:', error);
+
+            // Cek jenis error dan beri respons sesuai
+            if (error.message.includes('Token tidak valid')) {
+                return res.status(401).json({ message: 'Token tidak valid atau sudah kadaluarsa' });
+            }
+
+            if (error.message.includes('tidak ditemukan')) {
+                return res.status(404).json({ message: error.message });
+            }
+
+            // Tangani kesalahan validasi lainnya, jika ada
+            if (error.message.includes('Gagal mengupdate') || error.message.includes('Gagal mengambil')) {
+                return res.status(400).json({ message: error.message });
+            }
+
+            // Fallback untuk kesalahan lainnya
+            return res.status(500).json({ message: `Terjadi kesalahan: ${error.message}` });
+        }
     } catch (error) {
-        // Jika ada error yang dilempar dari fungsi `submitFinalAnswers`, tangani di sini
-        if (error.message.includes('Token tidak valid')) {
-            return res.status(401).json({ message: 'Token tidak valid atau sudah kadaluarsa' });
-        }
+        console.error('Kesalahan tidak terduga:', error);
 
-        if (error.message.includes('tidak ditemukan')) {
-            return res.status(404).json({ message: error.message });
-        }
-
-        // Untuk kesalahan lain, gunakan status 500 sebagai fallback
-        return res.status(500).json({ message: `Terjadi kesalahan: ${error.message}` });
+        // Tanggapan untuk kesalahan tidak terduga di luar proses normal
+        return res.status(500).json({ message: `Kesalahan tidak terduga: ${error.message}` });
     }
 };
+
+
 
 
 export const saveDraft = async (req, res) => {

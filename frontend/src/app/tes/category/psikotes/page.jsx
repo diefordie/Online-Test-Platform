@@ -127,12 +127,12 @@ export default function psikotes() {
             onMouseLeave={() => setDropdownOpen(false)}
           >
             <Link legacyBehavior href="/profile-edit">
-              <a className="block px-4 py-1 text-deepBlue text-sm text-gray-700 hover:bg-deepBlue hover:text-white rounded-md border-abumuda">
+              <a className="block px-4 py-1 text-deepBlue text-sm  hover:bg-deepBlue hover:text-white rounded-md border-abumuda">
                 Ubah Profil
               </a>
             </Link>
             <Link legacyBehavior href="/logout">
-              <a className="block px-4 py-1 text-deepBlue text-sm text-gray-700 hover:bg-deepBlue hover:text-white rounded-md">
+              <a className="block px-4 py-1 text-deepBlue text-sm  hover:bg-deepBlue hover:text-white rounded-md">
                 Logout
               </a>
             </Link>

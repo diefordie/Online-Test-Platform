@@ -49,12 +49,35 @@ export const editAuthorService = async (id, authorData) => {
 
 export const getAuthorService = async () => {
     try {
-        const authors = await prisma.author.findMany();
-        return authors;
+      const authors = await prisma.author.findMany({
+        select: {
+          id: true,           // Ambil id dari tabel Author
+          name: true,         // Ambil nama dari tabel Author
+          isApproved: true,   // Ambil isApproved dari tabel Author
+          user: {
+            select: {
+              createdAt: true, // Ambil createdAt dari tabel User
+              email: true,     // Ambil email dari tabel User
+            },
+          },
+        },
+      });
+  
+      // Map data untuk menyertakan rincian yang diminta
+      const result = authors.map((author) => ({
+        createdAt: author.user.createdAt, // Ambil createdAt dari tabel User
+        id: author.id,                    // Ambil id dari tabel Author
+        name: author.name,                // Ambil nama dari tabel Author
+        email: author.user.email,         // Ambil email dari tabel User
+        isApproved: author.isApproved,    // Ambil isApproved dari tabel Author
+      }));
+  
+      return result;
     } catch (error) {
-        throw new Error("Failed to retrieve authors: " + error.message);
+      throw new Error("Failed to retrieve authors: " + error.message);
     }
-};
+  };
+
 
 export const updateVerificationAuthorService = async (id, authorData) => {
     try {

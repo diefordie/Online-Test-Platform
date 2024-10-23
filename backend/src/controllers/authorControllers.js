@@ -26,7 +26,6 @@ export const editAuthor = async (req, res) => {
     try {
         const authorData = req.body;
         const { id } = req.params;
-        console.log("ID Penulis yang akan diedit:", id);
         const author = await editAuthorService(id, authorData);
         res.status(200).send({
             data: author,
@@ -59,7 +58,6 @@ export const editVerifiedAuthor = async (req, res) => {
     try {
         const authorData = req.body;
         const { id } = req.params;
-        console.log("ID Penulis yang akan diedit:", id);
         const author = await updateVerificationAuthorService(id, authorData);
         res.status(200).send({
             data: author,

@@ -11,7 +11,7 @@ export default function Pemrograman() {
   const [isModalOpen, setModalOpen] = useState(true);
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState("");
-  const {resultId, testId } = useParams();
+  const {resultId} = useParams();
   const [workTime, setWorkTime] = useState(0);
   const [userData, setUserData] = useState({
     
