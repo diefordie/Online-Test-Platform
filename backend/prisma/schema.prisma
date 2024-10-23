@@ -89,7 +89,7 @@ model Multiplechoice {
   question    String
   number      Int
   questionPhoto String?
-  weight      Int
+  weight      Float
   discussion  String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
