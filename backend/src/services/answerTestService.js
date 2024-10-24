@@ -1,9 +1,8 @@
 import { PrismaClient } from "@prisma/client";
+const prismaClient = new PrismaClient();
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 dotenv.config();
-
-const prismaClient = new PrismaClient();
 
 export const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_here';
 
@@ -173,6 +172,7 @@ export const submitFinalAnswers = async (testId, token) => {
             }
         }
 
+
         // Perbarui atau buat entri di tabel `result` dengan skor total
         const result = await prismaClient.result.findFirst({
             where: {
@@ -215,6 +215,8 @@ export const submitFinalAnswers = async (testId, token) => {
         throw new Error(`Gagal mengirim jawaban final: ${error.message}`);
     }
 };
+
+
 
 export const getAnswersByResultId = async (resultId) => {
     try {

@@ -15,83 +15,12 @@ const MengerjakanTes = () => {
     const [resultId, setResultId] = useState(null);
     const [answers, setAnswers] = useState({});
     const [title, setTitle] = useState('');
+    const [token, setToken] = useState('');
     const [remainingTime, setRemainingTime] = useState(0);
     const [workTime, setWorkTime] = useState(0); 
     const [timerActive, setTimerActive] = useState(false);
 
-    useEffect(() => {
-        const fetchWorkTime = async () => {
-            try {
-                const response = await fetch(`http://localhost:2000/timer/${testId}/worktime`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                if (!response.ok) throw new Error('Failed to fetch worktime');
-
-                const data = await response.json();
-                console.log('Fetched worktime:', data); // Log the full response
-
-                const { hours, minutes, seconds } = data; // Destructure the response
-
-                // Convert total time to seconds for remaining time calculation
-                const totalWorkTimeInSeconds = hours * 3600 + minutes * 60 + seconds;
-
-                // Set remaining time only if it's greater than zero
-                if (totalWorkTimeInSeconds > 0) {
-                    setRemainingTime(totalWorkTimeInSeconds);
-                    setTimerActive(true); // Activate the timer if there is time remaining
-                } else {
-                    setRemainingTime(0); // Ensure remainingTime is set to 0
-                    alert("Waktu sudah habis!"); // Alert if the time is already zero
-                }
-            } catch (error) {
-                console.error('Failed to fetch worktime:', error);
-                alert("Gagal mengambil waktu kerja."); // Add an alert for fetch error
-            }
-        };
-
-        fetchWorkTime();
-    }, [testId]);
-
-    const formatRemainingTime = (timeInSeconds) => {
-        if (typeof timeInSeconds !== 'number' || isNaN(timeInSeconds) || timeInSeconds < 0) {
-            return '00:00:00'; // Fallback to default format
-        }
-
-        const hours = Math.floor(timeInSeconds / 3600);
-        const minutes = Math.floor((timeInSeconds % 3600) / 60);
-        const seconds = timeInSeconds % 60;
-
-        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    };
-
-    // Format waktu yang tersisa untuk ditampilkan
-    const remainingTimeFormatted = formatRemainingTime(remainingTime);
-
-    // Timer countdown effect
-    useEffect(() => {
-        let timer;
-        if (timerActive && remainingTime > 0) {
-            timer = setInterval(() => {
-                setRemainingTime((prevTime) => {
-                    if (prevTime <= 1) {
-                        clearInterval(timer);
-                        alert("Waktu habis!"); // Show alert when time is up
-                        setTimerActive(false); // Stop the timer
-                        return 0; // Ensure remainingTime does not go below 0
-                    }
-                    return prevTime - 1;
-                });
-            }, 1000);
-        }
-
-        return () => clearInterval(timer); // Cleanup function
-    }, [timerActive, remainingTime]);
-    const [token, setToken] = useState('');
-
     const router = useRouter();
-
 
     useEffect(() => {
         const storedToken = localStorage.getItem('token');
@@ -101,7 +30,7 @@ const MengerjakanTes = () => {
     }, []);
 
     useEffect(() => {
-        if (!testId) return; // Tunggu hingga testId tersedia dari URL path
+        if (!testId) return;
 
         const fetchQuestionsAndAnswers = async () => {
             try {
@@ -261,7 +190,75 @@ const MengerjakanTes = () => {
         }
     };
 
+    useEffect(() => {
+        const fetchWorkTime = async () => {
+            try {
+                const response = await fetch(`http://localhost:2000/timer/${testId}/worktime`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                if (!response.ok) throw new Error('Failed to fetch worktime');
 
+                const data = await response.json();
+                console.log('Fetched worktime:', data); // Log the full response
+
+                const { hours, minutes, seconds } = data; // Destructure the response
+
+                // Convert total time to seconds for remaining time calculation
+                const totalWorkTimeInSeconds = hours * 3600 + minutes * 60 + seconds;
+
+                // Set remaining time only if it's greater than zero
+                if (totalWorkTimeInSeconds > 0) {
+                    setRemainingTime(totalWorkTimeInSeconds);
+                    setTimerActive(true); // Activate the timer if there is time remaining
+                } else {
+                    setRemainingTime(0); // Ensure remainingTime is set to 0
+                    alert("Waktu sudah habis!"); // Alert if the time is already zero
+                }
+            } catch (error) {
+                console.error('Failed to fetch worktime:', error);
+                alert("Gagal mengambil waktu kerja."); // Add an alert for fetch error
+            }
+        };
+
+        fetchWorkTime();
+    }, [testId]);
+
+    const formatRemainingTime = (timeInSeconds) => {
+        if (typeof timeInSeconds !== 'number' || isNaN(timeInSeconds) || timeInSeconds < 0) {
+            return '00:00:00'; // Fallback to default format
+        }
+
+        const hours = Math.floor(timeInSeconds / 3600);
+        const minutes = Math.floor((timeInSeconds % 3600) / 60);
+        const seconds = timeInSeconds % 60;
+
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    };
+
+    // Format waktu yang tersisa untuk ditampilkan
+    const remainingTimeFormatted = formatRemainingTime(remainingTime);
+
+    // Timer countdown effect
+    useEffect(() => {
+        let timer;
+        if (timerActive && remainingTime > 0) {
+            timer = setInterval(() => {
+                setRemainingTime((prevTime) => {
+                    if (prevTime <= 1) {
+                        clearInterval(timer);
+                        alert("Waktu habis!"); // Show alert when time is up
+                        setTimerActive(false); // Stop the timer
+                        return 0; // Ensure remainingTime does not go below 0
+                    }
+                    return prevTime - 1;
+                });
+            }, 1000);
+        }
+
+        return () => clearInterval(timer); // Cleanup function
+    }, [timerActive, remainingTime]);
 
     const handleOption = async (optionId, optionLabel, question) => {
         setSelectedOption(optionLabel);
@@ -304,8 +301,6 @@ const MengerjakanTes = () => {
         }
     };
     
-    
-
     const handlenextquestion = () => {
         if (currentOption < questions.length) {
             setCurrentOption((prev) => prev + 1);
@@ -501,19 +496,14 @@ const MengerjakanTes = () => {
                             {Array.from({ length: questions.length }, (_, i) => (
                                 <button
                                     key={i + 1}
-                                    className={`w-10 h-10 text-lg font-bold rounded border border-[#0B61AA] 
-                                        ${markedReview[i] ? 'bg-yellow-500 text-white' : 'bg-gray-200'} 
-                                        ${currentOption === i + 1 ? 'bg-[#0B61AA] text-white' : ''} 
-                                        hover:bg-gray-300 transition duration-200`}
-                                    onClick={() => setCurrentOption(i + 1)}
-                                    aria-label={`Question ${i + 1}`}
-                                    title={`Go to Question ${i + 1}`}>
+                                    className={`w-10 h-10 text-lg font-bold rounded border border-[#0B61AA] ${markedReview[i] ? 'bg-yellow-500 text-white' : 'bg-gray-200'} hover:bg-gray-300`}
+                                    onClick={() => setCurrentOption(i + 1)}>
                                     {i + 1}
                                 </button>
                             ))}
                         </div>
                     </div>
-                </div>  
+                </div>
             </div>
         </div>
     );

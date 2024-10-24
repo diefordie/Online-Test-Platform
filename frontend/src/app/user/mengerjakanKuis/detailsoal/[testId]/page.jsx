@@ -3,12 +3,24 @@
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import Link from 'next/link';
+// import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+// import { useRouter } from 'next/router';
 
 export default function Home() {
   const [testDetails, setTestDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const testId = 'cm20ol2di0001736jtuvjqdi2';
+  const { testId } = useParams(); 
+  const [token, setToken] = useState('');
+  // const router = useRouter();
+
+  useEffect(() => {
+      const storedToken = localStorage.getItem('token');
+      if (storedToken) {
+          setToken(storedToken);
+      }
+  }, []);
 
   // Fetch data from the backend
   useEffect(() => {

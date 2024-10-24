@@ -15,7 +15,10 @@ import dashboardRoutes from './src/routes/dashboardRoutes.js';
 
 import timerRoutes from './src/routes/timerRoutes.js';
 import detailSoal from './src/routes/detailsoalRoutes.js';
-import riwayatTransaksi from './src/routes/riwayattransaksiRoutes.js'
+import riwayattransaksiRoutes from './src/routes/riwayattransaksiRoutes.js';
+import paymentRoutes from './src/routes/paymentRoutes.js';
+
+import editProfile from './src/routes/editProfileUser.js';
 
 dotenv.config();
 const app = express();
@@ -46,7 +49,9 @@ app.use("/auth", authRoutes);
 app.use("/dashboard", dashboardRoutes);
 app.use('/timer', timerRoutes);
 app.use('/tes', detailSoal);
-app.use('/riwayat', riwayatTransaksi);
+app.use('/api', riwayattransaksiRoutes);
+app.use("/api/payment", paymentRoutes);
+app.use("/user", editProfile);
 // Mulai server
 const PORT = process.env.PORT || 2000;
 app.listen(PORT, () => {

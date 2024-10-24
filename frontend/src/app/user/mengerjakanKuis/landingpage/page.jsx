@@ -213,7 +213,7 @@ export default function Dashboard() {
               <img 
                 src="/images/etamtest.png" 
                 alt="EtamTest" 
-                className="h-[30px] lg:h-10 pl-3" 
+                className="h-[60px] lg:h-20 pl-3" 
               />
             </Link>
           </div>

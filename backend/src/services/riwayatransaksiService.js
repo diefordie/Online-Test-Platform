@@ -1,27 +1,44 @@
-import { PrismaClient } from "@prisma/client";
-import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
-dotenv.config();
+import prisma from '../../prisma/prismaClient.js';
 
-const prismaClient = new PrismaClient();
-export const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_here';
-
-export const getTransactions = async (userId) => {
-  return await prisma.transaction.findMany({
-    where: { test: { authorId: userId } },
-    include: {
-      test: {
-        select: {
-          title: true,
-          price: true,
-          similarity: true,
-          author: {
-            select: {
-              name: true 
-            }
-          }
-        }
-      }
+export const getTransactionByUserId = async (userId) => {
+    try {
+        const transactions = await prisma.transaction.findMany({
+            where: { userId },
+            include: {
+                test: {
+                    include: {
+                        author: true,  // Menambahkan relasi author
+                    },
+                },
+            },
+            orderBy: {
+                paymentTime: 'desc',  // Mengatur sorting berdasarkan waktu pembayaran
+            },
+        });
+        return transactions;
+    } catch (error) {
+        throw new Error('Failed to retrieve transaction history');
     }
-  });
+};
+
+export const getTransactionById = async (transactionId) => {
+    try {
+        const transaction = await prisma.transaction.findUnique({
+            where: { id: transactionId },
+            include: {
+                test: {
+                    include: {
+                        author: true,  // Menambahkan include author untuk mendapatkan nama author
+                    }
+                },
+                user: true,
+            }
+        });
+        if (!transaction) {
+            throw new Error('Transaction not found');
+        }
+        return transaction;
+    } catch (error) {
+        throw new Error('Failed to retrieve transaction details');
+    }
 };
