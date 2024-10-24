@@ -1,4 +1,6 @@
-import { prisma } from '../prismaClient.js'; // Pastikan Prisma Client di-import
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient(); 
 
 export const checkTransactionStatus = async (req, res) => {
   const userId = req.user.id; // Ambil user ID dari permintaan yang sudah diautentikasi
