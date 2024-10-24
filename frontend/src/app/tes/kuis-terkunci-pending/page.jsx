@@ -1,6 +1,6 @@
 // halaman kuisterkunci
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState } from "react";
 
 const MengerjakanTes = () => {
   const totalQuestions = 40; // Pindahkan deklarasi totalQuestions ke atas
@@ -9,9 +9,7 @@ const MengerjakanTes = () => {
   const [markedreview, setMarkedreview] = useState(
     Array(totalQuestions).fill(false)
   );
-  const [buttonText, setButtonText] = useState('Dapatkan Akses');
   const [isBlurred, setIsBlurred] = useState(true); // State to toggle blur
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IldGdHM2UXl4SGZWRnEzc0pXWXpyOHZXR0RzbTEiLCJlbWFpbCI6ImNoYXNjaHl5QGdtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzI5Nzg3MzExLCJleHAiOjE3Mjk3OTA5MTF9.uF50dPWsCWTB7oDDsY97vH4xk3y0qHlMqPB3XHkPnfs';
 
   const handleoption = (option) => {
     setSelectedoption(option);
@@ -41,33 +39,6 @@ const MengerjakanTes = () => {
   const handleSubmit = () => {
     alert("Submit jawaban berhasil!");
   };
-
-  useEffect(() => {
-    // Fungsi untuk memeriksa status transaksi dan mengubah teks tombol
-    const checkTransactionStatus = async () => {
-      try {
-        const response = await fetch('http://localhost:2000/api/check-status?testId=cm1ry216a0008nrs0p1ejk0t5', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`, // Sesuaikan token jika diperlukan
-          }
-        });
-        
-        const data = await response.json();
-
-        if (response.ok) {
-          // Update teks tombol berdasarkan pesan dari backend
-          setButtonText(data.message);
-        } else {
-          console.error('Error fetching transaction status:', data.message);
-        }
-      } catch (error) {
-        console.error('Failed to fetch transaction status:', error);
-      }
-    };
-
-    checkTransactionStatus();
-  }, []);
 
   return (
   <div className="max-w-full font-poppins">
@@ -127,15 +98,15 @@ const MengerjakanTes = () => {
                   className="w-16 h-16 mb-4 mx-auto"
                 />
 
-                {/* Button Dapatkan Akses */}
+                {/* Button Menunggu Pembayaran */}
                 <p className="text-sm mb-4">
                   Klik dibawah ini untuk mendapatkan akses soal
                 </p>
                 <button
                   className="px-4 py-2 bg-[#7BB3B4] text-white rounded-full shadow hover:bg-[#6A9DA3] transition duration-300 ease-in-out font-bold"
-                  onClick={() => alert(buttonText)} // Kamu bisa sesuaikan behavior onClick sesuai kebutuhan
+                  onClick={() => alert("Silakan selesaikan pembelian.")}
                 >
-                  {buttonText}
+                  Menunggu Pembayaran
                 </button>
               </div>
             </div>
