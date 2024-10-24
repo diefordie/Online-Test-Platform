@@ -1,87 +1,87 @@
-'use client'
-
-import React, { useState } from "react"; // Pastikan useState diimpor
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/app/firebase/config'; 
+'use client';
+import React, { useState } from "react"; 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from "next/image";
-import gambar1 from '@/app/assets/registrasi.png';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
 
 const Registrasi = () => {
-    // Definisikan state di sini
-    const [nama, setNama] = useState('');
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [role, setRole] = useState('user');
-    const [showPopup, setShowPopup] = useState(false); // Tambahkan definisi showPopup dan setShowPopup di sini
+    const [role, setRole] = useState('');
+    const [showPopup, setShowPopup] = useState(); 
     const router = useRouter();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // Proses registrasi Firebase
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            
-            const user = userCredential.user;
-
-            const db = getFirestore();
-
-            const status = role === 'author' ? false : true ;
-            await setDoc(doc(db, 'users', user.uid), {
-                nama,
-                email,
-                role,
-                isApproved: status,
+            const response = await fetch('http://localhost:2000/auth/registrasi', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name,
+                    email,
+                    password,
+                    role: role.toUpperCase(),
+                }),
             });
+    
+            const data = await response.json();
+    
+            if (!response.ok) {
+                if (response.status === 400) {
+                    throw new Error(data.message || 'Data yang Anda masukkan tidak valid. Silakan periksa kembali.');
+                } else if (response.status === 401) {
+                    throw new Error('Anda tidak memiliki hak akses. Silakan login kembali.');
+                } else if (response.status === 409) {
+                    throw new Error('Email anda telah terdaftar. Gunakan email lain.');
+                } else if (response.status === 500) {
+                    throw new Error('Terjadi kesalahan pada server. Silakan coba lagi nanti.');
+                } else {
+                    throw new Error('Terjadi kesalahan yang tidak diketahui. Silakan coba lagi.');
+                }
+            }
+    
+            console.log("Akun berhasil didaftarkan");
 
-            console.log("Akun berhasil didaftarkan", user);
+            setShowPopup(true);
 
-            // Tampilkan pop-up setelah registrasi berhasil
-            setShowPopup(true); // Pastikan setShowPopup didefinisikan
-
-            // Sembunyikan pop-up setelah beberapa detik dan arahkan ke halaman yang sesuai
             setTimeout(() => {
                 setShowPopup(false);
-                if (role === 'author') {
-                    router.push('/syarat'); // Arahkan ke halaman syarat jika role adalah author
+                if (role === 'AUTHOR') {
+                    router.push('/auth/syarat');
                 } else {
-                    router.push('/login'); // Arahkan ke halaman login jika role adalah user
+                    router.push('/auth/login');
                 }
-            }, 3000); 
+            }, 3000);
         } catch (err) {
-            console.error("Gagal Registrasi", err);
+            console.error("Kesalahan registrasi", err);
+            alert(err.message);
         }
     };
-
+    
     return (
-        <div className="relative min-h-screen flex items-center bg-white">
-            <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', padding: '20px' }}>
-                <Image
-                    alt="gambar1"
-                    src={gambar1}
-                    sizes="100vw"
-                    style={{
-                        width: '40%',
-                        height: 'auto',
-                        position: 'absolute',
-                        top: '23%',
-                    }}
-                />
-            </div>
+        <div className="relative min-h-screen flex justify between items-center bg-white">
+            <img 
+                src="/images/polygon.png" 
+                alt="Img 1" 
+                className="w-full max-w-xs md:max-w-sm max-w-md lg:h-max-screen object-contain"
+            />
+            
+            <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', padding: '20px' }}></div>
+            
 
-            <div className="absolute top-1/2 left-0 transform -translate-y-1/2 w-full max-w-sm p-8 bg-secondary shadow-md rounded-3xl ml-20">
+            <div className="absolute lg:right-1/2  lg:top-1/2 transform lg:-translate-y-1/2 w-full  max-w-screen p-4 lg:max-w-sm lg:p-7 bg-powderBlue shadow-md rounded-3xl ml-0 lg:ml-20">
                 <h2 className="text-3xl font-bold mb-6 text-black text-center">Daftar</h2>
                 <form className="space-y-4" onSubmit={handleSubmit}>
-                    {/* Input Form */}
                     <div>
-                        <label htmlFor='nama' className="block text-sm font-medium text-black">Nama:</label>
+                        <label htmlFor='name' className="block text-sm font-medium text-black">Nama:</label>
                         <input
                             type="text"
-                            id="nama"
-                            name="nama"
-                            onChange={(e) => setNama(e.target.value)}
+                            id="name"
+                            name="name"
+                            onChange={(e) => setName(e.target.value)}
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
                         />
                     </div>
@@ -113,24 +113,23 @@ const Registrasi = () => {
                             value={role}
                             onChange={(e) => setRole(e.target.value)}
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
-                            <option value="author">Author</option>
-                            <option value="user">User</option>
+                            <option value="AUTHOR">Author</option>
+                            <option value="USER">User</option>
                         </select>
                     </div>
                     <div className="flex justify-center">
                         <button
                             type="submit"
-                            className="bg-birutua text-putih py-2 px-10 rounded-2xl shadow-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+                            className="bg-deepBlue text-putih py-2 px-10 rounded-2xl shadow-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
                             Kirim
                         </button>
                     </div>
                     <p className="text-center mt-4 text-sm">
-                        Sudah memiliki akun? <Link href="/login" className="text-white font-bold hover:underline">Login</Link>
+                        Sudah memiliki akun? <Link href="/auth/login" className="text-white font-bold hover:underline">Login</Link>
                     </p>
                 </form>
             </div>
 
-            {/* Pop-up untuk pemberitahuan registrasi berhasil */}
             {showPopup && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -139,7 +138,12 @@ const Registrasi = () => {
                     </div>
                 </div>
             )}
-        </div>
+           <img 
+                src="/images/mobilepassword.png" 
+                alt="Img 2" 
+                className="w-full max-w-xs md:max-w-sm lg:max-w-md h-auto object-contain"
+            />
+         </div>
     );
 };
 

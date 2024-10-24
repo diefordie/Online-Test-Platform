@@ -13,6 +13,7 @@ export default function psikotes() {
   const [loading, setLoading] = useState([true]);
   const [error, setError] = useState([null]);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IldGdHM2UXl4SGZWRnEzc0pXWXpyOHZXR0RzbTEiLCJlbWFpbCI6ImNoYXNjaHl5QGdtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzI5Nzc2MjgyLCJleHAiOjE3Mjk3Nzk4ODJ9.0ka1wkLGztzgopxjhlvl77JSE7l5quPTMixKdlBFF0c';
 
   useEffect(() => {
     const fetchPopularTestsByCategory = async () => {
@@ -206,6 +207,117 @@ export default function psikotes() {
     setIsLiked(!isLiked);
   }; 
   
+  const [likedSearchItems, setLikedSearchItems] = useState({});
+const [likedPopulerItems, setLikedPopulerItems] = useState({});
+const [likedGratisItems, setLikedGratisItems] = useState({});
+
+const toggleLikeSearch = async (id) => {
+  const isLiked = likedSearchItems[id]; // Cek status apakah sudah di-like
+
+  try {
+    if (isLiked) {
+      // Jika sudah di-like, lakukan DELETE request
+      await fetch(`http://localhost:2000/api/favorites`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Gunakan token yang sudah didefinisikan
+        },
+        body: JSON.stringify({ testId: id }),
+      });
+    } else {
+      // Jika belum di-like, lakukan POST request
+      await fetch(`http://localhost:2000/api/favorites`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Gunakan token yang sudah didefinisikan
+        },
+        body: JSON.stringify({ testId: id }),
+      });
+    }
+
+    // Update state setelah permintaan berhasil
+    setLikedSearchItems((prevLikedItems) => ({
+      ...prevLikedItems,
+      [id]: !prevLikedItems[id], // Toggle status like
+    }));
+  } catch (error) {
+    console.error("Error handling favorite:", error);
+  }
+};
+
+const toggleLikePopuler = async (id) => {
+  const isLiked = likedPopulerItems[id]; // Cek status apakah sudah di-like
+
+  try {
+    if (isLiked) {
+      // Jika sudah di-like, lakukan DELETE request
+      await fetch(`http://localhost:2000/api/favorites`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Gunakan token yang sudah didefinisikan
+        },
+        body: JSON.stringify({ testId: id }),
+      });
+    } else {
+      // Jika belum di-like, lakukan POST request
+      await fetch(`http://localhost:2000/api/favorites`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Gunakan token yang sudah didefinisikan
+        },
+        body: JSON.stringify({ testId: id }),
+      });
+    }
+
+    // Update state setelah permintaan berhasil
+    setLikedPopulerItems((prevLikedItems) => ({
+      ...prevLikedItems,
+      [id]: !prevLikedItems[id], // Toggle status like
+    }));
+  } catch (error) {
+    console.error("Error handling favorite:", error);
+  }
+};
+
+const toggleLikeGratis = async (id) => {
+  const isLiked = likedGratisItems[id]; // Cek status apakah sudah di-like
+
+  try {
+    if (isLiked) {
+      // Jika sudah di-like, lakukan DELETE request
+      await fetch(`http://localhost:2000/api/favorites`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Pastikan kamu punya token JWT
+        },
+        body: JSON.stringify({ testId: id }),
+      });
+    } else {
+      // Jika belum di-like, lakukan POST request
+      await fetch(`http://localhost:2000/api/favorites`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Pastikan kamu punya token JWT
+        },
+        body: JSON.stringify({ testId: id }),
+      });
+    }
+
+    // Update state setelah permintaan berhasil
+    setLikedGratisItems((prevLikedItems) => ({
+      ...prevLikedItems,
+      [id]: !prevLikedItems[id], // Toggle status like
+    }));
+  } catch (error) {
+    console.error("Error handling favorite:", error);
+  }
+};
 
   return (
     <>
@@ -239,13 +351,13 @@ export default function psikotes() {
                   <nav className="hidden lg:block mt-2">
                       <ol className="list-reset flex space-x-2 ">
                       <li>
-                          <Link href="/userDashboard" legacyBehavior>
+                          <Link href="/user/dashboard" legacyBehavior>
                           <a className="hover:text-orange font-poppins font-bold">Home</a>
                           </Link>
                       </li>
                       <li>/</li>
                       <li>
-                          <Link href="/psikotes" legacyBehavior>
+                          <Link href="/tes/category/Psikotes" legacyBehavior>
                           <a className="hover:text-orange font-poppins font-bold">Latihan Tes Psikotes</a>
                           </Link>
                       </li>
@@ -394,15 +506,18 @@ export default function psikotes() {
                 </div>
 
                 <div className="absolute gap-1 bottom-5 left-0 right-0 flex justify-center items-center lg:justify-center lg:space-x-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 p-1 w-full">
-                    <a href="/tes" className="w-3/4 lg:w-1/4 text-xs lg:text-base text-center bg-paleBlue text-deepBlue py-3 lg:py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue mb-2 lg:mb-0">
+                    <a href="/tes/detailsoal" className="w-3/4 lg:w-1/4 text-xs lg:text-base text-center bg-paleBlue text-deepBlue py-3 lg:py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue mb-2 lg:mb-0">
                       Mulai
                     </a>
-                    <a href="/topScore" className="w-3/4 lg:w-2/5 text-xs lg:text-base text-center bg-paleBlue text-deepBlue py-1 lg:py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue mb-2 lg:mb-0">
+                    <a href="/user/topScore" className="w-3/4 lg:w-2/5 text-xs lg:text-base text-center bg-paleBlue text-deepBlue py-1 lg:py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue mb-2 lg:mb-0">
                       <i className="fa-solid fa-medal"></i>
                        <span className="ml-1">Top Score</span>
                     </a>
-                    <button onClick={toggleLike} className="lg:block text-center bg-paleBlue text-deepBlue inline-block px-3 py-2 rounded-full hover:bg-orange hover:text-deepBlue mb-2 lg:mb-0">
-                      <i className={`fa${isLiked ? "s" : "r"} fa-heart ${isLiked ? "text-red-500" : "text-deepBlue"}`}></i>
+                    <button 
+                      onClick={() => toggleLikeSearch(test.id)} 
+                      className="lg:block text-center bg-paleBlue text-deepBlue inline-block px-3 py-2 rounded-full hover:bg-orange hover:text-deepBlue mb-2 lg:mb-0"
+                    >
+                      <i className={`fa${likedSearchItems[test.id] ? "s" : "r"} fa-heart ${likedSearchItems[test.id] ? "text-red-500" : "text-deepBlue"}`}></i>
                     </button>
                 </div>
               </div>
@@ -474,15 +589,18 @@ export default function psikotes() {
                   </div>
 
                   <div className="absolute gap-1 bottom-5 left-0 right-0 flex justify-center items-center lg:justify-center lg:space-x-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 p-1 w-full">
-                    <a href="/tes" className="w-3/4 lg:w-1/4 text-xs lg:text-base text-center bg-paleBlue text-deepBlue py-3 lg:py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue mb-2 lg:mb-0">
+                    <a href="/tes/detailsoal" className="w-3/4 lg:w-1/4 text-xs lg:text-base text-center bg-paleBlue text-deepBlue py-3 lg:py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue mb-2 lg:mb-0">
                       Mulai
                     </a>
-                    <a href="/topScore" className="w-3/4 lg:w-2/5 text-xs lg:text-base text-center bg-paleBlue text-deepBlue py-1 lg:py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue mb-2 lg:mb-0">
+                    <a href="/user/topscore" className="w-3/4 lg:w-2/5 text-xs lg:text-base text-center bg-paleBlue text-deepBlue py-1 lg:py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue mb-2 lg:mb-0">
                       <i className="fa-solid fa-medal"></i>
                        <span className="ml-1">Top Score</span>
                     </a>
-                    <button onClick={toggleLike} className="lg:block text-center bg-paleBlue text-deepBlue inline-block px-3 py-2 rounded-full hover:bg-orange hover:text-deepBlue mb-2 lg:mb-0">
-                      <i className={`fa${isLiked ? "s" : "r"} fa-heart ${isLiked ? "text-red-500" : "text-deepBlue"}`}></i>
+                    <button 
+                      onClick={() => toggleLikePopuler(test.id)} 
+                      className="lg:block text-center bg-paleBlue text-deepBlue inline-block px-3 py-2 rounded-full hover:bg-orange hover:text-deepBlue mb-2 lg:mb-0"
+                    >
+                      <i className={`fa${likedPopulerItems[test.id] ? "s" : "r"} fa-heart ${likedPopulerItems[test.id] ? "text-red-500" : "text-deepBlue"}`}></i>
                     </button>
                   </div>
 
@@ -554,15 +672,18 @@ export default function psikotes() {
                 </div>
 
                 <div className="absolute gap-1 bottom-5 left-0 right-0 flex justify-center items-center lg:justify-center lg:space-x-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 p-1 w-full">
-                    <a href="/tes" className="w-3/4 lg:w-1/4 text-xs lg:text-base text-center bg-paleBlue text-deepBlue py-3 lg:py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue mb-2 lg:mb-0">
+                    <a href="/tes/detailsoal" className="w-3/4 lg:w-1/4 text-xs lg:text-base text-center bg-paleBlue text-deepBlue py-3 lg:py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue mb-2 lg:mb-0">
                       Mulai
                     </a>
-                    <a href="/topScore" className="w-3/4 lg:w-2/5 text-xs lg:text-base text-center bg-paleBlue text-deepBlue py-1 lg:py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue mb-2 lg:mb-0">
+                    <a href="/user/topscore" className="w-3/4 lg:w-2/5 text-xs lg:text-base text-center bg-paleBlue text-deepBlue py-1 lg:py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue mb-2 lg:mb-0">
                       <i className="fa-solid fa-medal"></i>
-                       <span className="ml-1">Top Score</span>
+                      <span className="ml-1">Top Score</span>
                     </a>
-                    <button onClick={toggleLike} className="lg:block text-center bg-paleBlue text-deepBlue inline-block px-3 py-2 rounded-full hover:bg-orange hover:text-deepBlue mb-2 lg:mb-0">
-                      <i className={`fa${isLiked ? "s" : "r"} fa-heart ${isLiked ? "text-red-500" : "text-deepBlue"}`}></i>
+                    <button 
+                      onClick={() => toggleLikeGratis(test.id)} 
+                      className="lg:block text-center bg-paleBlue text-deepBlue inline-block px-3 py-2 rounded-full hover:bg-orange hover:text-deepBlue mb-2 lg:mb-0"
+                    >
+                      <i className={`fa${likedGratisItems[test.id] ? "s" : "r"} fa-heart ${likedGratisItems[test.id] ? "text-red-500" : "text-deepBlue"}`}></i>
                     </button>
                 </div>
               </div>
