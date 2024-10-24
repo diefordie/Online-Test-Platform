@@ -1,6 +1,6 @@
 // src/routes/authorRoutes.js
-import express from 'express';
-import { createAuthor, editAuthor, getAuthor, editVerifiedAuthor } from '../controllers/authorControllers.js'; // Pastikan tambahkan .js pada jalur file
+import express from "express";
+import { createAuthor, editAuthor, getAuthor, editVerifiedAuthor } from "../controllers/authorControllers.js";
 
 const router = express.Router();
 

@@ -48,11 +48,10 @@ export const getPopularTestsService = async () => {
       accessCount: test.history.length, // Count the number of accesses
     }))
     .filter(test => test.accessCount > 0) // Filter out tests with 0 access count
-    .sort((a, b) => b.accessCount - a.accessCount) // Sort by access count in descending order
-    .slice(0, 4); // Take only the top 4 most accessed tests
+    .sort((a, b) => b.accessCount - a.accessCount); // Sort by access count in descending order
 
   const testIds = sortedTests.map(test => test.id);
-  
+
   // Fetch detailed test information
   return await getTestDetailsWithAccessCountAndAuthor(testIds);
 };
@@ -66,7 +65,6 @@ export const getFreeTestsService = async () => {
     include: {
       history: true, // Include history to calculate access count
     },
-    take: 4, // Take only the top 4 tests
   });
 
   // Set accessCount to 0 if there is no access history
@@ -133,7 +131,7 @@ export const getTestsByCategoryService = async (category) => {
   return await getTestDetailsWithAccessCountAndAuthor(testIds);
 };
 
-// Get 4 most popular tests within a category based on access count
+// Get most popular tests within a category based on access count
 export const getPopularTestsByCategoryService = async (category) => {
   const popularTests = await prisma.test.findMany({
     where: {
@@ -151,15 +149,13 @@ export const getPopularTestsByCategoryService = async (category) => {
       accessCount: test.history.length, // Count the number of accesses
     }))
     .filter(test => test.accessCount > 0) // Filter out tests with 0 access count
-    .sort((a, b) => b.accessCount - a.accessCount) // Sort by access count in descending order
-    .slice(0, 4); // Take only the top 4 most accessed tests
+    .sort((a, b) => b.accessCount - a.accessCount); // Sort by access count in descending order
 
   const testIds = sortedTests.map(test => test.testId);
 
   return await getTestDetailsWithAccessCountAndAuthor(testIds);
 };
 
-// Get 4 free tests within a category even if they have no access history
 export const getFreeTestsByCategoryService = async (category) => {
   const freeTests = await prisma.test.findMany({
     where: {
@@ -169,7 +165,6 @@ export const getFreeTestsByCategoryService = async (category) => {
     include: {
       history: true, // Include history to calculate access count
     },
-    take: 4, // Take only the top 4 tests
   });
 
   // Set accessCount to 0 if there is no access history
@@ -182,4 +177,3 @@ export const getFreeTestsByCategoryService = async (category) => {
 
   return await getTestDetailsWithAccessCountAndAuthor(testIds);
 };
-

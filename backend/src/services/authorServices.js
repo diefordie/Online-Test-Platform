@@ -1,12 +1,12 @@
 // src/services/authorServices.js
-import { PrismaClient } from '@prisma/client'; // Ubah require menjadi import
+import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const createAuthorService = async (authorData) => {
     return await prisma.author.create({
         data: {
             userId: authorData.userId,
-            nama: authorData.nama,
+            name: authorData.name,
             handphoneNum: authorData.handphoneNum,
             authorPhoto: authorData.authorPhoto,
             bank: authorData.bank,
@@ -31,7 +31,7 @@ export const editAuthorService = async (id, authorData) => {
             where: { id: id },
             data: {
                 userId: authorData.userId,
-                nama: authorData.nama,
+                name: authorData.name,
                 handphoneNum: authorData.handphoneNum,
                 authorPhoto: authorData.authorPhoto,
                 bank: authorData.bank,

@@ -1,4 +1,5 @@
-import { createMultipleChoiceService } from '../services/multiplechoiceSevice.js';
+import { createMultipleChoiceService, getMultipleChoiceService } from '../services/multiplechoiceSevice.js';
+
 const createMultipleChoice = async (req, res) => {
     try {
         const { testId, questions } = req.body;
@@ -25,7 +26,31 @@ const createMultipleChoice = async (req, res) => {
     }
 };
 
-export { createMultipleChoice }; // Menggunakan named export
+
+const getMultipleChoice = async (req, res) => {
+    try {
+        const { id } = req.params; // Mengambil testId dari parameter URL
+        console.log('Test ID yang dicari:', id);
+
+        // Memanggil service untuk mendapatkan pilihan ganda berdasarkan testId
+        const multipleChoices = await getMultipleChoiceService(id);
+
+        // Mengembalikan respons sukses
+        res.status(200).send({
+            data: multipleChoices,
+            message: 'Get multiple choice success',
+        });
+    } catch (error) {
+        console.error('Error fetching multiple choices:', error);
+        // Mengembalikan respons gagal
+        res.status(500).send({
+            message: 'Failed to get multiple choice',
+            error: error.message,
+        });
+    }
+};
+
+export { createMultipleChoice, getMultipleChoice }; // Menggunakan named export
 
 
 

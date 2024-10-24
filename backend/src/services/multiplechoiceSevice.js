@@ -32,7 +32,18 @@ const createMultipleChoiceService = async (testId, questions) => {
     return multipleChoices;
 };
 
-export { createMultipleChoiceService }; // Menggunakan named export
+const getMultipleChoiceService = async (testId) => {
+    return await prisma.multiplechoice.findMany({
+        where: {
+            testId: testId,
+        },
+        include: {
+            option: true,
+        },
+    });
+}
+
+export { createMultipleChoiceService, getMultipleChoiceService }; // Menggunakan named export
 
 
 
