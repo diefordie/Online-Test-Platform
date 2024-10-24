@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import jwt_decode from 'jwt-decode'; // Pastikan Anda menginstal jsonwebtoken jika belum ada
 
 export default function EditProfile({ params }) {
   const { userId } = params; // Ambil userId dari params
@@ -10,6 +11,7 @@ export default function EditProfile({ params }) {
     lastName: '',
     email: '',
     password: '',
+    profileImage: '', // Tambahkan state untuk menyimpan gambar profil
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,7 +27,7 @@ export default function EditProfile({ params }) {
         return;
       }
 
-      const response = await fetch(`http://localhost:2000/user/profile/${userId}`, {
+      const response = await fetch(`http://localhost:2000/user/profile`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -40,6 +42,7 @@ export default function EditProfile({ params }) {
           lastName: data.name.split(' ')[1] || '',
           email: data.email || '',
           password: '', // Kosongkan password untuk keamanan
+          profileImage: data.profileImage || '', // Tambahkan gambar profil dari data
         });
       } else {
         console.error('Failed to fetch user data');
@@ -61,11 +64,22 @@ export default function EditProfile({ params }) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, profileImage: reader.result }); // Set gambar profil
+      };
+      reader.readAsDataURL(file); // Baca file sebagai URL
+    }
+  };
+
   const handleSave = async (e) => {
     e.preventDefault(); // Mencegah refresh saat submit
     try {
       const token = localStorage.getItem('token'); // Ambil token dari localStorage
-      const response = await fetch(`http://localhost:2000/user/profile/${userId}`, {
+      const response = await fetch(`http://localhost:2000/user/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -74,6 +88,7 @@ export default function EditProfile({ params }) {
         body: JSON.stringify({
           name: `${formData.firstName} ${formData.lastName}`,
           email: formData.email,
+          profileImage: formData.profileImage, // Kirim gambar profil ke backend
         }),
       });
 
@@ -119,8 +134,20 @@ export default function EditProfile({ params }) {
         <div className="w-full max-w-[1228px] h-[88px] mx-auto mt-2 p-4 bg-[#0B61AA] text-white flex items-center justify-between rounded-md">
           <div className="flex items-center">
             <div className="w-16 h-16 rounded-full flex justify-center items-center relative">
-              <img src="/img/Profil.png" alt="Profil" className="h-16 w-16 rounded-full" />
-              <img src="/img/kamera.png" alt="Kamera" className="h-6 w-6 absolute bottom-0 right-1" />
+              <img src={formData.profileImage || "/img/Profil.png"} alt="Profil" className="h-16 w-16 rounded-full" />
+              <img
+                src="/img/kamera.png"
+                alt="Kamera"
+                className="h-6 w-6 absolute bottom-0 right-1 cursor-pointer"
+                onClick={() => document.getElementById('uploadProfileImage').click()} // Memicu klik input file
+              />
+              <input
+                type="file"
+                id="uploadProfileImage"
+                style={{ display: 'none' }} // Sembunyikan input file
+                onChange={handleFileChange} // Tangani perubahan file
+                accept="image/*" // Hanya terima file gambar
+              />
             </div>
             <div className="ml-4">
               <h3 className="text-xl font-semibold font-poppins">{`${formData.firstName} ${formData.lastName}`}</h3>
