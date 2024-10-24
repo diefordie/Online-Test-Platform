@@ -8,13 +8,18 @@ const createMultipleChoiceService = async (testId, questions) => {
     
     const multipleChoices = await Promise.all(
         questions.map(async (question) => {
+
+            if (!/^\d+(\.\d+)?$/.test(question.weight)) {
+                throw new Error(`Invalid weight value for question number ${question.number}. Weight must be a positive number without any signs, and can contain at most one decimal point.`);
+            }
+
             const multiplechoice = await prisma.multiplechoice.create({
                 data: {
                     testId: testId,
                     question: question.question,
                     number: question.number,
                     questionPhoto: question.questionPhoto || null, 
-                    weight: question.weight,
+                    weight: parseFloat(question.weight),
                     discussion: question.discussion || "",  
                     option: {
                         create: question.options.map((option) => ({

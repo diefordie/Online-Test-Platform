@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 
 const MembuatSoal = () => {
   const router = useRouter();
-  const [testId, setTestId] = useState('');
+  const [testId, setTestId] = useState('cm2i7ml8i0001wrlj72zolmrj');
   const [multiplechoiceId, setMultiplechoiceId] = useState('');
   const [id, setId] = useState('');
   const [question, setQuestion] = useState('');
@@ -21,8 +21,8 @@ const MembuatSoal = () => {
   const [pages, setPages] = useState([{ questions: [] }]);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   // const [labelCount, setlabelCount] = useState(1);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
+  // const [currentPage, setCurrentPage] = useState(0);
+  // const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -85,7 +85,11 @@ const MembuatSoal = () => {
   };
 
   const handleWeightChange = (e) => {
-    setWeight(e.target.value);
+    const value = e.target.value;
+    // Hanya angka dan satu titik desimal
+    if (/^\d*\.?\d*$/.test(value)) {
+      setWeight(value); // Simpan sebagai string untuk menghindari pembulatan
+    }
   }
 
   const loadPagesFromLocalStorage = () => {
@@ -96,9 +100,8 @@ const MembuatSoal = () => {
         }
     }
     return null;
-};
+  };
 
-  // Di komponen halaman buat soal
   useEffect(() => {
       const savedPages = loadPagesFromLocalStorage();
       if (savedPages) {
@@ -141,25 +144,17 @@ const MembuatSoal = () => {
             alert('Terjadi kesalahan saat menghapus soal. Silakan coba lagi.');
         }
     }
-};
+  };
 
+  const [jawabanBenar, setJawabanBenar] = useState(null);
 
-  // const [jawabanBenar, setJawabanBenar] = useState(null);
-
-  // const handleJawabanBenarChange = (index) => {
-  //   setJawabanBenar(index);
-  // };
-
-  // useEffect(() => {
-  //   const params = new URLSearchParams(window.location.search);
-  //   const initialNumber = params.get('number');
-  //   if (initialNumber) {
-  //     setNumber(initialNumber);
-  //   }
-  // }, []);
+  const handleJawabanBenarChange = (index) => {
+    setJawabanBenar(index);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     const data = {
       testId: testId,
       questions: [
@@ -167,7 +162,7 @@ const MembuatSoal = () => {
           question: cleanHtml(question), 
           number: parseInt(number), 
           questionPhoto: questionPhoto || "",
-          weight: parseInt(weight), 
+          weight: parseFloat(weight), 
           discussion: cleanHtml(discussion), 
           options 
         }
@@ -228,20 +223,17 @@ const MembuatSoal = () => {
   
       <header className="bg-white text-black-500 p-1 sm:p-2" style={{ maxWidth: '1440px', height: '71px' }}>
         <div className="container mx-auto flex justify-start items-center p-4">
-          {/* Navigation Bar */}
           <nav className="flex w-full justify-start space-x-4">
             <a className="w-[120px] h-[40px] text-center font-bold font-poppins mb-0.5 
             hover:bg-[#CAE6F9] hover:text-black bg-white text-black rounded-full border border-white 
             shadow-lg transition-all duration-300 flex items-center justify-center">
               Buat Soal
             </a>
-            <Link href="/Publikasi" legacyBehavior>
-              <a className="w-[120px] h-[40px] text-center font-bold font-poppins mb-0
+            <a className="w-[120px] h-[40px] text-center font-bold font-poppins mb-0
                 hover:bg-[#CAE6F9] hover:text-black bg-white text-black rounded-full border border-white 
                 shadow-lg transition-all duration-300 flex items-center justify-center">
                 Publikasi
-              </a>
-            </Link>
+            </a>
           </nav>
         </div>
       </header>
@@ -272,7 +264,10 @@ const MembuatSoal = () => {
                 <div className='flex items-center'>
                   <label className="font-medium-bold mr-2">Bobot</label>
                   <input
-                    type="number"
+                    type="text"
+                    step="0.01"
+                    min="0"
+                    id="weight"
                     value={weight}
                     onChange={handleWeightChange}
                     className="border p-2 w-full"
@@ -280,9 +275,13 @@ const MembuatSoal = () => {
                   />
                 </div>
               </div>
-              <ReactQuill value={question} onChange={setQuestion} modules={modules}
+              <ReactQuill 
+                value={question} 
+                onChange={setQuestion} 
+                modules={modules}
                 className='bg-white shadow-md rounded-md border border-gray-500'
-                style={{ maxWidth: '1220px', height: '150px', overflow: 'hidden' }} />
+                style={{ maxWidth: '1220px', height: '150px', overflow: 'hidden' }}
+                required />
             </div>
           </div>
   
@@ -330,7 +329,6 @@ const MembuatSoal = () => {
             <ReactQuill value={discussion} onChange={setDiscussion} modules={modules}
               placeholder='Tulis kunci jawaban di sini...' />
           </div>
-  
           {/* <div className='mt-4 flex justify-start space-x-4'>
             <button
               onClick={handleDelete}
