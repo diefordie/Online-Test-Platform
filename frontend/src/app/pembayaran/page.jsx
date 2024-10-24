@@ -2,7 +2,7 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 
 function App() {
-  const [testId, setTestId] = useState('cm2af2s9e0000rrppow3g25bb');
+  const [testId, setTestId] = useState('cm2nuphri0002v776s11rpkq0');
   const [testTitle, setTestTitle] = useState('');
   const [testSimilarity, setTestSimilarity] = useState();
   const [testPrice, setTestPrice] = useState();
@@ -26,7 +26,7 @@ function App() {
   useEffect(() => {
     const fetchTestDetail = async () => {
       try {
-        const response = await fetch(`http://localhost:2000/api/tests/test-detail/cm2af2s9e0000rrppow3g25bb`);
+        const response = await fetch(`http://localhost:2000/api/tests/test-detail/cm2nuphri0002v776s11rpkq0`);
         if (!response.ok) {
           const errorMessage = await response.text();
           throw new Error(`Error: ${response.status} - ${errorMessage}`)
@@ -73,6 +73,7 @@ function App() {
             },
             onClose: function () {
               console.log('Payment dialog closed');
+              window.location.href = 'http://localhost:3000';
             },
           });
         } else {
