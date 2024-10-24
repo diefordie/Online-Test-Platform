@@ -17,7 +17,7 @@ export const checkTransactionStatus = async (req, res) => {
       // Jika tidak ada transaksi ditemukan, alihkan ke halaman kuis terkunci
       return res.status(302).json({
         message: 'Dapatkan akses.',
-        redirectUrl: 'http://localhost:3000/tes/kuis-terkunci',
+        redirectUrl: 'http://localhost:3000/tes/kuis-terkunci-akses',
       });
     }
 
@@ -30,7 +30,7 @@ export const checkTransactionStatus = async (req, res) => {
       case 'PENDING':
         return res.status(302).json({
           message: 'Menunggu pembayaran.',
-          redirectUrl: 'http://localhost:3000/tes/kuis-terkunci',
+          redirectUrl: 'http://localhost:3000/tes/kuis-terkunci-pending',
         });
       case 'FAILED':
         return res.status(302).json({
