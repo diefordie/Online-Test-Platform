@@ -47,7 +47,7 @@ const MembuatSoal = () => {
       try {
         const response = await fetch(`http://localhost:2000/api/multiplechoice/question/${multiplechoiceId}`);
         if (!response.ok) {
-          const errorMessage = await response.text(); // Dapatkan pesan kesalahan dari server
+          const errorMessage = await response.text(); 
           throw new Error(`Error: ${response.status} - ${errorMessage}`);
         }
         const data = await response.json();

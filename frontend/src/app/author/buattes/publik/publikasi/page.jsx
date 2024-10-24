@@ -7,11 +7,19 @@ export default function PublikasiPage() {
   const [namaTes, setNamaTes] = useState('');
   const [testId, setTestId] = useState(null);
   const [durasiTes, setDurasiTes] = useState('');
+  // const [acakPertanyaan, setAcakPertanyaan] = useState({
+  //   waktu: false,
+  //   acak: false,
+  // });
+  // const [maksimumPercobaan, setMaksimumPercobaan] = useState('');
   const [hargaTes, setHargaTes] = useState('');
   const [prediksiKemiripan, setPrediksiKemiripan] = useState('');
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
 
+  // const handleCheckboxChange = (event) => {
+  //   setAcakPertanyaan({ ...acakPertanyaan, [event.target.name]: event.target.checked });
+  // };
 
   useEffect(() => {
     const url = new URL(window.location.href);
