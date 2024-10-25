@@ -11,6 +11,6 @@ const router = express.Router();
 router.post('/tests/:testId/temp', saveDraft);
 router.patch('/tests/:testId/update', updateDraft);
 router.get('/tests/:resultId/', getAnswersByResultIdController);
-router.patch('/tests/:resultId/submit', submitFinal);
+router.patch('/tests/submit', submitFinal);
 
 export default router;

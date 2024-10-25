@@ -1,7 +1,7 @@
 import { submitFinalAnswers, saveDraftAnswer, updateDraftAnswer, getAnswersByResultId} from '../services/answerTestService.js';
 
 export const submitFinal = async (req, res) => {
-    const { resultId } = req.params; // Ambil resultId dari parameter request
+    const { resultId } = req.body; // Ambil resultId dari body request
     const token = req.headers.authorization?.split(" ")[1]; // Ambil token dari header
 
     try {
@@ -46,6 +46,7 @@ export const submitFinal = async (req, res) => {
         return res.status(500).json({ message: `Kesalahan tidak terduga: ${error.message}` });
     }
 };
+
 
 
 

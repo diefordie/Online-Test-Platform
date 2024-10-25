@@ -15,10 +15,11 @@ model Test {
   category         Category
   title            String
   testDescription  String
-  price            Decimal
-  similarity       Decimal
-  worktime         Int
-  review           String
+  price            Decimal?
+  similarity       Decimal?
+  worktime         Int?
+  review           String?
+  isPublished      Boolean       @default(false)
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
   author           Author        @relation(fields: [authorId], references: [id])
@@ -27,6 +28,7 @@ model Test {
   history          History[]
   result           Result[]
   transaction      Transaction[]
+
 }
 
 model History {

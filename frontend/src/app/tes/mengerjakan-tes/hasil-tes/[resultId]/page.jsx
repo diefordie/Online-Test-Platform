@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import jwtDecode from 'jwt-decode';
 
 
 export default function Pemrograman() {
@@ -13,6 +14,12 @@ export default function Pemrograman() {
   const [feedback, setFeedback] = useState("");
   const {resultId} = useParams();
   const [workTime, setWorkTime] = useState(0);
+  const [leaderboardData, setLeaderboardData] = useState([]);
+  const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
+  const [leaderboardError, setLeaderboardError] = useState(null);
+  const [testId, setTestId] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [userRank, setUserRank] = useState(null);
   const [userData, setUserData] = useState({
     
     score: 0, // score sebagai angka
@@ -21,6 +28,23 @@ export default function Pemrograman() {
     correctAnswers: 0,
     wrongAnswers: 0,
   });
+  
+
+
+
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        setUserId(decodedToken.id);
+        console.log('User ID set:', decodedToken.id);
+      } catch (error) {
+        console.error('Error decoding token:', error);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (!resultId) return;  // Pastikan resultId tersedia sebelum melakukan apa pun
@@ -32,6 +56,57 @@ export default function Pemrograman() {
     }
   }, [resultId]); // Efek ini dijalankan ulang setiap kali resultId berubah
 
+  useEffect(() => {
+    const fetchTestDataAndLeaderboard = async () => {
+      if (!resultId) return;
+
+      setIsLoadingLeaderboard(true);
+      setLeaderboardError(null);
+
+      try {
+        // Fetch test result data
+        const resultResponse = await fetch(`http://localhost:2000/api/tests/test-result/${resultId}`);
+        if (!resultResponse.ok) {
+          throw new Error('Failed to fetch test result details');
+        }
+        const resultData = await resultResponse.json();
+        
+        // Assuming the test result data contains a field that can be used to identify the test
+        // This could be 'testId', 'testTitle', or any unique identifier for the test
+        const fetchedTestId = resultData.testId || resultData.testTitle;
+        setTestId(fetchedTestId);
+
+        if (!fetchedTestId) {
+          throw new Error('Could not determine test identifier from result data');
+        }
+
+        // Now fetch leaderboard data using the fetched test identifier
+        const leaderboardResponse = await fetch(`http://localhost:2000/api/leaderboard/${fetchedTestId}`);
+        if (!leaderboardResponse.ok) {
+          throw new Error('Failed to fetch leaderboard data');
+        }
+        const leaderboardData = await leaderboardResponse.json();
+        setLeaderboardData(leaderboardData.data);
+
+        const userRankData = leaderboardData.data.find(item => item.userId === userId);
+        console.log('User rank data:', userRankData);
+        if (userRankData) {
+          setUserRank(userRankData.ranking);
+          console.log('User rank set:', userRankData.ranking);
+        } else {
+          console.log('User rank not found in leaderboard data');
+        }
+
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setLeaderboardError(error.message);
+      } finally {
+        setIsLoadingLeaderboard(false);
+      }
+    };
+
+    fetchTestDataAndLeaderboard();
+  }, [resultId, userId]);
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60); // Menghitung menit
@@ -83,13 +158,6 @@ export default function Pemrograman() {
     return `${Math.min(percentage , 100)}% `; // Batasan maksimal lebar 100%
   };
 
-  const scores = [
-    { rank: 1, date: '04 - 09 - 2025', name: 'Abelia Putri Dwi 🏅', correct: 146, wrong: 4, total: '932,4' },
-    { rank: 2, date: '08 - 09 - 2025', name: 'Wahyu Fadilla S. 🏅', correct: 145, wrong: 5, total: '922,4' },
-    { rank: 3, date: '15 - 09 - 2025', name: 'Ardhi Iwantara S', correct: 145, wrong: 5, total: '922,4' },
-    { rank: 4, date: '15 - 09 - 2025', name: 'Ardhi Iwantara S', correct: 145, wrong: 5, total: '922,4' },
-    { rank: 5, date: '15 - 09 - 2025', name: 'Ardhi Iwantara S', correct: 145, wrong: 5, total: '922,4' },
-  ];
 
   const closeModal = () => setModalOpen(false);
 
@@ -164,6 +232,33 @@ export default function Pemrograman() {
     </div>
   );
   
+  const handleDownloadPDF = async () => {
+    try {
+      const response = await fetch(`http://localhost:2000/api/discussions/${resultId}/download`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to download PDF');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `pembahasan-${resultId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      // Tampilkan pesan error ke pengguna
+    }
+  };
 
   return (
     <>
@@ -299,7 +394,7 @@ export default function Pemrograman() {
                     </div>
                     <div className="text-sm lg:text-2xl bg-white p-2 font-semibold rounded-lg">
                       <ul>
-                        <li>{user.rank} </li>
+                      <li>{userRank !== null ? userRank : 'N/A'}</li>
                         <li>Peringkat</li>
                       </ul>
                     </div>
@@ -311,10 +406,10 @@ export default function Pemrograman() {
                     </div>
                   </div>
                   <div className="flex space-x-3 group-hover:opacity-100 transition-opacity duration-300 z-30 pt-4">
-                  <a href="/tes" className="bg-white border border-deepBlue text-[0.5rem] lg:text-lg text-deepBlue text-bold px-2  lg:px-2 py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue">
+                  <a onClick={handleDownloadPDF} className="bg-white border border-deepBlue text-[0.5rem] lg:text-lg text-deepBlue text-bold px-2  lg:px-2 py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue cursor-pointer">
                     Unduh Pembahasan Soal
                   </a>
-                  <a href="/topScore" className="bg-paleBlue border border-deepBlue text-[0.5rem] lg:text-lg text-deepBlue text-bold px-6  lg:px-7 py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue">
+                  <a href= {`/user/topscore/${testId}`} className="bg-paleBlue border border-deepBlue text-[0.5rem] lg:text-lg text-deepBlue text-bold px-6  lg:px-7 py-2 rounded-full inline-block hover:bg-orange hover:text-deepBlue">
                     Lihat Top Score
                   </a>
                 </div>
@@ -330,22 +425,16 @@ export default function Pemrograman() {
                     <thead className="bg-[#0B61AA] text-white">
                       <tr>
                         <th className="px-2 py-1">Rangking</th>
-                        <th className="px-2 py-1">Tanggal</th>
                         <th className="px-2 py-1">Nama</th>
-                        <th className="px-2 py-1">Benar</th>
-                        <th className="px-2 py-1">Salah</th>
                         <th className="px-2 py-1">Nilai Total</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {scores.slice(0, 3).map((score, index) => (
+                      {leaderboardData.slice(0, 3).map((entry, index) => (
                         <tr key={index} className={index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}>
-                          <td className="border px-4 py-2 text-center text-sm">{score.rank}</td>
-                          <td className="border px-4 py-2 text-center text-sm">{score.date}</td>
-                          <td className="border px-4 py-2 text-sm">{score.name}</td>
-                          <td className="border px-4 py-2 text-center text-sm">{score.correct}</td>
-                          <td className="border px-4 py-2 text-center text-sm">{score.wrong}</td>
-                          <td className="border px-4 py-2 text-center text-sm">{score.total}</td>
+                          <td className="border px-4 py-2 text-center">{entry.ranking}</td>
+                          <td className="border px-4 py-2">{entry.name}</td>
+                          <td className="border px-4 py-2 text-center">{entry.score}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -363,3 +452,4 @@ export default function Pemrograman() {
     </>
   );
 }
+

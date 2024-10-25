@@ -1,4 +1,4 @@
-import { loginAdminServices } from '../services/adminServices.js'; // Pastikan jalur sudah benar
+import { loginAdminServices, getDashboardStats } from '../services/adminServices.js'; // Pastikan jalur sudah benar
 
 export const loginAdmin = async (req, res) => {
     const { email, password } = req.body;
@@ -21,5 +21,15 @@ export const loginAdmin = async (req, res) => {
         } else {
             res.status(500).json({ message: 'Terjadi kesalahan saat login' });
         }
+    }
+};
+
+export const getDashboardStatsController = async (req, res) => {
+    try {
+        const stats = await getDashboardStats();
+        res.status(200).json(stats);
+    } catch (error) {
+        console.error('Error in getDashboardStatsController:', error);
+        res.status(500).json({ message: 'Failed to fetch dashboard statistics' });
     }
 };

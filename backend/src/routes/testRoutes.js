@@ -1,11 +1,20 @@
 import express from 'express';
-import { createTest, getTest, testResultController } from '../controllers/testControllers.js';
+import { createTest, getTest, testResultController, createTestController, publishTestController, getAllTests, fetchTestsByCategory } from '../controllers/testControllers.js';
 
 const router = express.Router();
 
 router.post('/create-test', createTest);
 router.get('/get-test/:id', getTest);
 router.get('/test-result/:resultId', testResultController);
+
+router.post('/tests', createTestController);
+
+router.put('/tests/:testId/publish', publishTestController);
+
+router.get('/category/:category', fetchTestsByCategory);
+
+router.get('/get-test', getAllTests);
+
 
 export default router; // Menggunakan default export
 

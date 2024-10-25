@@ -1,3 +1,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+@layer components {
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  .animate-slide-in {
+    animation: slideIn 0.3s ease-in-out;
+  }
+  .button-bounce {
+    transition: transform 0.3s ease-in-out;
+  }
+  .button-bounce:active {
+    animation: buttonBounce 0.3s ease-in-out;
+  }
+  @keyframes buttonBounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(0.95); }
+    75% { transform: scale(1.05); }
+  }
+}

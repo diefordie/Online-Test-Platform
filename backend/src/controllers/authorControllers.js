@@ -1,10 +1,13 @@
 // src/controllers/authorControllers.js
 import { 
     createAuthorService, 
-    editAuthorService, 
     getAuthorService, 
-    updateVerificationAuthorService 
+    updateVerificationAuthorService,
+    getAuthorByUserId,
+    editAuthorProfileService
+    
 } from "../services/authorServices.js";
+
 
 export const createAuthor = async (req, res) => {
     try {
@@ -25,10 +28,10 @@ export const createAuthor = async (req, res) => {
 export const editAuthor = async (req, res) => {
     try {
         const authorData = req.body;
-        const { id } = req.params;
-        const author = await editAuthorService(id, authorData);
+        const token = req.headers.authorization.split(' ')[1]; // Assuming Bearer token
+        const updatedAuthor = await editAuthorService(token, authorData);
         res.status(200).send({
-            data: author,
+            data: updatedAuthor,
             message: "Edit author success",
         });
     } catch (error) {
@@ -67,6 +70,41 @@ export const editVerifiedAuthor = async (req, res) => {
         res.status(500).send({
             message: "Failed to edit author",
             error: error.message,
+        });
+    }
+};
+
+
+export const getAuthorProfile = async (req, res) => {
+    try {
+        const token = req.headers.authorization.split(' ')[1]; // Assuming Bearer token
+        const authorProfile = await getAuthorByUserId(token);
+        res.status(200).json(authorProfile);
+    } catch (error) {
+        console.error("Error in getAuthorProfile:", error);
+        res.status(500).json({ message: "Failed to retrieve author profile", error: error.message });
+    }
+};
+
+
+
+
+export const editAuthorProfile = async (req, res) => {
+    try {
+        const token = req.headers.authorization.split(' ')[1]; // Assumes Bearer token
+        const profileData = req.body;
+
+        const updatedAuthor = await editAuthorProfileService(token, profileData);
+
+        res.status(200).json({
+            message: "Author profile updated successfully",
+            data: updatedAuthor
+        });
+    } catch (error) {
+        console.error("Error in editAuthorProfile controller:", error);
+        res.status(500).json({
+            message: "Failed to update author profile",
+            error: error.message
         });
     }
 };

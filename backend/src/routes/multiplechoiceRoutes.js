@@ -1,23 +1,21 @@
 import express from 'express';
-import { createMultipleChoice, getMultipleChoice } from '../controllers/multiplechoiceController.js';
+import { createMultipleChoice, updateMultipleChoice, getMultipleChoice, getMultipleChoiceById, deleteMultipleChoice, getQuestions, getMultipleChoiceByNumberAndTestId } from '../controllers/multiplechoiceController.js';
 
 const router = express.Router();
+router.get('/questions/:testId', getQuestions);
 
-// Endpoint untuk menambah soal ke tes
-router.post('/add-questions', createMultipleChoice);
-router.get('/get-questions/:id', getMultipleChoice);
+router.post('/add-questions', (req, res) => {
+    console.log('Request body:', req.body); 
+    createMultipleChoice(req, res);
+});
 
-export default router; // Menggunakan default export
+router.put('/update-question', updateMultipleChoice);
 
+router.get('/questions/:testId', getMultipleChoice);
+router.get('/question/:id', getMultipleChoiceById);
+router.get('/:testId', getQuestions);
+router.get('/:testId/:number', getMultipleChoiceByNumberAndTestId);
 
+router.delete('/question/:multiplechoiceId', deleteMultipleChoice);
 
-
-
-// const express = require("express");
-// const { createMultipleChoice } = require("../controllers/multiplechoiceController.js");
-// const router = express.Router();
-
-// // Endpoint untuk menambah soal ke tes
-// router.post("/add-questions", createMultipleChoice);
-
-// module.exports = router;
+export default router; 

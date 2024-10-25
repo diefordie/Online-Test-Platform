@@ -36,6 +36,15 @@ const MengerjakanTes = () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);  // Hapus event listener
         };
     }, []);
+
+    useEffect(() => {
+        const savedResultId = localStorage.getItem('resultId');
+        if (savedResultId) {
+            setResultId(savedResultId);  // Set resultId dari localStorage
+            console.log('Loaded resultId from localStorage:', savedResultId);
+        }
+    }, []);
+    
     
 
     useEffect(() => {
@@ -141,6 +150,10 @@ const MengerjakanTes = () => {
 
     const fetchAnswersByResultId = async (resultId) => {
         try {
+            const savedResultId = localStorage.getItem('resultId');
+                if (savedResultId) {
+                    setResultId(savedResultId);
+                }
             const response = await fetch(`http://localhost:2000/answer/tests/${resultId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -306,33 +319,50 @@ const MengerjakanTes = () => {
     };
 
     // Fungsi untuk submit jawaban akhir
-    const submitFinalAnswers = async (resultId, token) => {
+    const submitFinalAnswers = async (resultId) => {
         try {
-            // Kirim permintaan ke endpoint backend untuk submit jawaban final
-            const response = await fetch(`http://localhost:2000/answer/results/${resultId}/submit`, {
+            // Ambil resultId dari localStorage
+            const resultId = localStorage.getItem('resultId');
+            if (!resultId) {
+                throw new Error('Result ID tidak ditemukan di localStorage');
+            }
+    
+            // Ambil token dari localStorage (atau diambil dari tempat lain sesuai implementasi)
+            const token = localStorage.getItem('token');
+            if (!token) {
+                throw new Error('Token tidak ditemukan. Pastikan Anda sudah login.');
+            }
+    
+            // Kirim request ke backend dengan resultId di body
+            const response = await fetch(`http://localhost:2000/answer/tests/submit`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`, // Sertakan token di header Authorization
+                    Authorization: `Bearer ${token}`, // Sertakan token di header
                 },
+                body: JSON.stringify({ resultId }), // Kirim resultId di body
             });
     
-            // Cek apakah respons berhasil
+            // Cek apakah respons tidak OK (status 4xx atau 5xx)
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Gagal mengirim jawaban final');
             }
     
+            // Parsing response jika sukses
             const data = await response.json();
             console.log('Jawaban final berhasil disimpan:', data);
-    
-            // Beri notifikasi ke pengguna bahwa jawaban berhasil disimpan
             alert('Jawaban final berhasil disimpan!');
         } catch (error) {
             console.error('Error saat mengirim jawaban final:', error);
             alert('Terjadi kesalahan saat mengirim jawaban final: ' + error.message);
         }
     };
+    
+
+    
+    
+    
     
 
 
@@ -465,7 +495,7 @@ const MengerjakanTes = () => {
                 localStorage.removeItem('answers');
                 //localStorage.removeItem('resultId');
     
-                router.push(`/user/mengerjakanKuis/hasil-tes/${resultId}`);
+                router.push(`/tes/mengerjakan-tes/hasil-tes/${resultId}`);
             } catch (error) {
                 console.error('Error submitting final answers:', error);
     

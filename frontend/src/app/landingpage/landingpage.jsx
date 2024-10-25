@@ -2,6 +2,9 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import withAnimation from '../../components/withAnimation.js';
+import Button from '../../components/Button.js';
+
 
 // Data Testimoni
 const testimonials = [
@@ -56,12 +59,12 @@ const TestimonialsSection = () => {
       </h1>
 
       <div className="flex justify-center items-center mb-6">
-        <button
+        <Button
           onClick={handlePrev}
           className="text-gray-600 hover:text-gray-800 focus:outline-none"
         >
           <span className="text-2xl">‹</span>
-        </button>
+        </Button>
 
         <div className="mx-4 opacity-50">
           <img
@@ -129,12 +132,12 @@ const TestimonialsSection = () => {
           </p>
         </div>
 
-        <button
+        <Button
           onClick={handleNext}
           className="text-gray-600 hover:text-gray-800 focus:outline-none"
         >
           <span className="text-2xl">›</span>
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -157,12 +160,12 @@ const CallToActionSection = () => (
 
       {/* Bagian Kanan (Tombol) */}
       <div className="flex flex-col md:flex-col justify-center items-center space-y-4 w-full md:w-auto">
-        <button className="bg-[#0B61AA] text-white py-3 px-6 rounded-md shadow-md hover:bg-opacity-80 transition duration-300 w-full md:w-auto min-w-[200px]">
+        <Button className="bg-[#0B61AA] text-white py-3 px-6 rounded-md shadow-md hover:bg-opacity-80 transition duration-300 w-full md:w-auto min-w-[200px]">
           Mulai Test Sekarang
-        </button>
-        <button className="bg-white text-black border border-gray-300 py-3 px-6 rounded-md shadow-md hover:bg-gray-100 transition duration-300 w-full md:w-auto min-w-[200px]">
+        </Button>
+        <Button className="bg-white text-black border border-gray-300 py-3 px-6 rounded-md shadow-md hover:bg-gray-100 transition duration-300 w-full md:w-auto min-w-[200px]">
           Buat Soal Sendiri
-        </button>
+        </Button>
       </div>
     </div>
   </div>
@@ -182,7 +185,7 @@ const LandingPage = () => {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <div className="md:hidden">
-              <button
+              <Button
                 className="focus:outline-none text-white"
                 onClick={toggleSidebar}
               >
@@ -201,7 +204,7 @@ const LandingPage = () => {
                   <line x1="4" x2="20" y1="6" y2="6" />
                   <line x1="4" x2="20" y1="18" y2="18" />
                 </svg>
-              </button>
+              </Button>
             </div>
 
             <div className="text-2xl font-bold text-white">
@@ -260,7 +263,7 @@ const LandingPage = () => {
                 height={64}
                 className="rounded-full"
               />
-              <button onClick={toggleSidebar} className="text-white">
+              <Button onClick={toggleSidebar} className="text-white">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -275,7 +278,7 @@ const LandingPage = () => {
                   <line x1="18" y1="6" x2="6" y2="18"></line>
                   <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
-              </button>
+              </Button>
             </div>
             {["Beranda", "Kategori", "Cara Kerja", "About Us", "Testimoni"].map(
               (item) => (
@@ -612,4 +615,4 @@ const LandingPage = () => {
   );
 };
 
-export default LandingPage;
+export default withAnimation(LandingPage);

@@ -128,7 +128,7 @@ export const updateDraftAnswer = async (resultId, oldOptionId, newOptionId, newA
 
 
 // Fungsi untuk mengirim jawaban final
-export const submitFinalAnswers = async (testId, token) => {
+export const submitFinalAnswers = async (resultId, token) => {
     let decodedToken;
     try {
         decodedToken = jwt.verify(token, JWT_SECRET);
@@ -140,12 +140,11 @@ export const submitFinalAnswers = async (testId, token) => {
     const userId = decodedToken.id;
 
     try {
-        console.log(`Processing submit for testId: ${testId}, userId: ${userId}`);
+        console.log(`Processing submit for resultId: ${resultId}, userId: ${userId}`);
 
-        // 1. Ambil entri result terbaru dengan kombinasi userId dan testId yang cocok
-        const existingResult = await prismaClient.result.findFirst({
-            where: { userId, testId },
-            orderBy: { attemptNumber: 'desc' },
+        // 1. Ambil entri result berdasarkan resultId
+        const existingResult = await prismaClient.result.findUnique({
+            where: { id: resultId },
             include: {
                 detail_result: {
                     where: { status: 'draft' },
@@ -160,13 +159,13 @@ export const submitFinalAnswers = async (testId, token) => {
 
         // 2. Validasi apakah result ditemukan dan memiliki jawaban draft
         if (!existingResult) {
-            console.warn(`Tidak ada result ditemukan untuk testId: ${testId}, userId: ${userId}`);
-            throw new Error('Tidak ada result yang ditemukan untuk tes ini.');
+            console.warn(`Tidak ada result ditemukan untuk resultId: ${resultId}, userId: ${userId}`);
+            throw new Error('Tidak ada result yang ditemukan.');
         }
 
         if (!existingResult.detail_result.length) {
-            console.warn(`Tidak ada jawaban draft ditemukan untuk testId: ${testId}, userId: ${userId}`);
-            throw new Error('Tidak ada jawaban draft yang ditemukan untuk tes ini.');
+            console.warn(`Tidak ada jawaban draft ditemukan untuk resultId: ${resultId}, userId: ${userId}`);
+            throw new Error('Tidak ada jawaban draft yang ditemukan untuk result ini.');
         }
 
         let totalScore = 0;
@@ -213,6 +212,8 @@ export const submitFinalAnswers = async (testId, token) => {
         throw new Error(`Gagal mengirim jawaban final: ${error.message}`);
     }
 };
+
+
 
 export const getAnswersByResultId = async (resultId) => {
     try {
