@@ -9,25 +9,34 @@ datasource db {
   url = env("DATABASE_URL") // uses connection pooling
 }
 
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  EXPIRED
+}
+
 model Test {
-  id                String        @id @default(cuid())
-  authorId         String
-  userId           String
-  category         Category
-  title            String
-  testDescription  String
-  price            Decimal
-  similarity       Decimal
-  worktime         Int
-  review           String
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-  author           Author        @relation(fields: [authorId], references: [id])
-  user             User          @relation(fields: [userId], references: [id])
-  multiplechoice   Multiplechoice[]
-  favourite        Favourite[]
-  history          History[]
-  result           Result[]
+  id              String        @id @default(cuid())
+  authorId        String
+  userId          String
+  category        Category
+  title           String
+  testDescription String
+  price           Decimal
+  similarity      Decimal
+  worktime        Int
+  review          String
+  status          PaymentStatus @default(PENDING)  
+  paymentId       String?      
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  author          Author        @relation(fields: [authorId], references: [id])
+  user            User          @relation(fields: [userId], references: [id])
+  multiplechoice  Multiplechoice[]
+  favourite       Favourite[]
+  history         History[]
+  result          Result[]
 }
 
 model History {

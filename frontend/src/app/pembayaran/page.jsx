@@ -73,7 +73,6 @@ function App() {
             },
             onClose: function () {
               console.log('Payment dialog closed');
-              window.location.href = 'http://localhost:3000';
             },
           });
         } else {
@@ -100,7 +99,7 @@ const Navbar = () => {
       <div className="flex items-center space-x-4">
         {/* Vektor EtamTest */}
         <img 
-          src="/images/Vector.png" 
+          src="/img/Vector.png" 
           alt="EtamTest Logo" 
           className="h-8"  // Menyesuaikan ukuran dengan teks
         />

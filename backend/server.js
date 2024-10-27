@@ -29,6 +29,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.json());
+
+
 app.use(cors({
     origin: 'http://localhost:3000', // Mengizinkan request dari frontend di port 3000
     methods: ['GET', 'POST'],        // Metode HTTP yang diizinkan
@@ -37,6 +39,13 @@ app.use(cors({
 
 // Routes auth
 app.use("/auth", authRoutes);
+
+// Test endpoint
+app.get('/test', (req, res) => {
+    res.json({ message: 'Tunnel berhasil terhubung!' });
+});
+
+app.use('/api/payment', paymentRoutes);
 
 // Routes admin
 app.use("/api/admin", adminRoutes);
@@ -53,6 +62,11 @@ app.use("/author", authorRoutes);
 
 // Routes dashboard
 app.use("/dashboard", dashboardRoutes);
+
+app.use((req, res, next) => {
+    res.setHeader("Content-Security-Policy", "default-src 'self' https://cdn.ngrok.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com;");
+    next();
+});
 
 // Mulai server
 const PORT = process.env.PORT || 2000;
