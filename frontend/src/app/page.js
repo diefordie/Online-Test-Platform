@@ -7,7 +7,7 @@ import BuatTes from '@/app/author/buattes/page'
 const page = () => {
   return (
     <div>
-      <BuatTes />
+      <BuatSoal />
     </div>
   )
 }

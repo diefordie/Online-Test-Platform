@@ -55,6 +55,7 @@ export { updateMultipleChoice };
 const getMultipleChoice = async (req, res) => {
     try {
         const { testId } = req.params;  
+        const { pageName } = req.query;
 
         if (!testId) {
             return res.status(400).send({
@@ -62,7 +63,7 @@ const getMultipleChoice = async (req, res) => {
             });
         }
 
-        const multipleChoices = await getMultipleChoiceService(testId);
+        const multipleChoices = await getMultipleChoiceService(testId, pageName);
 
         if (!multipleChoices || multipleChoices.length === 0) {
             return res.status(404).send({
@@ -140,10 +141,10 @@ export { getQuestions };
 
 
 const getMultipleChoiceByNumberAndTestId = async (req, res) => {
-    const { testId, number } = req.params;
+    const { testId, number, pageName } = req.params;
 
     try {
-        const multipleChoice = await fetchMultipleChoiceByNumberAndTestId(testId, parseInt(number));
+        const multipleChoice = await fetchMultipleChoiceByNumberAndTestId(testId, parseInt(number), pageName);
 
         if (!multipleChoice) {
             return res.status(404).json({ message: 'Multiplechoice not found' });

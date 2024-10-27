@@ -86,6 +86,7 @@ model Favourite {
 model Multiplechoice {
   id          String    @id @default(cuid())
   testId      String
+  pageName    String
   question    String
   number      Int
   questionPhoto String?

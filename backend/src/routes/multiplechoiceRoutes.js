@@ -14,7 +14,7 @@ router.put('/update-question', updateMultipleChoice);
 router.get('/questions/:testId', getMultipleChoice);
 router.get('/question/:id', getMultipleChoiceById);
 router.get('/:testId', getQuestions);
-router.get('/:testId/:number', getMultipleChoiceByNumberAndTestId);
+router.get('/:testId/:number/:pageName', getMultipleChoiceByNumberAndTestId);
 
 router.delete('/question/:multiplechoiceId', deleteMultipleChoice);
 

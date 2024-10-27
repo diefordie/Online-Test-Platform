@@ -16,6 +16,7 @@ const createMultipleChoiceService = async (testId, questions) => {
             const multiplechoice = await prisma.multiplechoice.create({
                 data: {
                     testId: testId,
+                    pageName: question.pageName,
                     question: question.question,
                     number: question.number,
                     questionPhoto: question.questionPhoto || null, 
@@ -42,11 +43,12 @@ const createMultipleChoiceService = async (testId, questions) => {
 export { createMultipleChoiceService }; 
 
 const updateMultipleChoiceService = async (questionId, updatedData) => {
-    const { question, number, questionPhoto, weight, discussion, options } = updatedData;
+    const { pageName, question, number, questionPhoto, weight, discussion, options } = updatedData;
 
     const updateMultipleChoice = await prisma.multiplechoice.update({
         where: {id: questionId},
         data: {
+            pageName,
             question,
             number,
             questionPhoto,
@@ -88,6 +90,7 @@ const getMultipleChoiceService = async (testId) => {
     const multipleChoices = await prisma.Multiplechoice.findMany({
         where: {
             testId: testId,
+            pageName: pageName || undefined,
         },
         include: {
             option: true, 
@@ -156,11 +159,12 @@ const getQuestionsByTestId = async (testId) => {
 
 export { getQuestionsByTestId };
 
-const fetchMultipleChoiceByNumberAndTestId = async (testId, number) => {
+const fetchMultipleChoiceByNumberAndTestId = async (testId, number, pageName) => {
     return await prisma.multiplechoice.findFirst({
         where: {
             testId: testId,
             number: number,
+            pageName: pageName,
         },
     });
 };

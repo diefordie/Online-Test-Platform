@@ -9,9 +9,10 @@ import { useRouter } from 'next/navigation';
 
 const MembuatSoal = () => {
   const router = useRouter();
-  const [testId, setTestId] = useState('cm2i7ml8i0001wrlj72zolmrj');
+  const [testId, setTestId] = useState('cm2nkbnro0003q7tw36hs4sfq');
   const [multiplechoiceId, setMultiplechoiceId] = useState('');
   const [id, setId] = useState('');
+  const [pageName, setPageName] = useState('');
   const [question, setQuestion] = useState('');
   const [number, setNumber] = useState('');
   const [questionPhoto, setQuestionPhoto] = useState(null);
@@ -20,9 +21,9 @@ const MembuatSoal = () => {
   const [options, setOptions] = useState([{ optionDescription: '', isCorrect: false }]);
   const [pages, setPages] = useState([{ questions: [] }]);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  // const [labelCount, setlabelCount] = useState(1);
-  // const [currentPage, setCurrentPage] = useState(0);
-  // const [totalPages, setTotalPages] = useState(1);
+  const [labelCount, setlabelCount] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -30,9 +31,11 @@ const MembuatSoal = () => {
     const params = new URLSearchParams(url.search);
     const testIdFromUrl = params.get("testId");
     const multiplechoiceIdFromUrl = params.get("multiplechoiceId");
+    const pageNameFromUrl = params.get("pageName");
 
     console.log("Fetched testId:", testIdFromUrl); 
     console.log("Fetched multiplechoiceId:", multiplechoiceIdFromUrl); 
+    console.log("Fetched pageName:", pageNameFromUrl);
 
     if (testIdFromUrl) {
       setTestId(testIdFromUrl);
@@ -40,9 +43,15 @@ const MembuatSoal = () => {
     if (multiplechoiceIdFromUrl) {
       setMultiplechoiceId(multiplechoiceIdFromUrl); 
     }
+    if (pageNameFromUrl && pageNameFromUrl !== 'undefined') {
+      setPageName(pageNameFromUrl);
+    } else {
+      setPageName('Beri Nama')
+    }
   }, []);
 
   useEffect(() => {
+    if (!multiplechoiceId) return;
     const fetchData = async () => {
       try {
         const response = await fetch(`http://localhost:2000/api/multiplechoice/question/${multiplechoiceId}`);
@@ -52,6 +61,7 @@ const MembuatSoal = () => {
         }
         const data = await response.json();
         console.log('Response dari API:', data);
+        setPageName(data.pageName);
         setWeight(data.weight);
         setNumber(data.number);
         setQuestion(data.question);
@@ -86,9 +96,8 @@ const MembuatSoal = () => {
 
   const handleWeightChange = (e) => {
     const value = e.target.value;
-    // Hanya angka dan satu titik desimal
     if (/^\d*\.?\d*$/.test(value)) {
-      setWeight(value); // Simpan sebagai string untuk menghindari pembulatan
+      setWeight(value); 
     }
   }
 
@@ -96,7 +105,7 @@ const MembuatSoal = () => {
     if (testId && typeof window !== 'undefined') {
         const savedPages = localStorage.getItem(`pages_${testId}`);
         if (savedPages) {
-            return JSON.parse(savedPages);
+          return JSON.parse(savedPages);
         }
     }
     return null;
@@ -120,14 +129,12 @@ const MembuatSoal = () => {
                 throw new Error('Gagal menghapus soal dari database');
             }
 
-            // Update state lokal
             setPages(prevPages => {
                 const updatedPages = prevPages.map(page => ({
                     ...page,
                     questions: page.questions.filter(q => q !== multiplechoiceId)
                 }));
-                
-                // Simpan ke localStorage
+
                 if (testId && typeof window !== 'undefined') {
                     localStorage.setItem(`pages_${testId}`, JSON.stringify(updatedPages));
                 }
@@ -136,8 +143,6 @@ const MembuatSoal = () => {
             });
 
             console.log('Soal berhasil dihapus');
-            
-            // Navigasi kembali ke halaman buat soal
             router.push(`/author/buatSoal?testId=${testId}`);
         } catch (error) {
             console.error('Error saat menghapus soal:', error);
@@ -159,6 +164,7 @@ const MembuatSoal = () => {
       testId: testId,
       questions: [
         {
+          pageName: pageName,
           question: cleanHtml(question), 
           number: parseInt(number), 
           questionPhoto: questionPhoto || "",
@@ -241,7 +247,7 @@ const MembuatSoal = () => {
       <div className="container mx-auto lg: p-2 p-4 w-full" style={{ maxWidth: '1309px' }}>
         <header className='bg-[#0B61AA] font-bold font-poppins text-white p-4'>
           <div className="flex items-center justify-between">
-            <span>Tes Potensi Skolastik {number}</span>
+            <span>{pageName}</span>
           </div>
         </header>
   
@@ -329,14 +335,6 @@ const MembuatSoal = () => {
             <ReactQuill value={discussion} onChange={setDiscussion} modules={modules}
               placeholder='Tulis kunci jawaban di sini...' />
           </div>
-          {/* <div className='mt-4 flex justify-start space-x-4'>
-            <button
-              onClick={handleDelete}
-              className="bg-[#E58A7B] border border-black px-4 py-2 hover:text-white font-poppins rounded-[15px]"
-            >
-              Hapus
-            </button>
-          </div> */}
           <div className="flex justify-between items-center">
             <button
               onClick={handleDelete}
