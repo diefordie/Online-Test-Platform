@@ -73,13 +73,10 @@ const BuatTes = () => {
     <>
     {/* Header dengan Warna Biru Kustom */}
     <header className="bg-[#0B61AA] text-white p-4 sm:p-6">
-        <div className="container flex justify-between items-center">
+        <div className="container flex justify-between items-start">
           <div className="flex space-x-4 w-full">
             <Link href="/">
-              <img src="/images/menu.png" alt="Menu" className="h-7 sm:h-9 w-full-[50px]" />
-            </Link>
-            <Link href="/">
-              <img src="/images/Vector.png" alt="Vector" className="h-6 sm:h-9" style={{ maxWidth: '279px' }} />
+              <img src="/images/Vector.png" alt="Vector" className="h-6 sm:h-9 w-[85px] h-[26px] sm:w-[279px] sm:h-[55px]"/>
             </Link>
           </div>
         </div>
@@ -87,7 +84,7 @@ const BuatTes = () => {
 
       {/* Navigasi */}
       <nav className="bg-[#FFFF] text-black p-4 sm:p-6">
-        <ul className="flex space-x-6 sm:space-x-20">
+        <ul className="flex space-x-6 sm:space-x-20 ml-6">
           <li>
             <button
               className={`w-[120px] sm:w-[220px] h-[48px] rounded-[20px] shadow-md font-bold font-poppins ${activeTab === 'buatTes' ? 'bg-[#78AED6]' : ''}`}
@@ -95,7 +92,7 @@ const BuatTes = () => {
               >
               Buat Soal
             </button>
-          </li> 
+          </li>
           <li>
             <button
               className={`w-[120px] sm:w-[220px] h-[48px] rounded-[20px] shadow-md font-bold font-poppins ${activeTab === 'publikasi' ? 'bg-[#78AED6]' : ''}`}
@@ -110,26 +107,26 @@ const BuatTes = () => {
       {/* Konten Utama */}
       <div className="flex justify-center items-start mt-4">
         {activeTab === 'buatTes' && (
-          <div className="bg-[#78AED6] p-8 mx-4 rounded-md w-[341px] h-[344px] sm:w-[1343px] sm:h-[880px]">
-            <div className="flex justify-between  pr-10">
+          <div className="bg-[#78AED6] p-8 mx-4 rounded-md w-[375px] h-[506px] sm:w-[1343px] sm:h-[880px]">
+            <div className="flex justify-between  pr-9">
               {/* Bagian Kiri, Teks Rata Kanan */}
-              <div className="text-left pr-8 ">
-                <h3 className="font-poppins text-black text-lg mb-8 mt-7 ">Jenis</h3>
-                <h3 className="font-poppins text-black text-lg mb-8 mt-7 ">Kategori</h3>
-                <h3 className="font-poppins text-black text-lg mb-1 mt-7 ">Nama</h3>
-                <h3 className="font-poppins text-black text-lg mb-4 mt-7 pt-7 ">Deskripsi</h3>
+              <div className="text-right ml-auto pr-5 ">
+                <h3 className="font-poppins text-black text-sm sm:text-lg mb-6 mt-7 sm:pt-4 ">Jenis</h3>
+                <h3 className="font-poppins text-black text-sm sm:text-lg mb-4 mt-7 sm:pt-12">Kategori</h3>
+                <h3 className="font-poppins text-black text-sm sm:text-lg mb-4 mt-7 sm:pt-12">Nama</h3>
+                <h3 className="font-poppins text-black text-sm sm:text-lg mb-4 mt-7 sm:pt-12">Deskripsi</h3>
               </div>
 
               {/* Bar putih di samping */}
-              <div className="bg-white p-6 rounded-md shadow-lg" style={{ width: '902px', height: '677px' }}>
+              <div className="bg-white p-6 rounded-md w-[224px] h-[373px] sm:w-[902px] sm:h-[677px] shadow-lg">
                 {/* Dropdown Jenis Tes */}
-                <div className="mb-4">
+                <div className="mb-4 sm:pt-4">
                   <div className="relative" ref={jenisDropdownRef}>
                     <button
-                      className="w-full border border-gray-300 p-2 rounded-full flex justify-between items-center bg-white"
+                      className="w-[135px] h-[26px] sm:w-[160px] sm:h-[32px] border border-gray-300 p-2 rounded-full flex justify-between items-center bg-white"
                       onClick={() => setShowJenisDropdown(!showJenisDropdown)}
                     >
-                      <span className="font-poppins text-gray-500 italic">{jenisTes || 'Jenis Tes'}</span>
+                      <span className="font-poppins text-sm sm:text-lg text-gray-500 italic">{jenisTes || 'Jenis Tes'}</span>
                       <svg
                         className="w-4 h-4 ml-2 text-gray-500"
                         xmlns="http://www.w3.org/2000/svg"
@@ -145,22 +142,30 @@ const BuatTes = () => {
                       </svg>
                     </button>
                     {showJenisDropdown && (
-                    <div className="absolute z-10 w-full mt-1 border border-gray-300 bg-white rounded-md shadow-lg">
-                      <ul className="absolute z-10 w-full mt-1 border border-gray-300 bg-white rounded-md shadow-lg">
+                    <div className="absolute z-10 w-[115px] h-[87px] sm:w-[194px] sm:h-[185px] mt-1 border border-gray-300 bg-white rounded-md shadow-lg">
+                      <ul className="absolute z-10 w-[115px] h-[87px] sm:w-[194px] sm:h-[185px] mt-1 border border-gray-300 bg-white rounded-md shadow-lg">
                         <li>
-                          <button
-                            className="font-poppins  text-left px-4 py-2 text-gray-700 italic hover:bg-gray-100"
-                            onClick={() => { setJenisTes('PilihanGanda'); setShowJenisDropdown(false); }}
+                        <button
+                            className="font-poppins  text-left px-4 py-2 text-sm sm:text-lg text-gray-700 italic hover:bg-gray-100"
+                            onClick={() => { setJenisTes('Pilihan Ganda'); setShowJenisDropdown(false); }}
                           >
                             Pilihan Ganda
                           </button>
                         </li>
                         <li>
-                          <button
-                            className="font-poppins w-full text-left px-4 py-2 text-gray-700 italic hover:bg-gray-100"
+                        <button
+                            className="font-poppins w-full text-left px-4 py-2 text-sm sm:text-lg text-gray-700 italic hover:bg-gray-100"
                             onClick={() => { setJenisTes('Essay'); setShowJenisDropdown(false); }}
                           >
                             Essay
+                          </button>
+                        </li>
+                        <li>
+                          <button
+                          className="font-poppins w-full text-left px-4 py-2 text-sm sm:text-lg text-gray-700 italic hover:bg-gray-100"
+                          onClick={() => { setJenisTes('Psikotes'); setShowJenisDropdown(false); }}
+                          >
+                            Psikotes
                           </button>
                         </li>
                       </ul>
@@ -171,13 +176,13 @@ const BuatTes = () => {
                 </div>
 
                 {/* Dropdown Kategori Tes */}
-                <div className="mb-4">
+                <div className="mb-4 sm:pt-14">
                   <div className="relative" ref={kategoriDropdownRef}>
                     <button
-                      className="w-full border border-gray-300 p-2 rounded-full flex justify-between items-center bg-white"
+                      className="w-[135px] h-[26px] sm:w-[194px] sm:h-[32px] border border-gray-300 p-2 rounded-full flex justify-between items-center bg-white"
                       onClick={() => setShowKategoriDropdown(!showKategoriDropdown)}
                     >
-                      <span className="font-poppins text-gray-500 italic">{kategoriTes || 'Kategori Tes'}</span>
+                      <span className="font-poppins text-sm sm:text-lg text-gray-500 italic">{kategoriTes || 'Kategori Tes'}</span>
                       <svg
                         className="w-4 h-4 ml-2 text-gray-500"
                         xmlns="http://www.w3.org/2000/svg"
@@ -193,32 +198,40 @@ const BuatTes = () => {
                       </svg>
                     </button>
                     {showKategoriDropdown && (
-                      <div className="absolute z-10 w-full mt-1 border border-gray-300 bg-white rounded-md shadow-lg">
-                        <ul className="absolute z-10 w-full mt-1 border border-gray-300 bg-white rounded-md shadow-lg">
-                          <li>
-                            <button
-                              className="font-poppins w-full text-left px-4 py-2 text-gray-700 italic hover:bg-gray-100"
-                              onClick={() => { setKategoriTes('CPNS'); setShowKategoriDropdown(false); }}
-                            >
-                              CPNS
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              className="font-poppins w-full text-left px-4 py-2 text-gray-700 italic hover:bg-gray-100"
-                              onClick={() => { setKategoriTes('UTBK'); setShowKategoriDropdown(false); }}
-                            >
-                              UTBK
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              className="font-poppins w-full text-left px-4 py-2 text-gray-700 italic hover:bg-gray-100"
-                              onClick={() => { setKategoriTes('PEMROGRAMAN'); setShowKategoriDropdown(false); }}
-                            >
-                              PEMROGRAMAN
-                            </button>
-                          </li>
+                    <div className="absolute z-10 w-[114px] h-[119px] sm:w-[223px] sm:h-[184px] mt-1 border border-gray-300 bg-white rounded-md shadow-lg">
+                      <ul className="absolute z-10w-[114px] h-[119px] sm:w-[223px] sm:h-[184px] mt-1 border border-gray-300 bg-white rounded-md shadow-lg">
+                        <li>
+                          <button
+                            className="font-poppins w-full text-left px-4 py-2 text-sm sm:text-lg text-gray-700 italic hover:bg-gray-100"
+                            onClick={() => { setKategoriTes('CPNS'); setShowKategoriDropdown(false); }}
+                          >
+                            CPNS
+                          </button>
+                        </li>
+                        <li>
+                          <button
+                            className="font-poppins w-full text-left px-4 py-2 text-sm sm:text-lg text-gray-700 italic hover:bg-gray-100"
+                            onClick={() => { setKategoriTes('UTBK'); setShowKategoriDropdown(false); }}
+                          >
+                            UTBK
+                          </button>
+                        </li>
+                        <li>
+                          <button
+                            className="font-poppins w-full text-left px-4 py-2 text-sm sm:text-lg text-gray-700 italic hover:bg-gray-100"
+                            onClick={() => { setKategoriTes('Psikotes'); setShowKategoriDropdown(false); }}
+                          >
+                            Psikotes
+                          </button>
+                        </li>
+                        <li>
+                          <button
+                            className="font-poppins w-full text-left px-4 py-2 text-sm sm:text-lg text-gray-700 italic hover:bg-gray-100"
+                            onClick={() => { setKategoriTes('Pemrograman'); setShowKategoriDropdown(false); }}
+                          >
+                            Pemrograman
+                          </button>
+                        </li>
                         </ul>
                       </div>
                     )}
@@ -226,10 +239,10 @@ const BuatTes = () => {
                 </div>
 
                 {/* Input Nama Tes */}
-                <div className="mb-4">
+                <div className="mb-4 sm:pt-16">
                   <input
                     type="text"
-                    className="w-full border border-gray-300 p-2 rounded-full"
+                    className="w-[173px] h-[26px] sm:w-[615px] sm:[38px] border border-gray-300 p-2 rounded-full"
                     placeholder="Nama Tes"
                     value={namaTes} // Diubah di sini
                     onChange={(e) => setNamaTes(e.target.value)} 
@@ -237,21 +250,20 @@ const BuatTes = () => {
                 </div>
 
                 {/* Input Deskripsi */}
-                <div className="mb-4">
+                <div className="mb-4 sm:pt-6">
                   <textarea
-                    className="w-full border border-gray-300 p-2 rounded-md"
-                    rows="4"
-                    placeholder="Deskripsi"
+                    className="w-[173px] h-[58px] sm:w-[615px] sm:h-[38px] border border-gray-300 p-2 rounded-full"
                     value={deskripsi}
                     onChange={(e) => setDeskripsi(e.target.value)}
                   />
+                  <p className="font-poppins text-black mt-2 text-sm sm:text-lg">Deskripsikan secara singkat menegenai tes soal yang dibuat</p>
                 </div>
 
                 {/* Tombol Simpan */}
-                <div className="relative min-h-[450px]">
+                <div className="relative min-h-[170px] sm:min-h-[370px]">
                   <div className="absolute bottom-0 right-0 pb-10 mr-[-20px]">
                     <button
-                      className="bg-white text-black w-[180px] px-6 py-2 rounded-md hover:bg-[#0B61AA] hover:text-white transition duration-300" 
+                      className="bg-white text-black w-[98px] h-[27px] sm:w-[223px] sm:h-[54px] font-poppins font-semibold text-[0.5rem] sm:text-lg border border-black px-6 py-2 rounded-md hover:bg-[#0B61AA] hover:text-white transition duration-300" 
                       onClick={handleSubmit}>
                       Selanjutnya
                     </button>

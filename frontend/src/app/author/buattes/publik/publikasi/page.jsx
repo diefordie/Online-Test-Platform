@@ -81,80 +81,78 @@ export default function PublikasiPage() {
   const [activeTab, setActiveTab] = useState('publikasi');
   return (
     <div>
-      {/* Bar Atas */}
-      <header className="bg-[#0B61AA] text-white p-4 sm:p-6" style={{ maxWidth: '1440px', height: '108px' }}>
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="flex space-x-4">
+      {/* Header dengan Warna Biru Kustom */}
+      <header className="bg-[#0B61AA] text-white p-4 sm:p-6">
+        <div className="container flex justify-between items-start">
+          <div className="flex space-x-4 w-full">
             <Link href="/">
-              <img src="/images/menu.png" alt="Menu" className="h-7" style={{ maxWidth: '50px', height: '50px' }} />
-            </Link>
-            <Link href="/">
-              <img src="/images/Vector.png" alt="Vector" className="h-6" style={{ maxWidth: '279px', height: '50px' }} />
+              <img src="/images/Vector.png" alt="Vector" className="h-6 sm:h-9 w-[85px] h-[26px] sm:w-[279px] sm:h-[55px]"/>
             </Link>
           </div>
         </div>
       </header>
 
       {/* Navigasi */}
-      <nav className="bg-[#FFFFFF] text-black p-4">
-        <ul className="flex justify-around">
+      <nav className="bg-[#FFFF] text-black p-4 sm:p-6">
+        <ul className="flex space-x-6 sm:space-x-20 ml-6">
           <li>
             <button
-              className={`px-20 py-6 rounded-full font-bold font-poppins ${activeTab === 'buatTes' ? 'bg-[#78AED6]' : ''}`}
+              className={`w-[120px] sm:w-[220px] h-[48px] rounded-[20px] shadow-md font-bold font-poppins ${activeTab === 'buatTes' ? 'bg-[#78AED6]' : ''}`}
               onClick={() => setActiveTab('buatTes')}
-            >
+              >
               Buat Soal
             </button>
           </li>
           <li>
             <button
-              className={`px-20 py-6 rounded-full font-bold font-poppins ${activeTab === 'publikasi' ? 'bg-[#78AED6]' : ''}`}
+              className={`w-[120px] sm:w-[220px] h-[48px] rounded-[20px] shadow-md font-bold font-poppins ${activeTab === 'publikasi' ? 'bg-[#78AED6]' : ''}`}
               onClick={() => setActiveTab('publikasi')}
-            >
+              >
               Publikasi
             </button>
           </li>
         </ul>
       </nav>
 
-      
-      <div className="bg-[#78AED6] p-8 rounded-md mx-auto" style={{ width: '1100px', height: '750px', marginTop: '20px' }}>
-        <div className="flex justify-start pr-9">
+    <div className="flex justify-center items-center h-full">
+      <div className="w-[341px] h-[344px] sm:w-[1343px] sm:h-[816px] bg-[#78AED6] p-8 rounded-md text-sm sm:text-lg">
+        <div className="flex flex-row lg:flex-row justify-between pr-9">
           {/* Bagian Kiri, Teks Rata Kanan */}
-          <div className="text-left pr-5">
-            <h3 className="font-poppins text-black text-lg mb-8 mt-8">Nama Tes</h3>
-            <h3 className="font-poppins text-black text-lg mb-7 mt-5">Durasi Tes</h3>
-            {/* <h3 className="font-poppins text-black text-lg mb-4 mt-5">Acak Pertanyaan</h3> */}
-            {/* <h3 className="font-poppins text-black text-lg mb-4 mt-5">Maksimum Percobaan Kuis</h3> */}
-            <h3 className="font-poppins text-black text-lg mb-7 mt-5">Harga Tes</h3>
-            <h3 className="font-poppins text-black text-lg mb-4 mt-5">Prediksi Kemiripan</h3>
+          <div className="text-right pr-5 mb-5 lg:mb-0">
+            <h3 className="font-poppins text-black text-sm sm:text-lg pt-4 mb-10 sm:pt-8">Nama Tes</h3>
+            <h3 className="font-poppins text-black text-sm sm:text-lg pt-2 mb-12 sm:pt-7">Durasi Tes</h3>
+            {/* <h3 className="font-poppins text-black text-sm sm:text-lg mb-10 pt-18">Acak Pertanyaan</h3>
+            <h3 className="font-poppins text-black text-sm sm:text-lg mb-10 pt-4">Maksimum Percobasan Kuis</h3> */}
+            <h3 className="font-poppins text-black text-sm sm:text-lg pt-2 mb-12 sm:pt-10">Harga Tes</h3>
+            <h3 className="font-poppins text-black text-sm sm:text-lg pt-2 mb-10 sm:pt-12">Prediksi Kemiripan</h3>
           </div>
 
           {/* Bar putih di samping */}
-          <div className="bg-white p-6 rounded-md shadow-lg" style={{ width: '902px', height: '654px' }}>
+          <div className="w-[187px] h-[288px] sm:w-[902px] sm:h-[654px] bg-white p-6 rounded-md shadow-lg flex-grow lg:flex-shrink-0 text-sm sm:text-lg relative">
             {/* Input Nama Tes */}
-            <div className="mb-4">
+            <div className="mb-4 pt-1">
               <input
                 type="text"
-                className="w-full border border-gray-300 p-2 rounded-full bg-white text-gray-500"
+                className="w-[150px] h-[15px] sm:w-[615px] sm:h-[35px] border border-black p-2 rounded-full bg-[#78AED6] placeholder:text-black text-sm sm:text-lg"
                 value={namaTes}
                 onChange={(e) => setNamaTes(e.target.value)}
                 placeholder="Nama Tes"
               />
             </div>
 
-            <div className="mb-4">
-                <input
-                    type="text"
-                    className="w-full border border-gray-300 p-2 rounded-full bg-white text-gray-500"
-                    value={durasiTes}
-                    onChange={(e) => setDurasiTes(e.target.value)}
-                    placeholder="hh:mm"
-                />
+            {/* Input Durasi Tes */}
+            <div className="mb-5 pt-12">
+              <input
+                type="text"
+                className="w-[51px] h-[15px] sm:w-[141px] sm:h-[28px] border border-black p-2 rounded-full bg-[#78AED6] placeholder:text-black text-sm sm:text-lg"
+                value={durasiTes}
+                onChange={(e) => setDurasiTes(e.target.value)}
+                placeholder="hh:mm"
+              />
             </div>
 
             {/* Checkbox Acak Pertanyaan */}
-            {/* <div className="mb-4">
+            {/* <div className="mb-4 pt-8">
               <div className="flex items-center">
                 <input
                   type="checkbox"
@@ -164,7 +162,7 @@ export default function PublikasiPage() {
                   onChange={handleCheckboxChange}
                   className="mr-2"
                 />
-                <label htmlFor="waktu" className="text-gray-700">Peserta akan memiliki waktu untuk menyelesaikan seluruh kuis.</label>
+                <label htmlFor="waktu" className="text-black text-sm sm:text-lg">Peserta akan memiliki waktu untuk menyelesaikan seluruh kuis.</label>
               </div>
               <div className="flex items-center mt-2">
                 <input
@@ -175,37 +173,38 @@ export default function PublikasiPage() {
                   onChange={handleCheckboxChange}
                   className="mr-2"
                 />
-                <label htmlFor="acak" className="text-gray-700">Pertanyaan akan ditampilkan secara acak kepada setiap responden.</label>
+                <label htmlFor="acak" className="text-black text-sm sm:text-lg">Pertanyaan akan ditampilkan secara acak kepada setiap responden.</label>
               </div>
             </div> */}
 
             {/* Input Maksimum Percobaan Kuis
-            <div className="mb-4">
-              <input
-                type="text"
-                className="w-full border border-gray-300 p-2 rounded-full bg-white text-gray-500"
-                value={maksimumPercobaan}
-                onChange={(e) => setMaksimumPercobaan(e.target.value)}
-                placeholder="Maksimum Percobaan Kuis"
+            <div className="mb-2 pt-9">
+              <div className="flex items-center">
+                <input
+                  type="text"
+                  className="w-full border border-gray-300 p-2 rounded-full bg-white text-gray-500"
+                  value={maksimumPercobaan}
+                  onChange={(e) => setMaksimumPercobaan(e.target.value)}
+                  placeholder="Maksimum Percobaan Kuis"
               />
             </div> */}
 
             {/* Dropdown Harga Tes */}
-            <div className="mb-4">
+            <div className="mb-7 pt-16">
               <input
                 type="number"
                 step="0.01" // Mengizinkan input nilai desimal
-                className="w-full border border-gray-300 p-2 rounded-full bg-white text-gray-500"
+                className="w-[396px] h-[38px] border rounded-full border-black bg-[#78AED6] placeholder:text-black pl-2 text-sm sm:text-lg"
                 value={hargaTes}
                 onChange={(e) => setHargaTes(e.target.value)}
-                placeholder="Masukkan Harga Tes (dalam format desimal)"
+                placeholder="Harga Tes"
               />
             </div>
 
             {/* Dropdown Prediksi Kemiripan */}
-            <div className="mb-4">
+            <div className="mb-4 pt-16">
               <select
-                className="w-full border border-gray-300 p-2 rounded-full bg-white text-gray-500"
+                className="w-[175px] h-[32px] border rounded-full border-black bg-[#78AED6] pl-1"
                 value={prediksiKemiripan}
                 onChange={(e) => setPrediksiKemiripan(e.target.value)}
               >
@@ -218,10 +217,10 @@ export default function PublikasiPage() {
           </div>
         </div>
 
-        <div className='pt-4 flex justify-end pr-10'>
+        <div className='flex justify-end mr-8 p-2'>
           <button
             onClick={handlePublish}
-            className="bg-white text-black py-2 px-4 rounded-lg hover:bg-[#0B61AA] hover:text-white"
+            className="w-[102px] h-[30px] sm:w-[223px] sm:h-[54px] bg-white text-black text-sm sm:text-lg py-2 px-4 rounded-lg border border-black flex items-center justify-center shadow-md font-poppins font-semibold hover:bg-[#0B61AA]"
           >
             Publikasi
           </button>
@@ -267,6 +266,7 @@ export default function PublikasiPage() {
         </div>
       </div>
     )}
+      </div>
       </div>
   );
 }
