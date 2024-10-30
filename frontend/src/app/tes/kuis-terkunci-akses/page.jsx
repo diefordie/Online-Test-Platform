@@ -103,8 +103,8 @@ const MengerjakanTes = () => {
                   Klik dibawah ini untuk mendapatkan akses soal
                 </p>
                 <button
+                  href="/user/membeliPaket"
                   className="px-4 py-2 bg-[#7BB3B4] text-white rounded-full shadow hover:bg-[#6A9DA3] transition duration-300 ease-in-out font-bold"
-                  onClick={() => alert("Silakan lanjutkan pembelian.")}
                 >
                   Dapatkan Akses
                 </button>

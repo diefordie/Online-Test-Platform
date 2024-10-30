@@ -32,6 +32,34 @@ export default function Home() {
     fetchTestDetails();
   }, []);
 
+  const handleStartTest = async () => {
+    if (testDetails.price === 0) {
+      // Jika harga 0, langsung redirect ke halaman tryout
+      router.push(`/user/mengerjakan-tes/${testId}`);
+    } else {
+      try {
+        const response = await fetch(`http://localhost:2000/tes/check-status?testId=${testId}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`, // Ganti dengan token yang sesuai
+          },
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          // Redirect sesuai status
+          if (data.redirectUrl) {
+            router.push(data.redirectUrl);
+          }
+        } else {
+          console.error(data.message); // Tangani error jika ada
+        }
+      } catch (error) {
+        console.error('Error checking transaction status:', error);
+      }
+    }
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -104,7 +132,7 @@ export default function Home() {
             </span>
             </div>
             <Link href={`/tes/mengerjakan-tes/${testId}`}>
-          <button className="startButton">Mulai Try Out Sekarang</button>
+          <button className="startButton" onClick={handleStartTest}>Mulai Try Out Sekarang</button>
           </Link>
         </div>
 
