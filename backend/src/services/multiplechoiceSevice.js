@@ -171,3 +171,29 @@ const fetchMultipleChoiceByNumberAndTestId = async (testId, number, pageName) =>
 
 export {fetchMultipleChoiceByNumberAndTestId};
 
+const updateMultipleChoicePageNameService = async (testId, number, newPageName) => {
+    return await prisma.multiplechoice.updateMany({
+        where: {
+            testId: testId,
+            number: number,
+        },
+        data: {
+            pageName: newPageName,
+        },
+    });
+};
+
+export {updateMultipleChoicePageNameService};
+
+const getPagesByTestIdService = async (testId) => {
+    return await prisma.multiplechoice.findMany({
+      where: { testId: testId },
+      select: {
+        number: true,
+        pageName: true,
+      },
+    });
+  };
+  
+  export { getPagesByTestIdService };
+  

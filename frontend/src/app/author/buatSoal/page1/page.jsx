@@ -35,7 +35,6 @@ const MembuatSoal = () => {
 
     console.log("Fetched testId:", testIdFromUrl); 
     console.log("Fetched multiplechoiceId:", multiplechoiceIdFromUrl); 
-    console.log("Fetched pageName:", pageNameFromUrl);
 
     if (testIdFromUrl) {
       setTestId(testIdFromUrl);
@@ -43,10 +42,8 @@ const MembuatSoal = () => {
     if (multiplechoiceIdFromUrl) {
       setMultiplechoiceId(multiplechoiceIdFromUrl); 
     }
-    if (pageNameFromUrl && pageNameFromUrl !== 'undefined') {
-      setPageName(pageNameFromUrl);
-    } else {
-      setPageName('Beri Nama')
+    if (pageNameFromUrl) {
+      setPageName(decodeURIComponent(pageNameFromUrl));
     }
   }, []);
 
@@ -164,7 +161,7 @@ const MembuatSoal = () => {
       testId: testId,
       questions: [
         {
-          pageName: pageName,
+          pageName,
           question: cleanHtml(question), 
           number: parseInt(number), 
           questionPhoto: questionPhoto || "",
@@ -186,12 +183,22 @@ const MembuatSoal = () => {
     
       if (response.ok) {
         const result = await response.json();
-        console.log('Response dari API:', result); // Tambahkan ini untuk melihat seluruh data
+        console.log('Response dari API:', result);
         const MultiplechoiceId = result.data[0].id;
         console.log('MultiplechoiceId:', MultiplechoiceId);
+
+        localStorage.setItem('pageName', pageName);
     
+        const existingPages = JSON.parse(localStorage.getItem(`pages_${testId}`)) || [];
+        const newQuestion = { pageName, question, number, questionPhoto, weight, discussion, options };
+
+        existingPages.push(newQuestion);
+
+        localStorage.setItem(`pages_${testId}`, JSON.stringify(existingPages));
+        
         if (MultiplechoiceId) {
-          router.push(`/author/buatSoal?testId=${testId}`);        
+
+          router.push(`/author/buatSoal?testId=${testId}&pageName=${pageName}`);        
         } else {
           console.error('MultiplechoiceId is undefined');
         }

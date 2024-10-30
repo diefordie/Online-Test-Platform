@@ -1,4 +1,4 @@
-import { createMultipleChoiceService, updateMultipleChoiceService, getMultipleChoiceService, getMultipleChoiceByIdService, deleteMultipleChoiceService, getQuestionsByTestId, fetchMultipleChoiceByNumberAndTestId } from '../services/multiplechoiceSevice.js';
+import { createMultipleChoiceService, updateMultipleChoiceService, getMultipleChoiceService, getMultipleChoiceByIdService, deleteMultipleChoiceService, getQuestionsByTestId, fetchMultipleChoiceByNumberAndTestId, updateMultipleChoicePageNameService, getPagesByTestIdService } from '../services/multiplechoiceSevice.js';
 
 const createMultipleChoice = async (req, res) => {
     try {
@@ -157,8 +157,54 @@ const getMultipleChoiceByNumberAndTestId = async (req, res) => {
     }
 };
 
-export{
-    getMultipleChoiceByNumberAndTestId,
+export{ getMultipleChoiceByNumberAndTestId};
+
+const updateMultipleChoicePageNameController = async (req, res) => {
+    if (req.method !== 'PUT') {
+        return res.status(405).json({ message: 'Method not allowed' });
+    }
+
+    try {
+        const { testId, number, newPageName } = req.body;
+
+        if (!newPageName) {
+            return res.status(400).json({ message: 'Page name is required' });
+        }
+
+        const result = await updateMultipleChoicePageNameService(testId, number, newPageName);
+
+        if (result.count === 0) {
+            return res.status(404).json({ message: 'Multiple choice not found or nothing to update' });
+        }
+
+        return res.status(200).json({ message: 'Page name updated successfully' });
+    } catch (error) {
+        console.error('Error updating page name:', error);
+        return res.status(500).json({ message: 'Failed to update page name', error: error.message });
+    }
 };
 
+export {updateMultipleChoicePageNameController};
 
+const getPagesByTestIdController = async (req, res) => {
+    try {
+      const { testId } = req.query; 
+  
+      if (!testId) {
+        return res.status(400).json({ message: 'Test ID is required' });
+      }
+  
+      const pages = await getPagesByTestIdService(testId);
+  
+      if (!pages.length) {
+        return res.status(404).json({ message: 'No pages found for this test ID' });
+      }
+  
+      return res.status(200).json({ pages });
+    } catch (error) {
+      console.error('Error fetching pages:', error);
+      return res.status(500).json({ message: 'Failed to fetch pages', error: error.message });
+    }
+  };
+  
+  export { getPagesByTestIdController };
