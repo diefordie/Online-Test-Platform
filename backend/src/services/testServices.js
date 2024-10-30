@@ -43,6 +43,7 @@ const getTestResult = async (resultId) => {
         },
         test: {
           select: {
+            id: true, // id test
             title: true,
             multiplechoice: {
               select: {
@@ -80,6 +81,7 @@ const getTestResult = async (resultId) => {
     return {
       score: latestTestResult.score,
       userName: latestTestResult.user.name,
+      testId: latestTestResult.test.id, // id test
       testTitle: latestTestResult.test.title,
       correctAnswers, // jumlah jawaban benar
       wrongAnswers,   // jumlah jawaban salah

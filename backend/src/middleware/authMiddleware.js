@@ -1,20 +1,21 @@
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const secret = process.env.JWT_SECRET || 'your_jwt_secret'; // Mengambil secret dari environment
+export const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_here';
 
 export const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization']; // Ambil token dari header
-    const token = authHeader && authHeader.split(' ')[1]; // Formatnya biasanya "Bearer token"
+  const token = req.headers.authorization?.split(' ')[1]; // Ambil token dari header
 
-    if (!token) {
-        return res.status(401).json({ error: 'Access denied, no token provided' });
-    }
+  if (!token) {
+    return res.status(401).json({ message: 'Authorization token is missing' });
+  }
 
-    try {
-        const user = jwt.verify(token, secret); // Verifikasi token menggunakan variabel 'secret'
-        req.user = user; // Simpan data user yang terverifikasi di request object
-        next(); // Lanjutkan ke fungsi berikutnya
-    } catch (error) {
-        return res.status(403).json({ error: 'Invalid or expired token' });
-    }
+  try {
+    const decodedToken = jwt.verify(token, JWT_SECRET);
+    req.user = { id: decodedToken.id }; // Simpan userId ke req.user
+    next(); // Lanjutkan ke middleware atau controller berikutnya
+  } catch (error) {
+    return res.status(401).json({ message: 'Invalid or expired token' });
+  }
 };
