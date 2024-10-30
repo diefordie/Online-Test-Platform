@@ -6,110 +6,180 @@ import { useRouter } from 'next/navigation';
 
 const KotakNomor = () => {
   const router = useRouter();
-  const [pages, setPages] = useState([{ pageNumber: 1, questions: [1], pageName: "Beri Nama Tes" }]);
-  const [testId, setTestId] = useState('cm2i7ml8i0001wrlj72zolmrj');
+  const [testId, setTestId] = useState('');
+  const [pages, setPages] = useState([]);
   const [multiplechoiceId, setMultiplechoiceId] = useState('');
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [selectedNumber, setSelectedNumber] = useState(null);
-  const [isRenaming, setIsRenaming] = useState(null); 
+  const [isRenaming, setIsRenaming] = useState(null);
   const [renameValue, setRenameValue] = useState('');
+
+  useEffect(() => {
+    const savedPages = localStorage.getItem(`pages-${testId}`);
+    if (savedPages) {
+      setPages(JSON.parse(savedPages));
+    } else {
+      const initialPages = [{ pageNumber: 1, questions: [1], pageName: 'Beri Nama Tes' }];
+      setPages(initialPages);
+      localStorage.setItem(`pages-${testId}`, JSON.stringify(initialPages));
+    }
+  }, [testId]);
 
   useEffect(() => {
     const url = new URL(window.location.href);
     const params = new URLSearchParams(url.search);
     const testIdFromUrl = params.get("testId");
     const multiplechoiceIdFromUrl = params.get("multiplechoiceId");
-
-    console.log("Fetched testId:", testIdFromUrl);
-    console.log("Fetched multiplechoiceId:", multiplechoiceIdFromUrl);
+    const pageNameFromUrl = params.get("pageName") || localStorage.getItem('pageName');
 
     if (testIdFromUrl) {
       setTestId(testIdFromUrl);
-      // Load pages for this specific testId
-      if (typeof window !== 'undefined') {
-        const savedPages = localStorage.getItem(`pages_${testIdFromUrl}`);
-        if (savedPages) {
-          setPages(JSON.parse(savedPages));
-        } else {
-          setPages([{ questions: [] }]);
-        }
-      }
     }
+
     if (multiplechoiceIdFromUrl) {
       setMultiplechoiceId(multiplechoiceIdFromUrl);
     }
+
+    if (pageNameFromUrl) {
+      setPages((prevPages) => prevPages.map((page) => ({
+        ...page,
+        pageName: decodeURIComponent(pageNameFromUrl),
+      })));
+    }
+
   }, []);
 
-  useEffect(() => {
-    if (testId && typeof window !== 'undefined') {
-      localStorage.setItem(`pages_${testId}`, JSON.stringify(pages));
-    }
-  }, [pages, testId]);
-
   const addQuestion = (pageIndex) => {
-    setPages((prevPages) => {
-      const currentQuestions = prevPages[pageIndex].questions;
-      const newQuestionNumber = currentQuestions.length > 0 
-          ? Math.max(...currentQuestions) + 1
-          : 1;
+    setPages(prevPages => {
+      // Buat salinan pages yang ada
+      const updatedPages = [...prevPages];
+      
+      // Ambil page yang akan diupdate
+      const currentPage = {...updatedPages[pageIndex]};
+      
+      // Tambah satu nomor saja ke array questions
+      currentPage.questions = [...currentPage.questions, currentPage.questions.length + 1];
+      
+      // Update page di array pages
+      updatedPages[pageIndex] = currentPage;
 
-      const updatedPage = {
-          ...prevPages[pageIndex],
-          questions: [...currentQuestions, newQuestionNumber],
-      };
-
-      const newPages = prevPages.map((page, index) => 
-          index === pageIndex ? updatedPage : page
-      );
-
-      return newPages;
+      // Simpan ke localStorage
+      localStorage.setItem(`pages-${testId}`, JSON.stringify(updatedPages));
+      
+      // Log untuk debugging
+      console.log('Current questions after update:', currentPage.questions);
+      
+      return updatedPages;
     });
   };
 
   const addPage = () => {
-    const lastQuestionNumber = pages.reduce((acc, curr) => acc + curr.questions.length, 0);
-    const newPageNumber = pages.length + 1;
-    const newPage = { 
-      pageNumber: newPageNumber, 
-      questions: [lastQuestionNumber + 1],
-      pageName: "Beri Nama TES", 
-      isDropdownOpen: false 
-    };
-    setPages([...pages, newPage]);
-  };
+    setPages(prevPages => {
+      const lastPage = prevPages[prevPages.length - 1];
+      const lastQuestions = lastPage?.questions || [];
+      const lastQuestionNumber = lastQuestions.length > 0 
+        ? Math.max(...lastQuestions)
+        : 0;
+      
+      const updatedPages = [...prevPages, {
+        pageNumber: prevPages.length + 1,
+        questions: [lastQuestionNumber + 1],
+        pageName: 'Beri Nama Tes',
+        isDropdownOpen: false
+      }];
+
+      localStorage.setItem(`pages-${testId}`, JSON.stringify(updatedPages));
+      return updatedPages;
+    });
+  };
+
+  // Function to clear storage (useful for testing or reset functionality)
+  const clearStorage = () => {
+    localStorage.removeItem(`pages-${testId}`);
+    setPages([{ pageNumber: 1, questions: [1], pageName: 'Beri Nama Tes' }]);
+  };
 
   const toggleDropdown = (pageIndex) => {
-    setPages((prevPages) => {
-      return prevPages.map((page, index) => {
-        if (index === pageIndex) {
-          return { ...page, isDropdownOpen: !page.isDropdownOpen };
-        }
-        return { ...page, isDropdownOpen: false };
-      });
-    });
+    setPages(prevPages => 
+      prevPages.map((page, index) => ({
+        ...page,
+        isDropdownOpen: index === pageIndex ? !page.isDropdownOpen : false
+      }))
+    );
   };
 
   const handleRename = (pageIndex) => {
     setIsRenaming(pageIndex);
-    setRenameValue(pages[pageIndex].title);
+    setRenameValue(pages[pageIndex]);
   };
 
-  const saveRename = (pageIndex) => {
-      setPages((prevPages) => {
-          const updatedPages = prevPages.map((page, index) => {
-              if (index === pageIndex) {
-                  return { ...page, title: renameValue };
-              }
-              return page;
-          });
-          return updatedPages;
+  const saveRename = async (pageIndex) => {
+    console.log("Starting saveRename with value:", renameValue); // Debug log
+
+    // Validasi yang lebih ketat
+    if (!renameValue || renameValue.trim() === '') {
+      alert("Please enter a page name");
+      return;
+    }
+
+    try {
+      const requestData = {
+        testId: testId,
+        pageIndex: pageIndex,
+        newPageName: renameValue.trim()
+      };
+      
+      console.log("Sending data:", requestData); // Debug log
+
+      const response = await fetch(`http://localhost:2000/api/multiplechoice/update-pageName`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
       });
-      setIsRenaming(null); 
-  };
+
+      const responseData = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(responseData.message || 'Failed to update page name');
+      }
+
+      setPages((prevPages) => {
+        const updatedPages = prevPages.map((page, index) => {
+          if (index === pageIndex) {
+            return { ...page, pageName: renameValue.trim() };
+          }
+          return page;
+        });
+        return updatedPages;
+      });
+      setIsRenaming(null);
+      setRenameValue(''); // Reset nilai setelah berhasil
+    } catch (error) {
+      console.error("Error details:", error);
+      alert(error.message);
+    }
+};
 
   const deletePage = (pageIndex) => {
     if (confirm("Apakah Anda yakin ingin menghapus tes ini?")) {
         setPages((prevPages) => prevPages.filter((_, index) => index !== pageIndex));
+    }
+  };
+
+  const fetchPagesFromDB = async (testId) => {
+    try {
+      const response = await fetch(`http://localhost:2000/api/multiplechoice/getPages?testId=${testId}`);
+      const data = await response.json();
+
+      if (response.ok) {
+        setPages(data.pages);
+      } else {
+        console.error('Failed to fetch pages:', data.message);
+      }
+    } catch (error) {
+      console.error("Failed to fetch pages from DB:", error);
     }
   };
 
@@ -134,22 +204,23 @@ const KotakNomor = () => {
     }
   };  
 
-  const handleQuestionSelect = async (questionNumber) => {
+  const handleQuestionSelect = async (questionNumber, pageIndex) => {
     if (!testId) {
       console.error("testId is null. Cannot navigate.");
-      return; 
+      return;  
     }
-  
+    
     const multiplechoiceId = await fetchMultipleChoiceId(testId, questionNumber);
+    const pageName = pages[pageIndex]?.pageName || '';
   
     if (multiplechoiceId === null) {
       console.log("multiplechoiceId not found. You can create a new one.");
-      router.push(`/author/buatSoal/page1?testId=${testId}&multiplechoiceId=${multiplechoiceId}&nomor=${questionNumber}`);
+      router.push(`/author/buatSoal/page1?testId=${testId}&multiplechoiceId=${multiplechoiceId}&nomor=${questionNumber}&pageName=${pageName}`);
     }
   
     setSelectedNumber(questionNumber);
     
-    router.push(`/author/buatSoal/page1?testId=${testId}&multiplechoiceId=${multiplechoiceId}&nomor=${questionNumber}`);
+    router.push(`/author/buatSoal/page1?testId=${testId}&multiplechoiceId=${multiplechoiceId}&nomor=${questionNumber}&pageName=${pageName}`);
   };  
   
 const handleSave = () => {
@@ -195,11 +266,10 @@ const handleSave = () => {
         </div>
       </header>
 
-      {pages.map((page, pageIndex) => (
+      {Array.isArray(pages) && pages.map((page, pageIndex) => (
         <div key={page.pageNumber} className="my-4">
           <div className="flex justify-between items-center bg-[#0B61AA] text-white p-2" style={{ maxWidth: '1376px', height: '61px' }}>
             {isRenaming === pageIndex ? (
-              // <h2 className="text-lg">Tes</h2>
               <div className="flex items-center">
                 <input
                   type="text"
@@ -215,7 +285,7 @@ const handleSave = () => {
                 </button>
               </div>
             ) : (
-              <h2 className="text-lg">{page.title}</h2>
+              <h2 className="text-lg">{page.pageName}</h2>
             )}
 
             <div className="relative">
@@ -253,12 +323,12 @@ const handleSave = () => {
 
           <div className="mt-4"></div>
           <div className="flex flex-row flex-wrap p-4 gap-3 justify-start border" style={{ maxWidth: '100%', padding: '0 2%' }}>
-            {page.questions.map((question, questionIndex) => (
+            {Array.isArray(page.questions) && page.questions.map((question, questionIndex) => (
               <div
-                key={questionIndex}
+                key={`${pageIndex}-${question}`}
                 className="flex flex-col items-center border border-gray-300 p-2 bg-white rounded-lg shadow-md cursor-pointer"
                 style={{ width: '80px', height: '80px' }}
-                onClick={() => handleQuestionSelect(question)} // Tambahkan logika untuk memilih soal
+                onClick={() => handleQuestionSelect(question, pageIndex)} 
               >
                 <span className="bg-white border rounded-full w-8 h-8 flex items-center justify-center mb-2 rounded-[15px]">
                   {question}
@@ -288,7 +358,7 @@ const handleSave = () => {
         
         <div className="flex justify-end space-x-2 mr-4">
           <button
-            onClick={handleSave} // Memanggil fungsi handleSave saat tombol diklik
+            onClick={handleSave} 
             className="bg-[#E8F4FF] border border-black flex items-center space-x-2 px-4 py-2 hover:text-black font-poppins rounded-[15px] shadow-lg"
           >
             Simpan

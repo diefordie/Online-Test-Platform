@@ -36,7 +36,7 @@ const BuatTes = () => {
     e.preventDefault();
   
     const newTest = {
-      authorId: 'cm2ncb27u000148hn62zyv46a',
+      authorId: 'cm2vepy7500015lz9h7nj6z2p',
       type: jenisTes,
       category: kategoriTes,
       title: namaTes,
