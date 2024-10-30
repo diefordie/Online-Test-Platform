@@ -21,6 +21,7 @@ import { authenticateToken } from './src/middleware/authMiddleware.js';
 //import checkStatusTransactionRoutes from './src/routes/checkStatusRoutes.js';
 import editProfile from './src/routes/editProfileUser.js';
 import riwayattransaksiRoutes from './src/routes/riwayattransaksiRoutes.js';
+import paymentRoutes from './src/routes/paymentRoutes.js';
 
 dotenv.config();
 const app = express();
@@ -48,7 +49,7 @@ app.use(cors({
 app.use("/author", authorRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/tests", testRoutes);
-app.use("/test", testRoutes);
+// app.use("/test", testRoutes);
 app.use("/api/multiplechoice", multiplechoiceRoutes);
 app.use("/answer", answerTest);
 app.use("/auth", authRoutes);
@@ -60,6 +61,7 @@ app.use('/api', discussRoutes);
 app.use('/api/favorites', authenticateToken, favoriteRoutes);
 app.use("/user", editProfile);
 app.use('/api', riwayattransaksiRoutes);
+app.use('/api/payment', paymentRoutes);
 
 // Mulai server
 const PORT = process.env.PORT || 2000;

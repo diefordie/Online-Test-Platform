@@ -1,17 +1,20 @@
 import React from 'react'
-import LandingPage from '@/app/landingpage/landingpage'
+// import LandingPage from '@/app/landingpage/landingpage'
 // import GuestDashboard from '@/app/guestDashboard/page'
 // import landingpage from './src/app/user/landingpage/page'
 // import authorAgreement from '@/app/authorAgreement/page'
-import buatSoal from './author/buatSoal/page'
+// import buatSoal from './author/buatSoal/page'
+import Pembayaran from '@/app/payment/page'
+
 
 const page = () => {
   return (
     <div>
-      <LandingPage />
+      {/* <LandingPage /> */}
       {/* <GuestDashboard /> */}
       {/* <landingpage /> */}
-      <buatSoal/>
+      {/* <buatSoal/> */}
+      <Pembayaran/>
       {/* <authorAgreement /> */}
     </div>
   )

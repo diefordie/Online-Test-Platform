@@ -1,4 +1,4 @@
-import { createTestService, getTestService, getTestResult} from '../services/testServices.js'; // Pastikan menggunakan ekstensi .js
+import { createTestService, getTestService, getTestResult, getTestDetailById} from '../services/testServices.js'; // Pastikan menggunakan ekstensi .js
 
 const createTest = async (req, res) => {
     try {
@@ -132,4 +132,25 @@ const fetchTestsByCategory = async (req, res, next) => {
 export { createTest , getTest, testResultController, createTestController,
     publishTestController,
     getAllTests,
-    fetchTestsByCategory}; // Menggunakan named
+    fetchTestsByCategory};
+
+    export const getTestDetail = async (req, res) => {
+        const { testId } = req.params;
+    
+        try {
+            const test = await getTestDetailById(testId); // Memanggil service untuk mendapatkan detail test
+    
+            if (!test) {
+                return res.status(404).json({ error: 'Test not found' });
+            }
+    
+            res.status(200).json({
+                title: test.title,
+                similarity: test.similarity,
+                price: test.price,
+            });
+        } catch (error) {
+            console.error("Error fetching test detail:", error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    };
