@@ -75,38 +75,42 @@ export default function EditProfile({ params }) {
     }
   };
 
-  const handleSave = async (e) => {
-    e.preventDefault(); // Mencegah refresh saat submit
+  const handleSave = async (event) => {
+    if (!event) {
+      console.error("Event is undefined!");
+      return;
+    }
+    event.preventDefault(); // Pastikan preventDefault() dipanggil pada event yang terdefinisi
+    
     try {
-      const token = localStorage.getItem('token'); // Ambil token dari localStorage
+      const token = localStorage.getItem("token"); 
       const response = await fetch(`http://localhost:2000/user/profile`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Sertakan token JWT di header
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify({
           name: `${formData.firstName} ${formData.lastName}`,
           email: formData.email,
-          profileImage: formData.profileImage, // Kirim gambar profil ke backend
+          profileImage: formData.profileImage,
         }),
       });
-
+  
       if (!response.ok) {
-        throw new Error('Gagal memperbarui profil');
+        throw new Error("Gagal memperbarui profil");
       }
-
-      alert('Profil berhasil diperbarui!');
-      router.push('/user/dashboard'); // Arahkan ke halaman dashboard setelah sukses
+  
+      alert("Profil berhasil diperbarui!");
     } catch (error) {
-      console.error('Error updating profile:', error);
-      alert('Gagal memperbarui profil.');
+      console.error("Error updating profile:", error);
+      alert("Gagal memperbarui profil.");
     }
   };
-
-  const handleLogout = () => {
-    localStorage.removeItem('token'); // Hapus token saat logout
-    router.push('/auth/login'); // Arahkan ke halaman login
+  
+  const handleDashboard = () => {
+    // localStorage.removeItem('token'); // Hapus token saat logout
+    router.push('/user/dashboard'); // Arahkan ke halaman login
   };
 
   if (loading) {
@@ -122,10 +126,10 @@ export default function EditProfile({ params }) {
       {/* Header */}
       <div className="w-full bg-[#0B61AA] p-4 text-white flex justify-between items-center rounded-md">
         <div className="flex-shrink-0">
-          <img src="/img/etamtest.png" alt="Etamtest" className="h-6 object-contain" style={{ maxWidth: '216px', height: '52px' }} />
+          <img src="/images/logo.png" alt="Etamtest" className="h-6 object-contain" style={{ maxWidth: '216px', height: '52px' }} />
         </div>
         <div className="flex-shrink-0">
-          <img src="/img/keluar.png" alt="Logout" className="max-w-[44px] h-[22px]" onClick={handleLogout} />
+          <img src="/images/back.png" alt="Home" className="max-w-[44px] h-[22px]" onClick={handleDashboard} />
         </div>
       </div>
 
@@ -134,9 +138,9 @@ export default function EditProfile({ params }) {
         <div className="w-full max-w-[1228px] h-[88px] mx-auto mt-2 p-4 bg-[#0B61AA] text-white flex items-center justify-between rounded-md">
           <div className="flex items-center">
             <div className="w-16 h-16 rounded-full flex justify-center items-center relative">
-              <img src={formData.profileImage || "/img/Profil.png"} alt="Profil" className="h-16 w-16 rounded-full" />
+              <img src={formData.profileImage || "/images/profil.png"} alt="Profil" className="h-16 w-16 rounded-full" />
               <img
-                src="/img/kamera.png"
+                src="/images/camera.png"
                 alt="Kamera"
                 className="h-6 w-6 absolute bottom-0 right-1 cursor-pointer"
                 onClick={() => document.getElementById('uploadProfileImage').click()} // Memicu klik input file
@@ -156,9 +160,17 @@ export default function EditProfile({ params }) {
           </div>
         </div>
 
+                  {/* Actions section */}
+                  <div className="actions flex items-center justify-end space-x-2">
+            <div className="flex items-center justify-center w-[29px] h-[29px] bg-white rounded-[10px]">
+              <img src="/img/trash.png" alt="sampah" className="w-5 h-5" />
+          </div>
+        </div>
+
         {/* Form */}
         <div className="w-full max-w-[1228px] mx-auto mt-0 p-4 bg-white shadow-md border border-black rounded-md">
-          <form className="space-y-4 mt-4" onSubmit={handleSave}>
+        <form className="space-y-4 mt-4" onSubmit={(event) => handleSave(event)}>
+
             <div className="relative">
               <label className="block text-gray-700 font-poppins">Nama Depan</label>
               <input
@@ -168,6 +180,7 @@ export default function EditProfile({ params }) {
                 onChange={handleChange}
                 className="w-full p-2 border border-black rounded-[15px] mt-1 font-poppins"
               />
+              <img src="/img/edit.png" alt="Edit" className="absolute right-6 top-1/2 transform -translate-y-1/2 w-5 h-5 mt-3" />
             </div>
 
             <div className="relative">
@@ -177,8 +190,9 @@ export default function EditProfile({ params }) {
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
-                className="w-full p-2 border border-black rounded-[15px] mt-1 font-poppins"
+                className="w-full p-2 border border-black rounded-[15px] mt-1 pr-10 font-poppins"
               />
+              <img src="/img/edit.png" alt="Edit" className="absolute right-6 top-1/2 transform -translate-y-1/2 w-5 h-5 mt-3" />
             </div>
 
             <div className="relative">
@@ -188,8 +202,9 @@ export default function EditProfile({ params }) {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full p-2 border border-black rounded-[15px] mt-1 font-poppins"
+                className="w-full p-2 border border-black rounded-[15px] mt-1 pr-10 font-poppins"
               />
+              <img src="/img/edit.png" alt="Edit" className="absolute right-6 top-1/2 transform -translate-y-1/2 w-5 h-5 mt-3" />
             </div>
 
             <div className="relative">
@@ -201,6 +216,7 @@ export default function EditProfile({ params }) {
                 onChange={handleChange}
                 className="w-full p-2 border border-black rounded-[15px] mt-1 font-poppins"
               />
+              <img src="/img/edit.png" alt="Edit" className="absolute right-6 top-1/2 transform -translate-y-1/2 w-5 h-5 mt-3" />
             </div>
 
             <div className="flex justify-end">

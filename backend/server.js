@@ -18,7 +18,7 @@ import leaderboardRoutes from './src/routes/leaderboardRoutes.js';
 import discussRoutes from './src/routes/discussionRoutes.js';
 import favoriteRoutes from './src/routes/favoriteRoute.js';
 import { authenticateToken } from './src/middleware/authMiddleware.js';
-//import checkStatusTransactionRoutes from './src/routes/checkStatusRoutes.js';
+// import checkStatusTransactionRoutes from './src/routes/checkStatusRoutes.js';
 import editProfile from './src/routes/editProfileUser.js';
 import riwayattransaksiRoutes from './src/routes/riwayattransaksiRoutes.js';
 

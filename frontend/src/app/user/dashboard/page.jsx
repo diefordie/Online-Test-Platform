@@ -446,6 +446,32 @@ const toggleLikeGratis = async (id) => {
   }
 };
 
+  // Logout function
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('http://localhost:2000/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Include token if needed
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Logout failed');
+      }
+
+      // Optionally clear the token from local storage
+      localStorage.removeItem('token');
+
+      // Redirect to login page
+      window.location.href = '/auth/login';
+    } catch (error) {
+      console.error('Error during logout:', error);
+      setError(error.message);
+    }
+  };
+
 
   return (
     <>
@@ -508,8 +534,8 @@ const toggleLikeGratis = async (id) => {
                       Ubah Profil
                   </a>
                   </Link>
-                  <Link legacyBehavior href="/logout">
-                  <a className="block px-4 py-1 text-deepBlue text-sm text-gray-700 hover:bg-deepBlue hover:text-white rounded-md">
+                  <Link legacyBehavior href="/auth/login">
+                  <a onClick={handleLogout}className="block px-4 py-1 text-deepBlue text-sm text-gray-700 hover:bg-deepBlue hover:text-white rounded-md">
                       Logout
                   </a>
                   </Link>
