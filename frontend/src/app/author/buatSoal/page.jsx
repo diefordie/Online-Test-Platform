@@ -7,30 +7,22 @@ import { useRouter } from 'next/navigation';
 const KotakNomor = () => {
   const router = useRouter();
   const [testId, setTestId] = useState('cm2nkbnro0003q7tw36hs4sfq');
-  const [pages, setPages] = useState([{ pageNumber: 1, questions: [1], pageName: 'Beri Nama Tes'}]);
+  const [pages, setPages] = useState([]);
   const [multiplechoiceId, setMultiplechoiceId] = useState('');
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [selectedNumber, setSelectedNumber] = useState(null);
-  const [isRenaming, setIsRenaming] = useState(null); 
+  const [isRenaming, setIsRenaming] = useState(null);
   const [renameValue, setRenameValue] = useState('');
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!testId) return;
-
-      try {
-        const response = await fetch(`http://localhost:2000/api/multiplechoice/questions?testId=${testId}`);
-        if (response.ok) {
-          const data = await response.json();
-          setPages(data); 
-        } else {
-          console.error('Error loading data:', response.statusText);
-        }
-      } catch (error) {
-        console.error('Error:', error);
-      }
-    };
-    fetchData();
+    const savedPages = localStorage.getItem(`pages-${testId}`);
+    if (savedPages) {
+      setPages(JSON.parse(savedPages));
+    } else {
+      const initialPages = [{ pageNumber: 1, questions: [1], pageName: 'Beri Nama Tes' }];
+      setPages(initialPages);
+      localStorage.setItem(`pages-${testId}`, JSON.stringify(initialPages));
+    }
   }, [testId]);
 
   useEffect(() => {
@@ -40,21 +32,8 @@ const KotakNomor = () => {
     const multiplechoiceIdFromUrl = params.get("multiplechoiceId");
     const pageNameFromUrl = params.get("pageName") || localStorage.getItem('pageName');
 
-    console.log("Fetched testId:", testIdFromUrl);
-    console.log("Fetched multiplechoiceId:", multiplechoiceIdFromUrl);
-
     if (testIdFromUrl) {
       setTestId(testIdFromUrl);
-
-      if (typeof window !== 'undefined') {
-        const savedPages = localStorage.getItem(`pages_${testIdFromUrl}`);
-        if (savedPages) {
-          setPages(JSON.parse(savedPages));
-        } else {
-          setPages([{ questions: [] }]);
-          fetchPagesFromDB(testIdFromUrl);
-        }
-      }
     }
 
     if (multiplechoiceIdFromUrl) {
@@ -67,75 +46,66 @@ const KotakNomor = () => {
         pageName: decodeURIComponent(pageNameFromUrl),
       })));
     }
+
   }, []);
 
-  useEffect(() => {
-    if (testId && typeof window !== 'undefined') {
-      localStorage.setItem(`pages_${testId}`, JSON.stringify(pages));
-    }
-  }, [pages, testId]);
-
   const addQuestion = (pageIndex) => {
-    setPages((prevPages) => {
-      const updatedPage = {
-        
-        ...prevPages[pageIndex],
-        questions: [...prevPages[pageIndex].questions, prevPages[pageIndex].questions.length + prevPages[pageIndex].questions[0]]
-      };
+    setPages(prevPages => {
+      // Buat salinan pages yang ada
+      const updatedPages = [...prevPages];
+      
+      // Ambil page yang akan diupdate
+      const currentPage = {...updatedPages[pageIndex]};
+      
+      // Tambah satu nomor saja ke array questions
+      currentPage.questions = [...currentPage.questions, currentPage.questions.length + 1];
+      
+      // Update page di array pages
+      updatedPages[pageIndex] = currentPage;
 
-      let newPages = prevPages.map((page, index) => {
-        if (index === pageIndex) {
-          return updatedPage;
-        } else if (index > pageIndex) {
-          const previousPage = index === 0 ? updatedPage : prevPages[index - 1];
-          const firstQuestionNumber = previousPage.questions[previousPage.questions.length - 1] + 1;
-          const updatedQuestions = page.questions.map((_, questionIndex) => firstQuestionNumber + questionIndex);
-          return {
-            ...page,
-            questions: updatedQuestions
-          };
-        }
-        return page;
-      });
-
-      newPages = newPages.map((page, index) => {
-        if (index > pageIndex) {
-          const previousPage = newPages[index - 1];
-          const previousLastQuestion = previousPage.questions[previousPage.questions.length - 1];
-          const updatedQuestions = page.questions.map((_, questionIndex) => previousLastQuestion + 1 + questionIndex);
-          return {
-            ...page,
-            questions: updatedQuestions
-          };
-        }
-        return page;
-      });
-
-      return newPages;
+      // Simpan ke localStorage
+      localStorage.setItem(`pages-${testId}`, JSON.stringify(updatedPages));
+      
+      // Log untuk debugging
+      console.log('Current questions after update:', currentPage.questions);
+      
+      return updatedPages;
     });
   };
 
   const addPage = () => {
-    const lastQuestionNumber = pages.reduce((acc, curr) => acc + curr.questions.length, 0);
-    const newPageNumber = pages.length + 1;
-    const newPage = { 
-      pageNumber: newPageNumber, 
-      questions: [lastQuestionNumber + 1],
-      pageName: 'Beri Nama Tes',
-      isDropdownOpen: false 
-    };
-    setPages([...pages, newPage]);
+    setPages(prevPages => {
+      const lastPage = prevPages[prevPages.length - 1];
+      const lastQuestions = lastPage?.questions || [];
+      const lastQuestionNumber = lastQuestions.length > 0 
+        ? Math.max(...lastQuestions)
+        : 0;
+      
+      const updatedPages = [...prevPages, {
+        pageNumber: prevPages.length + 1,
+        questions: [lastQuestionNumber + 1],
+        pageName: 'Beri Nama Tes',
+        isDropdownOpen: false
+      }];
+
+      localStorage.setItem(`pages-${testId}`, JSON.stringify(updatedPages));
+      return updatedPages;
+    });
+  };
+
+  // Function to clear storage (useful for testing or reset functionality)
+  const clearStorage = () => {
+    localStorage.removeItem(`pages-${testId}`);
+    setPages([{ pageNumber: 1, questions: [1], pageName: 'Beri Nama Tes' }]);
   };
 
   const toggleDropdown = (pageIndex) => {
-    setPages((prevPages) => {
-      return prevPages.map((page, index) => {
-        if (index === pageIndex) {
-          return { ...page, isDropdownOpen: !page.isDropdownOpen };
-        }
-        return { ...page, isDropdownOpen: false };
-      });
-    });
+    setPages(prevPages => 
+      prevPages.map((page, index) => ({
+        ...page,
+        isDropdownOpen: index === pageIndex ? !page.isDropdownOpen : false
+      }))
+    );
   };
 
   const handleRename = (pageIndex) => {
@@ -144,33 +114,53 @@ const KotakNomor = () => {
   };
 
   const saveRename = async (pageIndex) => {
+    console.log("Starting saveRename with value:", renameValue); // Debug log
+
+    // Validasi yang lebih ketat
+    if (!renameValue || renameValue.trim() === '') {
+      alert("Please enter a page name");
+      return;
+    }
+
     try {
-      await fetch(`http://localhost:2000/api/multiplechoice/update-pageName`, {
+      const requestData = {
+        testId: testId,
+        pageIndex: pageIndex,
+        newPageName: renameValue.trim()
+      };
+      
+      console.log("Sending data:", requestData); // Debug log
+
+      const response = await fetch(`http://localhost:2000/api/multiplechoice/update-pageName`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          testId: testId,
-          pageIndex: pageIndex,
-          pageName: renameValue,
-        }),
+        body: JSON.stringify(requestData),
       });
+
+      const responseData = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(responseData.message || 'Failed to update page name');
+      }
 
       setPages((prevPages) => {
         const updatedPages = prevPages.map((page, index) => {
           if (index === pageIndex) {
-            return { ...page, pageName: renameValue };
+            return { ...page, pageName: renameValue.trim() };
           }
-            return page;
-          });
-          return updatedPages;
+          return page;
         });
-      setIsRenaming(null); 
+        return updatedPages;
+      });
+      setIsRenaming(null);
+      setRenameValue(''); // Reset nilai setelah berhasil
     } catch (error) {
-      console.error("Error updating pageName:", error);
+      console.error("Error details:", error);
+      alert(error.message);
     }
-  };
+};
 
   const deletePage = (pageIndex) => {
     if (confirm("Apakah Anda yakin ingin menghapus tes ini?")) {
@@ -276,7 +266,7 @@ const handleSave = () => {
         </div>
       </header>
 
-      {pages.map((page, pageIndex) => (
+      {Array.isArray(pages) && pages.map((page, pageIndex) => (
         <div key={page.pageNumber} className="my-4">
           <div className="flex justify-between items-center bg-[#0B61AA] text-white p-2" style={{ maxWidth: '1376px', height: '61px' }}>
             {isRenaming === pageIndex ? (
@@ -333,9 +323,9 @@ const handleSave = () => {
 
           <div className="mt-4"></div>
           <div className="flex flex-row flex-wrap p-4 gap-3 justify-start border" style={{ maxWidth: '100%', padding: '0 2%' }}>
-            {page.questions.map((question, questionIndex) => (
+            {Array.isArray(page.questions) && page.questions.map((question, questionIndex) => (
               <div
-                key={questionIndex}
+                key={`${pageIndex}-${question}`}
                 className="flex flex-col items-center border border-gray-300 p-2 bg-white rounded-lg shadow-md cursor-pointer"
                 style={{ width: '80px', height: '80px' }}
                 onClick={() => handleQuestionSelect(question, pageIndex)} 
