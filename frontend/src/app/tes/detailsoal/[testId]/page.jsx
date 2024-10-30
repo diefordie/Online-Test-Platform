@@ -97,13 +97,13 @@ export default function Home() {
             <p style={{ color: 'gray' }}>Tes Penalaran Matematika</p>
             <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'gray' }}>
               <img src="/image/clock.png" alt="Clock Icon" style={{ width: '20px', height: '20px' }} /> 
-              <span>{testDetails.duration} jam</span>
+              <span>{testDetails.duration} menit</span>
               |
               <img src="/image/paper.png" alt="Paper Icon" style={{ width: '20px', height: '20px' }} />
               <span>{testDetails.numQuestions}</span>
             </span>
             </div>
-            <Link href={`/user/mengerjakanKuis/${testId}`}>
+            <Link href={`/tes/mengerjakan-tes/${testId}`}>
           <button className="startButton">Mulai Try Out Sekarang</button>
           </Link>
         </div>

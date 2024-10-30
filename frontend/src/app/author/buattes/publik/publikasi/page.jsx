@@ -1,32 +1,78 @@
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
 
 export default function PublikasiPage() {
   const [namaTes, setNamaTes] = useState('');
+  const [testId, setTestId] = useState(null);
   const [durasiTes, setDurasiTes] = useState('');
-  const [acakPertanyaan, setAcakPertanyaan] = useState({
-    waktu: false,
-    acak: false,
-  });
-  const [maksimumPercobaan, setMaksimumPercobaan] = useState('');
+  // const [acakPertanyaan, setAcakPertanyaan] = useState({
+  //   waktu: false,
+  //   acak: false,
+  // });
+  // const [maksimumPercobaan, setMaksimumPercobaan] = useState('');
   const [hargaTes, setHargaTes] = useState('');
   const [prediksiKemiripan, setPrediksiKemiripan] = useState('');
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
 
-  const handleCheckboxChange = (event) => {
-    setAcakPertanyaan({ ...acakPertanyaan, [event.target.name]: event.target.checked });
-  };
+  // const handleCheckboxChange = (event) => {
+  //   setAcakPertanyaan({ ...acakPertanyaan, [event.target.name]: event.target.checked });
+  // };
 
-  const handlePublish = () => {
-    if (namaTes && durasiTes && maksimumPercobaan && hargaTes && prediksiKemiripan) {
-      // Logic to publish the test goes here
-      setShowSuccessPopup(true);
-    } else {
-      setShowErrorPopup(true);
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const params = new URLSearchParams(url.search);
+    const testIdFromUrl = params.get("testId");
+  
+    console.log("Fetched testId:", testIdFromUrl); // Cek nilai testId yang diambil
+  
+    if (testIdFromUrl) {
+      setTestId(testIdFromUrl);
     }
-  };
+  }, []);
+
+  const handlePublish = async () => {
+    const [hours, minutes] = durasiTes.split(':').map(Number);
+    const totalMinutes = (hours || 0) * 60 + (minutes || 0);
+
+    const payload = {
+        price: hargaTes,
+        similarity: parseFloat(prediksiKemiripan),
+        worktime: totalMinutes
+    };
+
+    // Validasi input
+    if (!payload.price || isNaN(payload.similarity) || isNaN(payload.worktime)) {
+        alert("Semua field harus diisi untuk publikasi.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:2000/test/tests/${testId}/publish`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            console.log('Tes berhasil disimpan!');
+            setShowSuccessPopup(true); 
+            setShowErrorPopup(false);   
+        } else {
+            console.error('Gagal menyimpan tes.', await response.text());
+            setShowErrorPopup(true);   
+            setShowSuccessPopup(false);  
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        setShowErrorPopup(true);      
+        setShowSuccessPopup(false);     
+    }
+};
 
   const closePopup = () => {
     setShowSuccessPopup(false);
@@ -34,57 +80,58 @@ export default function PublikasiPage() {
   };
   const [activeTab, setActiveTab] = useState('publikasi');
   return (
-    <div className="max-w-full">
-      {/* Header dengan Warna Biru Kustom */}
-    <header className="bg-[#0B61AA] text-white p-4 sm:p-6">
-        <div className="container flex justify-between items-center">
-          <div className="flex space-x-4 w-full">
+    <div>
+      {/* Bar Atas */}
+      <header className="bg-[#0B61AA] text-white p-4 sm:p-6" style={{ maxWidth: '1440px', height: '108px' }}>
+        <div className="container mx-auto flex justify-between items-center">
+          <div className="flex space-x-4">
             <Link href="/">
-              <img src="/images/menu.png" alt="Menu" className="h-7 sm:h-9 w-full-[50px]" />
+              <img src="/images/menu.png" alt="Menu" className="h-7" style={{ maxWidth: '50px', height: '50px' }} />
             </Link>
             <Link href="/">
-              <img src="/images/Vector.png" alt="Vector" className="h-6 sm:h-9" style={{ maxWidth: '279px' }} />
+              <img src="/images/Vector.png" alt="Vector" className="h-6" style={{ maxWidth: '279px', height: '50px' }} />
             </Link>
           </div>
         </div>
       </header>
 
       {/* Navigasi */}
-      <nav className="bg-[#FFFF] text-black p-4 sm:p-6">
-        <ul className="flex space-x-6 sm:space-x-20">
+      <nav className="bg-[#FFFFFF] text-black p-4">
+        <ul className="flex justify-around">
           <li>
             <button
-              className={`w-[120px] sm:w-[220px] h-[48px] rounded-[20px] shadow-md font-bold font-poppins ${activeTab === 'buatTes' ? 'bg-[#78AED6]' : ''}`}
+              className={`px-20 py-6 rounded-full font-bold font-poppins ${activeTab === 'buatTes' ? 'bg-[#78AED6]' : ''}`}
               onClick={() => setActiveTab('buatTes')}
-              >
+            >
               Buat Soal
             </button>
-          </li> 
+          </li>
           <li>
             <button
-              className={`w-[120px] sm:w-[220px] h-[48px] rounded-[20px] shadow-md font-bold font-poppins ${activeTab === 'publikasi' ? 'bg-[#78AED6]' : ''}`}
+              className={`px-20 py-6 rounded-full font-bold font-poppins ${activeTab === 'publikasi' ? 'bg-[#78AED6]' : ''}`}
               onClick={() => setActiveTab('publikasi')}
-              >
+            >
               Publikasi
             </button>
           </li>
         </ul>
       </nav>
 
-      <div className="bg-[#78AED6] p-8 rounded-md mx-auto" style={{ maxWidth: '1150px', height: '800px', marginTop: '20px' }}>
-        <div className="flex flex-row  lg:flex-row  justify-between pr-9">
+      
+      <div className="bg-[#78AED6] p-8 rounded-md mx-auto" style={{ width: '1100px', height: '750px', marginTop: '20px' }}>
+        <div className="flex justify-start pr-9">
           {/* Bagian Kiri, Teks Rata Kanan */}
-          <div className="text-right pr-5 mb-5 lg:mb-0">
-            <h3 className="font-poppins text-black text-lg mb-4 mt-7">Nama Tes</h3>
-            <h3 className="font-poppins text-black text-lg mb-4 mt-7">Durasi Tes</h3>
-            <h3 className="font-poppins text-black text-lg mb-4 mt-7">Acak Pertanyaan</h3>
-            <h3 className="font-poppins text-black text-lg mb-4 mt-7">Maksimum Percobaan Kuis</h3>
-            <h3 className="font-poppins text-black text-lg mb-4 mt-7">Harga Tes</h3>
-            <h3 className="font-poppins text-black text-lg mb-4 mt-7">Prediksi Kemiripan</h3>
+          <div className="text-left pr-5">
+            <h3 className="font-poppins text-black text-lg mb-8 mt-8">Nama Tes</h3>
+            <h3 className="font-poppins text-black text-lg mb-7 mt-5">Durasi Tes</h3>
+            {/* <h3 className="font-poppins text-black text-lg mb-4 mt-5">Acak Pertanyaan</h3> */}
+            {/* <h3 className="font-poppins text-black text-lg mb-4 mt-5">Maksimum Percobaan Kuis</h3> */}
+            <h3 className="font-poppins text-black text-lg mb-7 mt-5">Harga Tes</h3>
+            <h3 className="font-poppins text-black text-lg mb-4 mt-5">Prediksi Kemiripan</h3>
           </div>
 
           {/* Bar putih di samping */}
-          <div className="bg-white p-6 rounded-md shadow-lg flex-grow lg:flex-shrink-0" style={{ maxWidth: '902px', height: '654px' }}>
+          <div className="bg-white p-6 rounded-md shadow-lg" style={{ width: '902px', height: '654px' }}>
             {/* Input Nama Tes */}
             <div className="mb-4">
               <input
@@ -96,19 +143,18 @@ export default function PublikasiPage() {
               />
             </div>
 
-            {/* Input Durasi Tes */}
             <div className="mb-4">
-              <input
-                type="text"
-                className="w-full border border-gray-300 p-2 rounded-full bg-white text-gray-500"
-                value={durasiTes}
-                onChange={(e) => setDurasiTes(e.target.value)}
-                placeholder="hh:mm"
-              />
+                <input
+                    type="text"
+                    className="w-full border border-gray-300 p-2 rounded-full bg-white text-gray-500"
+                    value={durasiTes}
+                    onChange={(e) => setDurasiTes(e.target.value)}
+                    placeholder="hh:mm"
+                />
             </div>
 
             {/* Checkbox Acak Pertanyaan */}
-            <div className="mb-4">
+            {/* <div className="mb-4">
               <div className="flex items-center">
                 <input
                   type="checkbox"
@@ -131,9 +177,9 @@ export default function PublikasiPage() {
                 />
                 <label htmlFor="acak" className="text-gray-700">Pertanyaan akan ditampilkan secara acak kepada setiap responden.</label>
               </div>
-            </div>
+            </div> */}
 
-            {/* Input Maksimum Percobaan Kuis */}
+            {/* Input Maksimum Percobaan Kuis
             <div className="mb-4">
               <input
                 type="text"
@@ -142,19 +188,18 @@ export default function PublikasiPage() {
                 onChange={(e) => setMaksimumPercobaan(e.target.value)}
                 placeholder="Maksimum Percobaan Kuis"
               />
-            </div>
+            </div> */}
 
             {/* Dropdown Harga Tes */}
             <div className="mb-4">
-              <select
+              <input
+                type="number"
+                step="0.01" // Mengizinkan input nilai desimal
                 className="w-full border border-gray-300 p-2 rounded-full bg-white text-gray-500"
                 value={hargaTes}
                 onChange={(e) => setHargaTes(e.target.value)}
-              >
-                <option value="" disabled>Harga Tes</option>
-                <option value="Berbayar">Berbayar</option>
-                <option value="Gratis">Gratis</option>
-              </select>
+                placeholder="Masukkan Harga Tes (dalam format desimal)"
+              />
             </div>
 
             {/* Dropdown Prediksi Kemiripan */}
@@ -165,15 +210,15 @@ export default function PublikasiPage() {
                 onChange={(e) => setPrediksiKemiripan(e.target.value)}
               >
                 <option value="" disabled>Kemiripan Soal</option>
-                <option value="45%">45%</option>
-                <option value="65%">65%</option>
-                <option value="80%">80%</option>
+                <option value="0.85">45%</option>
+                <option value="0.65">65%</option>
+                <option value="0.80">80%</option>
               </select>
             </div>
           </div>
         </div>
 
-        <div className='pt-10 flex justify-end pr-10'>
+        <div className='pt-4 flex justify-end pr-10'>
           <button
             onClick={handlePublish}
             className="bg-white text-black py-2 px-4 rounded-lg hover:bg-[#0B61AA] hover:text-white"
@@ -183,45 +228,45 @@ export default function PublikasiPage() {
         </div>
       </div>
 
-      {/* Success Popup */}
-      {showSuccessPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-          <div className="bg-[#2E8EC5] p-6 rounded-lg shadow-lg text-center">
-            <div className="bg-[#78AED6] p-4 rounded-t-lg text-white ">
-              <h2 className="text-lg font-semibold">Tes Berhasil Di Publikasikan</h2>
-            </div>
-            <div className="bg-[#2E8EC5] p-4 text-black">
-              <p>Tes kamu sekarang bisa diakses oleh peserta.</p>
-            </div>
-            <button
-              onClick={closePopup}
-              className="mt-4 bg-white text-black py-1 px-4 rounded-lg"
-            >
-              Oke
-            </button>
-          </div>
+        {/* Pop-up Sukses */}
+        {showSuccessPopup && (
+      <div className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 flex items-center justify-center z-50  text-sm sm:text-lg">
+        <div className="w-[90%] max-w-[619px] bg-[#78AED6] text-black p-4 rounded-lg text-center  text-sm sm:text-lg">
+          <h2 className="font-bold bg-[#0B61AA] text-white p-4 rounded-t-lg">
+            Tes Berhasil Di Publikasikan
+          </h2>
+          <p className="my-4">
+            Tes kamu sekarang bisa diakses oleh peserta
+          </p>
+          <button
+            className="bg-white text-black px-4 py-2 rounded-md mt-4"
+            onClick={closePopup}
+          >
+            Oke
+          </button>
         </div>
-      )}
+      </div>
+    )}
 
-      {/* Error Popup */}
-      {showErrorPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-          <div className="bg-[#2E8EC5] p-6 rounded-lg shadow-lg text-center">
-            <div className="bg-[#78AED6] p-4 rounded-t-lg text-white ">
-              <h2 className="text-lg font-semibold">Publikasi Gagal</h2>
-            </div>
-            <div className="bg-[#2E8EC5] p-4 text-black">
-              <p>Pastikan semua data telah diisi dengan lengkap.</p>
-            </div>
-            <button
-              onClick={closePopup}
-              className="mt-4 bg-white text-black py-1 px-4 rounded-lg"
-            >
-              Oke
-            </button>
-          </div>
+    {/* Pop-up Gagal */}
+    {showErrorPopup && (
+      <div className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 flex items-center justify-center z-50  text-sm sm:text-lg">
+        <div className="w-[90%] max-w-[619px] bg-[#78AED6] text-black p-4 rounded-lg text-center  text-sm sm:text-lg">
+          <h2 className="font-bold bg-[#0B61AA] text-white p-4 rounded-t-lg">
+            Publikasi Gagal
+          </h2>
+          <p className="my-4">
+            Pastikan semua data telah diisi dengan lengkap
+          </p>
+          <button
+            className="bg-white text-black px-4 py-2 rounded-md mt-4"
+            onClick={closePopup}
+          >
+            Oke
+          </button>
         </div>
-      )}
-    </div>
+      </div>
+    )}
+      </div>
   );
 }
