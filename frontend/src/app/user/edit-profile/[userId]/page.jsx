@@ -5,11 +5,14 @@ import { useRouter } from 'next/navigation';
 import jwt_decode from 'jwt-decode'; // Pastikan Anda menginstal jsonwebtoken jika belum ada
 
 export default function EditProfile({ params }) {
-  const { userId } = params; // Ambil userId dari params
+  const { userId } = params;
+  const [currentPassword, setCurrentPassword] = useState('');
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
+    currentPassword: '',
     password: '',
     profileImage: '', // Tambahkan state untuk menyimpan gambar profil
   });
@@ -41,6 +44,7 @@ export default function EditProfile({ params }) {
           firstName: data.name.split(' ')[0] || '',
           lastName: data.name.split(' ')[1] || '',
           email: data.email || '',
+          currentPassword: '',
           password: '', // Kosongkan password untuk keamanan
           profileImage: data.profileImage || '', // Tambahkan gambar profil dari data
         });
@@ -75,38 +79,62 @@ export default function EditProfile({ params }) {
     }
   };
 
-  const handleSave = async (event) => {
-    if (!event) {
-      console.error("Event is undefined!");
-      return;
-    }
-    event.preventDefault(); // Pastikan preventDefault() dipanggil pada event yang terdefinisi
-    
-    try {
-      const token = localStorage.getItem("token"); 
-      const response = await fetch(`http://localhost:2000/user/profile`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name: `${formData.firstName} ${formData.lastName}`,
-          email: formData.email,
-          profileImage: formData.profileImage,
-        }),
-      });
-  
-      if (!response.ok) {
-        throw new Error("Gagal memperbarui profil");
-      }
-  
-      alert("Profil berhasil diperbarui!");
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      alert("Gagal memperbarui profil.");
-    }
+  const handleDeleteProfileImage = () => {
+    setFormData({ ...formData, profileImage: '' });
   };
+
+const handleSave = async (event) => {
+    event.preventDefault(); // Pastikan preventDefault() dipanggil pada event yang terdefinisi
+
+    try {
+        const token = localStorage.getItem("token");
+
+        // Update user profile
+        const profileResponse = await fetch(`http://localhost:2000/user/profile`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                name: `${formData.firstName} ${formData.lastName}`,
+                email: formData.email,
+                profileImage: formData.profileImage,
+            }),
+        });
+
+        if (!profileResponse.ok) {
+            throw new Error("Gagal memperbarui profil");
+        }
+
+        // Update password only if it's provided
+        if (formData.password) {
+            // Di sini kita akan menggunakan currentPassword yang sudah didapat sebelumnya
+            const currentPassword = 'your_current_password'; // Gantilah ini dengan mekanisme untuk mendapatkan currentPassword
+            
+            const passwordResponse = await fetch(`http://localhost:2000/user/profile/change-password`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    currentPassword: currentPassword, // Kirimkan currentPassword
+                    newPassword: formData.password,
+                }),
+            });
+
+            if (!passwordResponse.ok) {
+                throw new Error("Gagal memperbarui password");
+            }
+        }
+
+        alert("Profil dan password berhasil diperbarui!");
+    } catch (error) {
+        console.error("Error updating profile:", error);
+        alert("Gagal memperbarui profil.");
+    }
+};
   
   const handleDashboard = () => {
     // localStorage.removeItem('token'); // Hapus token saat logout
@@ -163,7 +191,7 @@ export default function EditProfile({ params }) {
                   {/* Actions section */}
                   <div className="actions flex items-center justify-end space-x-2">
             <div className="flex items-center justify-center w-[29px] h-[29px] bg-white rounded-[10px]">
-              <img src="/img/trash.png" alt="sampah" className="w-5 h-5" />
+              <img src="/img/trash.png" alt="sampah" className="w-5 h-5 cursor-pointer" onClick={handleDeleteProfileImage} />
           </div>
         </div>
 
@@ -211,8 +239,8 @@ export default function EditProfile({ params }) {
               <label className="block text-gray-700 font-poppins">Ubah Kata Sandi</label>
               <input
                 type="password"
-                name="password"
-                value={formData.password}
+                name="currentPassword"
+                value={formData.currentPassword}
                 onChange={handleChange}
                 className="w-full p-2 border border-black rounded-[15px] mt-1 font-poppins"
               />

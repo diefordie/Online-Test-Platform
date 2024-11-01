@@ -194,20 +194,23 @@ export default function RiwayatTransaksiHeader() {
             {/* Gambar Tes dengan Kategori dan Jumlah Orang */}
             <div className="relative w-[100px] sm:w-[150px]">
               {/* Icon mata dan jumlah orang */}
-              <div className="absolute top-2 left-2 flex items-center space-x-1 text-sm text-gray-500">
+              <div className="absolute top-1 left-2 flex items-center space-x-1 text-sm text-gray-500">
                 <img src="/images/eye-icon.png" alt="Jumlah Dikerjakan" className="w-4 h-4" />
                 <span>{item.historyCount}</span>
               </div>
               {/* Gambar */}
+              <div className='w-[120px] h-[168px] bg-white flex flex-col items-center justify-center rounded shadow-md'>
               <img
                 src={item.image || '/images/tes.png'}
                 alt={item.test.title}
-                className="w-full h-auto rounded-lg object-cover shadow-md"
+                className="w-[100px] h-[168px] object-contain"
               />
-              {/* Kategori Tes */}
-              <div className="text-center mt-2 text-sm font-semibold text-[#0B61AA]">
+              <div className="text-center mb-4 text-sm font-semibold text-[#0B61AA]">
                 Try Out {item.test.category}
               </div>
+              </div>
+              {/* Kategori Tes */}
+              
             </div>
 
             {/* Detail Tes */}
@@ -216,36 +219,38 @@ export default function RiwayatTransaksiHeader() {
               <p className="text-sm text-[#0B61AA]">
                 Prediksi Kemiripan {item.test.similarity}%
               </p>
-              <div className="flex items-center mt-4">
+              <p className="text-sm mt-4">Dibuat Oleh :</p>
+              <div className="flex items-center mt-2">
+                <div className='flex items-center'>
                 <img
                   src={item.test.author?.photo || '/images/foto.png'}
                   alt="Foto Pembuat"
-                  className="w-10 h-10 rounded-full mr-2"
+                  className="w-7 h-7 rounded-full mr-2"
                 />
                 <div>
-                  <p className="text-sm">Dibuat Oleh:</p>
                   <strong className="text-sm">{item.test.author?.name || 'Penulis Tidak Diketahui'}</strong>
+                </div>
                 </div>
               </div>
               {/* Tautan Aksi */}
               <div className="flex justify-end mt-4 space-x-2">
                 {item.customStatus === 'Belum Bayar' && (
-                  <Link href="/bayar" className="bg-[#0B61AA] text-white px-4 py-2 rounded-lg">
+                  <Link href="/user/membeliPaket" className="bg-[#0B61AA] text-white px-4 py-2 rounded-lg">
                     Bayar
                   </Link>
                 )}
                 {item.customStatus === 'Berhasil (Belum Dikerjakan)' && (
-                  <Link href="/mulai" className="bg-[#0B61AA] text-white px-4 py-2 rounded-lg">
+                  <Link href="/tes/detailsoal/cm2ps606n0000umajhjfi59u3" className="bg-[#0B61AA] text-white px-4 py-2 rounded-lg">
                     Mulai
                   </Link>
                 )}
                 {item.customStatus === 'Selesai (Sudah Dikerjakan)' && (
-                  <Link href="/score" className="bg-[#0B61AA] text-white px-4 py-2 rounded-lg">
+                  <Link href="/user/topscore/cm2ps606n0000umajhjfi59u3" className="bg-[#0B61AA] text-white px-4 py-2 rounded-lg">
                     Score
                   </Link>
                 )}
                 {item.customStatus === 'Tidak Berhasil' && (
-                  <Link href="/beli-lagi" className="bg-[#0B61AA] text-white px-4 py-2 rounded-lg">
+                  <Link href="/user/membeliPaket" className="bg-[#0B61AA] text-white px-4 py-2 rounded-lg">
                     Beli Lagi
                   </Link>
                 )}

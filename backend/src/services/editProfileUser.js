@@ -48,7 +48,7 @@ export const updateUserProfile = async (userId, name, email, userPhoto) => {
 };
 
 // Update user password
-export const updateUserPassword = async (userId, currentPassword, newPassword) => {
+export const updateUserPassword = async (userId, newPassword) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -58,6 +58,10 @@ export const updateUserPassword = async (userId, currentPassword, newPassword) =
     if (!user) {
       throw new Error('User not found');
     }
+
+    // Ambil currentPassword dari token atau sesi
+    // Misalnya, Anda bisa menggunakan req.user di middleware untuk menyimpan user info
+    const currentPassword = req.user.password; // Sesuaikan sesuai implementasi Anda
 
     // Compare current password with the stored hash
     const isMatch = await bcrypt.compare(currentPassword, user.password);
@@ -85,3 +89,42 @@ export const updateUserPassword = async (userId, currentPassword, newPassword) =
     throw new Error(`Failed to update password: ${error.message}`);
   }
 };
+
+// // Update user password
+// export const updateUserPassword = async (userId, currentPassword, newPassword) => {
+//   try {
+//     const user = await prisma.user.findUnique({
+//       where: { id: userId },
+//       select: { password: true },
+//     });
+
+//     if (!user) {
+//       throw new Error('User not found');
+//     }
+
+//     // Compare current password with the stored hash
+//     const isMatch = await bcrypt.compare(currentPassword, user.password);
+//     if (!isMatch) {
+//       throw new Error('Current password is incorrect');
+//     }
+
+//     // Hash the new password
+//     const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+//     // Start a transaction to ensure both Firebase and Prisma are updated
+//     await prisma.$transaction(async (prisma) => {
+//       // Update password in Firebase Authentication
+//       await firebaseAdmin.auth().updateUser(userId, { password: newPassword });
+
+//       // Update hashed password in Prisma
+//       await prisma.user.update({
+//         where: { id: userId },
+//         data: { password: hashedPassword },
+//       });
+//     });
+
+//     return { message: 'Password updated successfully' };
+//   } catch (error) {
+//     throw new Error(`Failed to update password: ${error.message}`);
+//   }
+// };
