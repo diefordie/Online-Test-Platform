@@ -154,7 +154,7 @@ const handleSave = async (event) => {
       {/* Header */}
       <div className="w-full bg-[#0B61AA] p-4 text-white flex justify-between items-center rounded-md">
         <div className="flex-shrink-0">
-          <img src="/images/logo.png" alt="Etamtest" className="h-6 object-contain" style={{ maxWidth: '216px', height: '52px' }} />
+          <img src="/images/etamtest.png" alt="Etamtest" className="h-6 object-contain" style={{ maxWidth: '216px', height: '52px' }} />
         </div>
         <div className="flex-shrink-0">
           <img src="/images/back.png" alt="Home" className="max-w-[44px] h-[22px]" onClick={handleDashboard} />

@@ -7,8 +7,18 @@ export default function RiwayatTransaksiHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const token = localStorage.getItem('token');
-  console.log('Token:', token);
+  const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    console.log('Transactions updated:', transactions);
+  }, [transactions]);
+
+  useEffect(() => {
+    // Mengakses localStorage di sisi klien
+    const storedToken = localStorage.getItem('token');
+    setToken(storedToken);
+    console.log('Token:', storedToken);
+  }, []);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -19,29 +29,25 @@ export default function RiwayatTransaksiHeader() {
     return status.replace(/\s*\(.*?\)\s*/g, '').trim();
   };
 
-
   // Fungsi untuk mengambil riwayat transaksi dari backend
   const fetchTransactions = async () => {
-    try {
-      const token = localStorage.getItem('token'); // Ambil token dari localStorage
-      if (!token) {
-        console.error('Token tidak tersedia');
-        return;
-      }
+    if (!token) {
+      console.error('Token tidak tersedia');
+      return;
+    }
 
+    try {
       const response = await fetch('http://localhost:2000/api/riwayat-transaksi', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          // Sertakan token JWT di header Authorization
           'Authorization': `Bearer ${token}`,
         },
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
-        console.log('Fetched Transactions:', data); 
+        console.log('Fetched Transactions:', data);
         setTransactions(data);
       } else {
         console.error('Failed to fetch transactions');
@@ -54,16 +60,22 @@ export default function RiwayatTransaksiHeader() {
   };
 
   useEffect(() => {
-    fetchTransactions(); // Panggil API saat komponen pertama kali dimuat
-  }, []);
+    if (token) {
+      fetchTransactions();
+    }
+  }, [token]);
 
   // Fungsi untuk mendapatkan data sesuai dengan tab yang aktif
-  const getDataByTab = () => {
-    const filteredTransactions = transactions.filter((item) => item.customStatus === activeTab);
-    console.log('Active Tab:', activeTab);
-    console.log('Filtered Transactions:', filteredTransactions);
-    return filteredTransactions;
-  };
+const getDataByTab = () => {
+  console.log('All Transactions:', transactions);
+  console.log('Active Tab:', activeTab);
+  const filteredTransactions = transactions.filter((item) => {
+    const itemStatus = item.customStatus || '';
+    return itemStatus.includes(activeTab);
+  });
+  console.log('Filtered Transactions:', filteredTransactions);
+  return filteredTransactions;
+};
 
   return (
     <>
@@ -181,12 +193,7 @@ export default function RiwayatTransaksiHeader() {
 
       {/* Konten Berdasarkan Tab yang Aktif */}
       <div className="container mx-auto p-4 space-y-4">
-      {loading ? (
-        <p>Loading...</p>
-      ) : getDataByTab().length === 0 ? (
-        <p>Tidak ada transaksi</p>
-      ) : (
-        getDataByTab().map((item) => (
+        {getDataByTab().map((item) => (
           <div
             key={item.id}
             className="w-full sm:w-[1374px] bg-[#F3F3F3] shadow-md p-4 flex rounded-lg"
@@ -194,24 +201,22 @@ export default function RiwayatTransaksiHeader() {
             {/* Gambar Tes dengan Kategori dan Jumlah Orang */}
             <div className="relative w-[100px] sm:w-[150px]">
               {/* Icon mata dan jumlah orang */}
-              <div className="absolute top-1 left-2 flex items-center space-x-1 text-sm text-gray-500">
+              <div className="absolute top-2 left-2 flex items-center space-x-1 text-sm text-gray-500">
                 <img src="/images/eye-icon.png" alt="Jumlah Dikerjakan" className="w-4 h-4" />
                 <span>{item.historyCount}</span>
               </div>
               {/* Gambar */}
-              <div className='w-[120px] h-[168px] bg-white flex flex-col items-center justify-center rounded shadow-md'>
               <img
                 src={item.image || '/images/tes.png'}
                 alt={item.test.title}
-                className="w-[100px] h-[168px] object-contain"
+                className="w-full h-auto rounded-lg object-cover shadow-md"
               />
-              <div className="text-center mb-4 text-sm font-semibold text-[#0B61AA]">
+              {/* Kategori Tes */}
+              <div className="text-center mt-2 text-sm font-semibold text-[#0B61AA]">
                 Try Out {item.test.category}
               </div>
-              </div>
-              {/* Kategori Tes */}
-              
             </div>
+
 
             {/* Detail Tes */}
             <div className="ml-4 flex-1">
@@ -219,57 +224,46 @@ export default function RiwayatTransaksiHeader() {
               <p className="text-sm text-[#0B61AA]">
                 Prediksi Kemiripan {item.test.similarity}%
               </p>
-              <p className="text-sm mt-4">Dibuat Oleh :</p>
-              <div className="flex items-center mt-2">
-                <div className='flex items-center'>
+              <div className="flex items-center mt-4">
                 <img
                   src={item.test.author?.photo || '/images/foto.png'}
                   alt="Foto Pembuat"
-                  className="w-7 h-7 rounded-full mr-2"
+                  className="w-10 h-10 rounded-full mr-2"
                 />
                 <div>
+                  <p className="text-sm">Dibuat Oleh:</p>
                   <strong className="text-sm">{item.test.author?.name || 'Penulis Tidak Diketahui'}</strong>
-                </div>
                 </div>
               </div>
               {/* Tautan Aksi */}
               <div className="flex justify-end mt-4 space-x-2">
                 {item.customStatus === 'Belum Bayar' && (
-                  <Link href="/user/membeliPaket" className="bg-[#0B61AA] text-white px-4 py-2 rounded-lg">
+                  <Link href="/bayar" className="bg-[#0B61AA] text-white px-4 py-2 rounded-lg">
                     Bayar
                   </Link>
                 )}
                 {item.customStatus === 'Berhasil (Belum Dikerjakan)' && (
-                  <Link href="/tes/detailsoal/cm2ps606n0000umajhjfi59u3" className="bg-[#0B61AA] text-white px-4 py-2 rounded-lg">
+                  <Link href="/mulai" className="bg-[#0B61AA] text-white px-4 py-2 rounded-lg">
                     Mulai
                   </Link>
                 )}
                 {item.customStatus === 'Selesai (Sudah Dikerjakan)' && (
-                  <Link href="/user/topscore/cm2ps606n0000umajhjfi59u3" className="bg-[#0B61AA] text-white px-4 py-2 rounded-lg">
+                  <Link href="/score" className="bg-[#0B61AA] text-white px-4 py-2 rounded-lg">
                     Score
                   </Link>
                 )}
                 {item.customStatus === 'Tidak Berhasil' && (
-                  <Link href="/user/membeliPaket" className="bg-[#0B61AA] text-white px-4 py-2 rounded-lg">
+                  <Link href="/beli-lagi" className="bg-[#0B61AA] text-white px-4 py-2 rounded-lg">
                     Beli Lagi
                   </Link>
                 )}
               </div>
-              {/* Menampilkan status di UI tanpa teks dalam kurung */}
-              {/* <p className="text-[#0B61AA] text-xs sm:text-sm">
-                Status: {formatStatus(item.customStatus)}
-              </p> */}
-                  {/* Gunakan formatStatus untuk menampilkan status tanpa teks dalam kurung */}
-                  {/* <p className="text-[#0B61AA] text-xs sm:text-sm">
-                    Status: {formatStatus(item.customStatus)}
-                  </p> */}
-                </div>
-              </div>
-            
-          ))
-        )}
+            </div>
+          </div>
+        ))}
       </div>
 
     </>
   );
 }
+

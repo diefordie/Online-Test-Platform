@@ -11,14 +11,3 @@ export const getUserTransactionHistory = async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 };
-
-// export const getTransactionDetails = async (req, res) => {
-//     const transactionId = req.params.transactionId; // Get transaction ID from the request parameters
-//     try {
-//         const transaction = await getTransactionById(transactionId);
-//         return res.status(200).json(transaction);
-//     } catch (error) {
-//         console.error('Error fetching transaction details:', error);
-//         return res.status(500).json({ error: error.message });
-//     }
-// };
