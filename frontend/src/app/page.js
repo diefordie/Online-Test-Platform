@@ -3,7 +3,7 @@ import React from 'react'
 // import GuestDashboard from '@/app/guestDashboard/page'
 // import landingpage from './src/app/user/landingpage/page'
 // import authorAgreement from '@/app/authorAgreement/page'
-import buatSoal from './author/buatSoal/page'
+// import BuatSoal from './author/buatSoal/page'
 import BuatTes from './author/buattes/page'
 
 const page = () => {
@@ -12,7 +12,7 @@ const page = () => {
       {/* <LandingPage /> */}
       {/* <GuestDashboard /> */}
       {/* <landingpage /> */}
-      {/* <buatSoal/> */}
+      {/* <BuatSoal/> */}
       <BuatTes />
       {/* <authorAgreement /> */}
     </div>

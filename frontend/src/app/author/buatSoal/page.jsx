@@ -34,6 +34,12 @@ const KotakNomor = () => {
 
     if (testIdFromUrl) {
       setTestId(testIdFromUrl);
+      const savedPages = localStorage.getItem(`pages_${testIdFromUrl}`);
+      if (savedPages) {
+        setPages(JSON.parse(savedPages));
+      } else {
+        fetchPagesFromDB(testIdFromUrl); // Fetch pages from DB if not in local storage
+      }
     }
 
     if (multiplechoiceIdFromUrl) {
@@ -51,27 +57,28 @@ const KotakNomor = () => {
 
   const addQuestion = (pageIndex) => {
     setPages(prevPages => {
-      // Buat salinan pages yang ada
-      const updatedPages = [...prevPages];
-      
-      // Ambil page yang akan diupdate
-      const currentPage = {...updatedPages[pageIndex]};
-      
-      // Tambah satu nomor saja ke array questions
-      currentPage.questions = [...currentPage.questions, currentPage.questions.length + 1];
-      
-      // Update page di array pages
-      updatedPages[pageIndex] = currentPage;
+        // Buat salinan pages yang ada
+        const updatedPages = [...prevPages];
 
-      // Simpan ke localStorage
-      localStorage.setItem(`pages-${testId}`, JSON.stringify(updatedPages));
-      
-      // Log untuk debugging
-      console.log('Current questions after update:', currentPage.questions);
-      
-      return updatedPages;
+        // Pastikan page yang akan diupdate ada
+        const currentPage = updatedPages[pageIndex] ? { ...updatedPages[pageIndex] } : { questions: [] };
+
+        // Pastikan `questions` adalah array
+        currentPage.questions = Array.isArray(currentPage.questions) ? currentPage.questions : [];
+
+        // Tambah satu nomor saja ke array questions
+        currentPage.questions = [...currentPage.questions, currentPage.questions.length + 1];
+        updatedPages[pageIndex] = currentPage;
+
+        // Simpan ke localStorage
+        localStorage.setItem(`pages-${testId}`, JSON.stringify(updatedPages));
+
+        console.log('Current questions after update:', currentPage.questions);
+
+        return updatedPages;
     });
   };
+
 
   const addPage = () => {
     setPages(prevPages => {
@@ -94,10 +101,10 @@ const KotakNomor = () => {
   };
 
   // Function to clear storage (useful for testing or reset functionality)
-  const clearStorage = () => {
-    localStorage.removeItem(`pages-${testId}`);
-    setPages([{ pageNumber: 1, questions: [1], pageName: 'Beri Nama Tes' }]);
-  };
+  // const clearStorage = () => {
+  //   localStorage.removeItem(`pages-${testId}`);
+  //   setPages([{ pageNumber: 1, questions: [1], pageName: 'Beri Nama Tes' }]);
+  // };
 
   const toggleDropdown = (pageIndex) => {
     setPages(prevPages => 
@@ -114,53 +121,33 @@ const KotakNomor = () => {
   };
 
   const saveRename = async (pageIndex) => {
-    console.log("Starting saveRename with value:", renameValue); // Debug log
-
-    // Validasi yang lebih ketat
-    if (!renameValue || renameValue.trim() === '') {
-      alert("Please enter a page name");
-      return;
-    }
-
     try {
-      const requestData = {
-        testId: testId,
-        pageIndex: pageIndex,
-        newPageName: renameValue.trim()
-      };
-      
-      console.log("Sending data:", requestData); // Debug log
-
-      const response = await fetch(`http://localhost:2000/api/multiplechoice/update-pageName`, {
+      await fetch(`http://localhost:2000/api/multiplechoice/update-pageName`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(requestData),
+        body: JSON.stringify({
+          testId: testId,
+          pageIndex: pageIndex,
+          pageName: renameValue,
+        }),
       });
-
-      const responseData = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(responseData.message || 'Failed to update page name');
-      }
-
       setPages((prevPages) => {
         const updatedPages = prevPages.map((page, index) => {
           if (index === pageIndex) {
-            return { ...page, pageName: renameValue.trim() };
+            return { ...page, pageName: renameValue };
           }
-          return page;
+            return page;
+          });
+          localStorage.setItem(`pages-${testId}`, JSON.stringify(updatedPages));
+          return updatedPages;
         });
-        return updatedPages;
-      });
-      setIsRenaming(null);
-      setRenameValue(''); // Reset nilai setelah berhasil
+      setIsRenaming(null); 
     } catch (error) {
-      console.error("Error details:", error);
-      alert(error.message);
+      console.error("Error updating pageName:", error);
     }
-};
+  };
 
   const deletePage = (pageIndex) => {
     if (confirm("Apakah Anda yakin ingin menghapus tes ini?")) {

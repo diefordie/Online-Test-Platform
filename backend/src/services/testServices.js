@@ -5,7 +5,7 @@ const createTestService = async (newTest) => {
     try {
         return await prisma.test.create({
             data: {
-                authorId: "cm2vepy7500015lz9h7nj6z2p",
+                authorId: "cm2vj4sq50001110uzxkv9q97",
                 type: newTest.type,
                 category: newTest.category,
                 title: newTest.title,

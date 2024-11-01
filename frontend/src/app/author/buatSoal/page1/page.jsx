@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 
 const MembuatSoal = () => {
   const router = useRouter();
-  const [testId, setTestId] = useState('cm2nkbnro0003q7tw36hs4sfq');
+  const [testId, setTestId] = useState('');
   const [multiplechoiceId, setMultiplechoiceId] = useState('');
   const [id, setId] = useState('');
   const [pageName, setPageName] = useState('');
@@ -129,7 +129,9 @@ const MembuatSoal = () => {
             setPages(prevPages => {
                 const updatedPages = prevPages.map(page => ({
                     ...page,
-                    questions: page.questions.filter(q => q !== multiplechoiceId)
+                    questions: Array.isArray(page.questions)
+                        ? page.questions.filter(q => q !== multiplechoiceId)
+                        : [],
                 }));
 
                 if (testId && typeof window !== 'undefined') {
@@ -224,7 +226,7 @@ const MembuatSoal = () => {
   return (
     <div className="container mx-auto p-0" style={{ maxWidth: '1440px' }}>
       <header className="bg-[#0B61AA] text-white p-4 sm:p-6 font-poppins" style={{ maxWidth: '1440px', height: '108px' }}>
-        <div className="container mx-auto flex justify-start items-center p-0">
+        <div className="container mx-auto flex justify-start items-center">
           <Link href="/">
             <img src="/img/menu.png" alt="Menu" className="h-7" style={{ maxWidth: '69px', height: '70px' }} />
           </Link>
