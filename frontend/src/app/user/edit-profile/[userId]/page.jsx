@@ -122,7 +122,7 @@ export default function EditProfile({ params }) {
       {/* Header */}
       <div className="w-full bg-[#0B61AA] p-4 text-white flex justify-between items-center rounded-md">
         <div className="flex-shrink-0">
-          <img src="/img/etamtest.png" alt="Etamtest" className="h-6 object-contain" style={{ maxWidth: '216px', height: '52px' }} />
+          <img src="/images/etamtest.png" alt="Etamtest" className="h-6 object-contain" style={{ maxWidth: '216px', height: '52px' }} />
         </div>
         <div className="flex-shrink-0">
           <img src="/img/keluar.png" alt="Logout" className="max-w-[44px] h-[22px]" onClick={handleLogout} />

@@ -6,7 +6,7 @@ import { jwtDecode } from "jwt-decode";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 
-export default function CPNS() {
+export default function Pemrograman() {
   const [popularTestsByCategory, setPopularTestsByCategory] = useState([]);
   const [freeTestsByCategory, setFreeTestsByCategory] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
@@ -111,7 +111,7 @@ export default function CPNS() {
   useEffect(() => {
     const fetchPopularTestsByCategory = async () => {
       try {
-        const response = await fetch('http://localhost:2000/dashboard/popular-tests-by-category?category=CPNS');
+        const response = await fetch('http://localhost:2000/dashboard/popular-tests-by-category?category=Pemrograman');
         if (!response.ok) {
           throw new Error('Failed to fetch popular tests by category');
         }
@@ -131,7 +131,7 @@ export default function CPNS() {
   useEffect(() => {
     const fetchFreeTestsByCategory = async () => {
       try {
-        const response = await fetch('http://localhost:2000/dashboard/free-tests-by-category?category=CPNS');
+        const response = await fetch('http://localhost:2000/dashboard/free-tests-by-category?category=Pemrograman');
         if (!response.ok) {
           throw new Error('Failed to fetch free tests by category');
         }
@@ -153,7 +153,7 @@ export default function CPNS() {
     if (!searchQuery) return;
 
     try {
-      const response = await fetch(`http://localhost:2000/dashboard/search-tests-by-category?title=${encodeURIComponent(searchQuery)}&category=CPNS`);
+      const response = await fetch(`http://localhost:2000/dashboard/search-tests-by-category?title=${encodeURIComponent(searchQuery)}&category=Pemrograman`);
       if (!response.ok) {
         throw new Error('Failed to search tests');
       }
@@ -301,183 +301,116 @@ export default function CPNS() {
   }; 
   
   const [likedSearchItems, setLikedSearchItems] = useState({});
-  const [likedPopulerItems, setLikedPopulerItems] = useState({});
-  const [likedGratisItems, setLikedGratisItems] = useState({});
-  
-  
-    // Ambil status like dari local storage saat komponen dimuat
-    useEffect(() => {
-      const fetchFavorites = async () => {
-        try {
-          const response = await fetch('http://localhost:2000/api/favorites', {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          if (!response.ok) {
-            throw new Error('Failed to fetch favorites');
-          }
-          const favoriteTests = await response.json();
-  
-          // Buat objek liked items berdasarkan favoriteTests
-          const likedItems = {};
-          favoriteTests.forEach(test => {
-            likedItems[test.id] = true; // Asumsikan test.id adalah ID dari tes
-          });
-  
-          // Update state dengan liked items
-          setLikedSearchItems(likedItems);
-          setLikedPopulerItems(likedItems); // Jika kamu ingin menggunakan likedPopulerItems
-          setLikedGratisItems(likedItems); // Jika kamu ingin menggunakan likedGratisItems
-        } catch (error) {
-          console.error('Error fetching favorite tests:', error);
-        }
-      };
-  
-      // Memanggil fetchFavorites untuk mendapatkan favorit dari server
-      fetchFavorites();
-    }, [token]);
-  
-    // Mengupdate local storage setiap kali likedSearchItems diupdate
-    useEffect(() => {
-      localStorage.setItem('likedSearchItems', JSON.stringify(likedSearchItems));
-    }, [likedSearchItems]);
-  
-    // Mengupdate local storage setiap kali likedPopulerItems diupdate
-    useEffect(() => {
-      localStorage.setItem('likedPopulerItems', JSON.stringify(likedPopulerItems));
-    }, [likedPopulerItems]);
-  
-    // Mengupdate local storage setiap kali likedGratisItems diupdate
-    useEffect(() => {
-      localStorage.setItem('likedGratisItems', JSON.stringify(likedGratisItems));
-    }, [likedGratisItems]);
-  
-    // Mengambil status like dari local storage saat pertama kali komponen dimuat
-    useEffect(() => {
-      const storedLikedSearchItems = localStorage.getItem('likedSearchItems');
-      if (storedLikedSearchItems) {
-        setLikedSearchItems(JSON.parse(storedLikedSearchItems));
-      }
-      // Lakukan hal yang sama untuk likedPopulerItems dan likedGratisItems
-      const storedLikedPopulerItems = localStorage.getItem('likedPopulerItems');
-      if (storedLikedPopulerItems) {
-        setLikedPopulerItems(JSON.parse(storedLikedPopulerItems));
-      }
-      const storedLikedGratisItems = localStorage.getItem('likedGratisItems');
-      if (storedLikedGratisItems) {
-        setLikedGratisItems(JSON.parse(storedLikedGratisItems));
-      }
-    }, []);
-  
-    const toggleLikeSearch = async (id) => {
-      const isLiked = likedSearchItems[id]; // Cek status apakah sudah di-like
-  
-      try {
-        if (isLiked) {
-          // Jika sudah di-like, lakukan DELETE request
-          await fetch(`http://localhost:2000/api/favorites`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ testId: id }),
-          });
-        } else {
-          // Jika belum di-like, lakukan POST request
-          await fetch(`http://localhost:2000/api/favorites`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ testId: id }),
-          });
-        }
-  
-        // Update state setelah permintaan berhasil
-        setLikedSearchItems((prevLikedItems) => ({
-          ...prevLikedItems,
-          [id]: !prevLikedItems[id], // Toggle status like
-        }));
-      } catch (error) {
-        console.error("Error handling favorite:", error);
-      }
-    };
-  
-    const toggleLikePopuler = async (id) => {
-      const isLiked = likedPopulerItems[id]; // Cek status apakah sudah di-like
-  
-      try {
-        if (isLiked) {
-          // Jika sudah di-like, lakukan DELETE request
-          await fetch(`http://localhost:2000/api/favorites`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ testId: id }),
-          });
-        } else {
-          // Jika belum di-like, lakukan POST request
-          await fetch(`http://localhost:2000/api/favorites`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ testId: id }),
-          });
-        }
-  
-        // Update state setelah permintaan berhasil
-        setLikedPopulerItems((prevLikedItems) => ({
-          ...prevLikedItems,
-          [id]: !prevLikedItems[id], // Toggle status like
-        }));
-      } catch (error) {
-        console.error("Error handling favorite:", error);
-      }
-    };
-  
-    const toggleLikeGratis = async (id) => {
-      const isLiked = likedGratisItems[id]; // Cek status apakah sudah di-like
-  
-      try {
-        if (isLiked) {
-          // Jika sudah di-like, lakukan DELETE request
-          await fetch(`http://localhost:2000/api/favorites`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ testId: id }),
-          });
-        } else {
-          // Jika belum di-like, lakukan POST request
-          await fetch(`http://localhost:2000/api/favorites`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ testId: id }),
-          });
-        }
-  
-        // Update state setelah permintaan berhasil
-        setLikedGratisItems((prevLikedItems) => ({
-          ...prevLikedItems,
-          [id]: !prevLikedItems[id], // Toggle status like
-        }));
-      } catch (error) {
-        console.error("Error handling favorite:", error);
-      }
-    };
+const [likedPopulerItems, setLikedPopulerItems] = useState({});
+const [likedGratisItems, setLikedGratisItems] = useState({});
+
+const toggleLikeSearch = async (id) => {
+  const isLiked = likedSearchItems[id]; // Cek status apakah sudah di-like
+
+  try {
+    if (isLiked) {
+      // Jika sudah di-like, lakukan DELETE request
+      await fetch(`http://localhost:2000/api/favorites`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Gunakan token yang sudah didefinisikan
+        },
+        body: JSON.stringify({ testId: id }),
+      });
+    } else {
+      // Jika belum di-like, lakukan POST request
+      await fetch(`http://localhost:2000/api/favorites`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Gunakan token yang sudah didefinisikan
+        },
+        body: JSON.stringify({ testId: id }),
+      });
+    }
+
+    // Update state setelah permintaan berhasil
+    setLikedSearchItems((prevLikedItems) => ({
+      ...prevLikedItems,
+      [id]: !prevLikedItems[id], // Toggle status like
+    }));
+  } catch (error) {
+    console.error("Error handling favorite:", error);
+  }
+};
+
+const toggleLikePopuler = async (id) => {
+  const isLiked = likedPopulerItems[id]; // Cek status apakah sudah di-like
+
+  try {
+    if (isLiked) {
+      // Jika sudah di-like, lakukan DELETE request
+      await fetch(`http://localhost:2000/api/favorites`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Gunakan token yang sudah didefinisikan
+        },
+        body: JSON.stringify({ testId: id }),
+      });
+    } else {
+      // Jika belum di-like, lakukan POST request
+      await fetch(`http://localhost:2000/api/favorites`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Gunakan token yang sudah didefinisikan
+        },
+        body: JSON.stringify({ testId: id }),
+      });
+    }
+
+    // Update state setelah permintaan berhasil
+    setLikedPopulerItems((prevLikedItems) => ({
+      ...prevLikedItems,
+      [id]: !prevLikedItems[id], // Toggle status like
+    }));
+  } catch (error) {
+    console.error("Error handling favorite:", error);
+  }
+};
+
+const toggleLikeGratis = async (id) => {
+  const isLiked = likedGratisItems[id]; // Cek status apakah sudah di-like
+
+  try {
+    if (isLiked) {
+      // Jika sudah di-like, lakukan DELETE request
+      await fetch(`http://localhost:2000/api/favorites`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Pastikan kamu punya token JWT
+        },
+        body: JSON.stringify({ testId: id }),
+      });
+    } else {
+      // Jika belum di-like, lakukan POST request
+      await fetch(`http://localhost:2000/api/favorites`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Pastikan kamu punya token JWT
+        },
+        body: JSON.stringify({ testId: id }),
+      });
+    }
+
+    // Update state setelah permintaan berhasil
+    setLikedGratisItems((prevLikedItems) => ({
+      ...prevLikedItems,
+      [id]: !prevLikedItems[id], // Toggle status like
+    }));
+  } catch (error) {
+    console.error("Error handling favorite:", error);
+  }
+};
 
   return (
     <>
@@ -506,7 +439,7 @@ export default function CPNS() {
         <div className="relative flex inline-block items-center ">
           <div className="mx-auto">
               {/* Judul besar */}
-              <h5 className="text-sm lg:text-3xl font-bold font-bodoni lg:mr-8">Latihan Soal Tes CPNS</h5>
+              <h5 className="text-sm lg:text-3xl font-bold font-bodoni lg:mr-8">Latihan Soal Tes Pemrograman</h5>
                   {/* Breadcrumb di bawah h5 */}
                   <nav className="hidden lg:block mt-2">
                       <ol className="list-reset flex space-x-2 ">
@@ -517,8 +450,8 @@ export default function CPNS() {
                       </li>
                       <li>/</li>
                       <li>
-                          <Link href="/tes/category/cpns" legacyBehavior>
-                          <a className="hover:text-orange font-poppins font-bold">Latihan Tes CPNS</a>
+                          <Link href="/tes/category/pemrograman" legacyBehavior>
+                          <a className="hover:text-orange font-poppins font-bold">Latihan Tes Pemrograman</a>
                           </Link>
                       </li>
                       </ol>
