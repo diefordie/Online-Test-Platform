@@ -4,7 +4,7 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 
 function App() {
-  const [testId, setTestId] = useState('cm2unu0b70000eu85gvybecoc');
+  const [testId, setTestId] = useState('cm2vefs5z0002hity4pkvdzry');
   const [testTitle, setTestTitle] = useState('');
   const [testSimilarity, setTestSimilarity] = useState();
   const [testPrice, setTestPrice] = useState();
@@ -28,7 +28,7 @@ function App() {
   useEffect(() => {
     const fetchTestDetail = async () => {
       try {
-        const response = await fetch(`http://localhost:2000/api/tests/test-detail/cm2unu0b70000eu85gvybecoc`);
+        const response = await fetch(`http://localhost:2000/api/tests/test-detail/cm2vefs5z0002hity4pkvdzry`);
         if (!response.ok) {
           const errorMessage = await response.text();
           throw new Error(`Error: ${response.status} - ${errorMessage}`)
@@ -55,7 +55,7 @@ function App() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ testId }), // Kirim testId ke backend
+          body: JSON.stringify({ testId }), 
         });
   
         const data = await response.json();
