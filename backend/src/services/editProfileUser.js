@@ -20,35 +20,41 @@ export const getUserById = async (userId) => {
   }
 };
 
-// Update user profile (name, email, photo)
-export const updateUserProfile = async (userId, name, email, userPhoto) => {
+// Memperbarui nama pengguna
+export const updateUserName = async (userId, name) => {
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { name },
+    });
+    return updatedUser;
+  } catch (error) {
+    throw new Error(`Failed to update name: ${error.message}`);
+  }
+};
+
+// Memperbarui email pengguna
+export const updateUserEmail = async (userId, email) => {
   try {
     const existingUser = await prisma.user.findUnique({ where: { email } });
-
     if (existingUser && existingUser.id !== userId) {
       throw new Error('Email is already in use by another user');
     }
 
-    // Start a transaction to ensure consistency between Firebase and Prisma
-    const result = await prisma.$transaction(async (prisma) => {
-      // Update email in Firebase Authentication
-      await firebaseAdmin.auth().updateUser(userId, { email });
-
-      // Update user profile in Prisma
-      return await prisma.user.update({
-        where: { id: userId },
-        data: { name, email, userPhoto },
-      });
+    await firebaseAdmin.auth().updateUser(userId, { email });
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { email },
     });
 
-    return result;
+    return updatedUser;
   } catch (error) {
-    throw new Error(`Failed to update profile: ${error.message}`);
+    throw new Error(`Failed to update email: ${error.message}`);
   }
 };
 
-// Update user password
-export const updateUserPassword = async (userId, newPassword) => {
+// Memperbarui kata sandi pengguna
+export const updateUserPassword = async (userId, currentPassword, newPassword) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -59,29 +65,16 @@ export const updateUserPassword = async (userId, newPassword) => {
       throw new Error('User not found');
     }
 
-    // Ambil currentPassword dari token atau sesi
-    // Misalnya, Anda bisa menggunakan req.user di middleware untuk menyimpan user info
-    const currentPassword = req.user.password; // Sesuaikan sesuai implementasi Anda
-
-    // Compare current password with the stored hash
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
       throw new Error('Current password is incorrect');
     }
 
-    // Hash the new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    // Start a transaction to ensure both Firebase and Prisma are updated
-    await prisma.$transaction(async (prisma) => {
-      // Update password in Firebase Authentication
-      await firebaseAdmin.auth().updateUser(userId, { password: newPassword });
-
-      // Update hashed password in Prisma
-      await prisma.user.update({
-        where: { id: userId },
-        data: { password: hashedPassword },
-      });
+    await firebaseAdmin.auth().updateUser(userId, { password: newPassword });
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
     });
 
     return { message: 'Password updated successfully' };
@@ -90,41 +83,21 @@ export const updateUserPassword = async (userId, newPassword) => {
   }
 };
 
-// // Update user password
-// export const updateUserPassword = async (userId, currentPassword, newPassword) => {
-//   try {
-//     const user = await prisma.user.findUnique({
-//       where: { id: userId },
-//       select: { password: true },
-//     });
+// Memperbarui foto profil pengguna
+export const updateUserPhoto = async (userId, userPhotoUrl) => {
+  try {
+    console.log("Updating user photo for userId:", userId, "with URL:", userPhotoUrl);
 
-//     if (!user) {
-//       throw new Error('User not found');
-//     }
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { userPhoto: userPhotoUrl },
+    });
 
-//     // Compare current password with the stored hash
-//     const isMatch = await bcrypt.compare(currentPassword, user.password);
-//     if (!isMatch) {
-//       throw new Error('Current password is incorrect');
-//     }
+    console.log("Database update successful. Updated user:", updatedUser);
 
-//     // Hash the new password
-//     const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-//     // Start a transaction to ensure both Firebase and Prisma are updated
-//     await prisma.$transaction(async (prisma) => {
-//       // Update password in Firebase Authentication
-//       await firebaseAdmin.auth().updateUser(userId, { password: newPassword });
-
-//       // Update hashed password in Prisma
-//       await prisma.user.update({
-//         where: { id: userId },
-//         data: { password: hashedPassword },
-//       });
-//     });
-
-//     return { message: 'Password updated successfully' };
-//   } catch (error) {
-//     throw new Error(`Failed to update password: ${error.message}`);
-//   }
-// };
+    return updatedUser;
+  } catch (error) {
+    console.error('Error updating user photo in database:', error.message);
+    throw new Error(`Failed to update photo: ${error.message}`);
+  }
+};

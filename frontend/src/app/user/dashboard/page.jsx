@@ -511,32 +511,6 @@ const [likedGratisItems, setLikedGratisItems] = useState({});
     }
   };
 
-   // Logout function
-   const handleLogout = async () => {
-    try {
-      const response = await fetch('http://localhost:2000/auth/logout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Include token if needed
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Logout failed');
-      }
-
-      // Optionally clear the token from local storage
-      localStorage.removeItem('token');
-
-      // Redirect to login page
-      window.location.href = '/auth/login';
-    } catch (error) {
-      console.error('Error during logout:', error);
-      setError(error.message);
-    }
-  };
-
   // Logout function
   const handleLogout = async () => {
     try {
@@ -606,7 +580,7 @@ const [likedGratisItems, setLikedGratisItems] = useState({});
                   <img 
                   src={userData?.userPhoto ||"/images/profile.png" }
                   alt="profile" 
-                  className="h-14 cursor-pointer mr-5"
+                  className="h-14 w-14 rounded-full cursor-pointer mr-5"
                   onMouseEnter={() => setDropdownOpen(true)}
                   onMouseLeave={() => setDropdownOpen(false)}
                   />
@@ -620,7 +594,7 @@ const [likedGratisItems, setLikedGratisItems] = useState({});
                   onMouseEnter={() => setDropdownOpen(true)}
                   onMouseLeave={() => setDropdownOpen(false)}
               >
-                  <Link legacyBehavior href= {`/user/edit-profile/${userId}`}       >
+                  <Link legacyBehavior href= {`/user/edit-profile/${userId}`}>
                   <a className="block px-4 py-1 text-deepBlue text-sm text-gray-700 hover:bg-deepBlue hover:text-white rounded-md border-abumuda">
                       Ubah Profil
                   </a>

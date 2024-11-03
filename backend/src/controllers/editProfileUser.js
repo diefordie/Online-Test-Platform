@@ -1,12 +1,31 @@
-import path from 'path'; // Import path module
+import dotenv from 'dotenv';
+import { initializeApp } from 'firebase/app';
 import { 
   getUserById, 
-  updateUserProfile, 
-  updateUserPassword 
+  updateUserName, 
+  updateUserEmail, 
+  updateUserPassword, 
+  updateUserPhoto 
 } from '../services/editProfileUser.js';
-import { uploadFileToStorage } from '../../firebase/firebaseBucket.js'; // Ensure this is correctly implemented
+import { uploadFileToStorage } from '../../firebase/firebaseBucket.js';
 
-// Get user profile
+// Load environment variables
+dotenv.config();
+
+// Konfigurasi Firebase
+const firebaseConfig = {
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.FIREBASE_APP_ID,
+};
+
+// Initialize Firebase app with your config
+initializeApp(firebaseConfig);
+
+// Mendapatkan data profil pengguna
 export const getUserProfile = async (req, res) => {
   const userId = req.user.id;
 
@@ -22,25 +41,36 @@ export const getUserProfile = async (req, res) => {
   }
 };
 
-// Edit user profile
-export const editUserProfile = async (req, res) => {
+// Memperbarui Nama Pengguna
+export const updateName = async (req, res) => {
   const userId = req.user.id;
-  const { name, email, userPhoto } = req.body;
+  const { name } = req.body;
 
   try {
-    const updatedUser = await updateUserProfile(userId, name, email, userPhoto);
-    return res.status(200).json({ 
-      message: 'Profile updated successfully', 
-      user: updatedUser 
-    });
+    const updatedUser = await updateUserName(userId, name);
+    return res.status(200).json({ message: 'Name updated successfully', user: updatedUser });
   } catch (error) {
-    console.error('Error updating user profile:', error);
+    console.error('Error updating user name:', error);
     return res.status(400).json({ message: error.message });
   }
 };
 
-// Change user password
-export const changeUserPassword = async (req, res) => {
+// Memperbarui Email Pengguna
+export const updateEmail = async (req, res) => {
+  const userId = req.user.id;
+  const { email } = req.body;
+
+  try {
+    const updatedUser = await updateUserEmail(userId, email);
+    return res.status(200).json({ message: 'Email updated successfully', user: updatedUser });
+  } catch (error) {
+    console.error('Error updating user email:', error);
+    return res.status(400).json({ message: error.message });
+  }
+};
+
+// Memperbarui Kata Sandi Pengguna
+export const changePassword = async (req, res) => {
   const userId = req.user.id;
   const { currentPassword, newPassword } = req.body;
 
@@ -53,24 +83,32 @@ export const changeUserPassword = async (req, res) => {
   }
 };
 
-// Upload user photo
-export const uploadUserPhoto = async (req, res) => {
+// Mengunggah Foto Profil Pengguna
+export const uploadPhoto = async (req, res) => {
   try {
-    const userId = req.user.id; // Ensure the user ID comes from req.user for consistency
-    const file = req.file; // Ensure Multer is configured to handle file uploads
+    const userId = req.user.id;
+    const file = req.file;
+
+    console.log("User ID:", userId); // Log untuk memeriksa userId
+    console.log("File received:", file); // Log untuk memastikan file diterima
 
     if (!file) {
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    const localFilePath = path.resolve(file.path); // Ensure proper file path resolution
-    const destination = `profiles/${Date.now()}_${file.originalname}`; // Firebase Storage path
+    const destination = `profiles/${Date.now()}_${file.originalname}`;
+    const url = await uploadFileToStorage(file.buffer, destination);
 
-    const url = await uploadFileToStorage(localFilePath, destination);
+    console.log("URL generated from Firebase:", url); // Log untuk melihat URL dari Firebase
 
-    return res.status(200).json({ 
-      message: 'File uploaded successfully', 
-      url 
+    // Panggil `updateUserPhoto` untuk menyimpan URL ke database
+    const updatedUser = await updateUserPhoto(userId, url);
+
+    console.log("Updated user data:", updatedUser); // Log hasil dari Prisma untuk memastikan update berhasil
+
+    return res.status(200).json({
+      message: 'File uploaded successfully',
+      url: updatedUser.userPhoto,
     });
   } catch (error) {
     console.error('Error uploading file:', error);

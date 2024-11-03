@@ -299,12 +299,12 @@ const toggleLike = async (id) => {
                   onMouseEnter={() => setDropdownOpen(true)}
                   onMouseLeave={() => setDropdownOpen(false)}
               >
-                  <Link legacyBehavior href="/profile-edit">
+                  <Link legacyBehavior href={`/user/edit-profile/${userId}`}>
                   <a className="block px-4 py-1 text-deepBlue text-sm text-gray-700 hover:bg-deepBlue hover:text-white rounded-md border-abumuda">
                       Ubah Profil
                   </a>
                   </Link>
-                  <Link legacyBehavior href="/logout">
+                  <Link legacyBehavior href="/auth/login">
                   <a className="block px-4 py-1 text-deepBlue text-sm text-gray-700 hover:bg-deepBlue hover:text-white rounded-md">
                       Logout
                   </a>

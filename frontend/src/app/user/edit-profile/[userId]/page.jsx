@@ -2,29 +2,25 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import jwt_decode from 'jwt-decode'; // Pastikan Anda menginstal jsonwebtoken jika belum ada
 
 export default function EditProfile({ params }) {
   const { userId } = params;
-  const [currentPassword, setCurrentPassword] = useState('');
-
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     currentPassword: '',
-    password: '',
-    profileImage: '', // Tambahkan state untuk menyimpan gambar profil
+    newPassword: '',
+    profileImage: '', // Menyimpan URL gambar profil
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const router = useRouter();
 
   // Fungsi untuk mengambil data profil pengguna dari backend
   const fetchUserData = async () => {
     try {
-      const token = localStorage.getItem('token'); // Ambil token dari localStorage
+      const token = localStorage.getItem('token');
       if (!token) {
         console.error('Token tidak tersedia');
         return;
@@ -34,19 +30,18 @@ export default function EditProfile({ params }) {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Sertakan token JWT di header
+          'Authorization': `Bearer ${token}`,
         },
       });
 
       if (response.ok) {
         const data = await response.json();
+        const [firstName, lastName] = data.name ? data.name.split(' ') : ["", ""];
         setFormData({
-          firstName: data.name.split(' ')[0] || '',
-          lastName: data.name.split(' ')[1] || '',
+          firstName,
+          lastName,
           email: data.email || '',
-          currentPassword: '',
-          password: '', // Kosongkan password untuk keamanan
-          profileImage: data.profileImage || '', // Tambahkan gambar profil dari data
+          profileImage: data.userPhoto || '', // URL dari backend
         });
       } else {
         console.error('Failed to fetch user data');
@@ -61,7 +56,7 @@ export default function EditProfile({ params }) {
   };
 
   useEffect(() => {
-    fetchUserData(); // Panggil API saat komponen pertama kali dimuat
+    fetchUserData();
   }, []);
 
   const handleChange = (e) => {
@@ -71,11 +66,7 @@ export default function EditProfile({ params }) {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData({ ...formData, profileImage: reader.result }); // Set gambar profil
-      };
-      reader.readAsDataURL(file); // Baca file sebagai URL
+      setFormData({ ...formData, profileImage: file });
     }
   };
 
@@ -83,70 +74,83 @@ export default function EditProfile({ params }) {
     setFormData({ ...formData, profileImage: '' });
   };
 
-const handleSave = async (event) => {
-    event.preventDefault(); // Pastikan preventDefault() dipanggil pada event yang terdefinisi
+  const handleSave = async (event) => {
+    event.preventDefault();
+    const token = localStorage.getItem("token");
 
     try {
-        const token = localStorage.getItem("token");
+      // Perbarui Nama
+      await fetch("http://localhost:2000/user/profile/name", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: `${formData.firstName} ${formData.lastName}` }),
+      });
 
-        // Update user profile
-        const profileResponse = await fetch(`http://localhost:2000/user/profile`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-                name: `${formData.firstName} ${formData.lastName}`,
-                email: formData.email,
-                profileImage: formData.profileImage,
-            }),
+      // Perbarui Email
+      await fetch("http://localhost:2000/user/profile/email", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({ email: formData.email }),
+      });
+
+      // Perbarui Foto Profil jika gambar diubah
+      if (formData.profileImage instanceof File) {
+        const profileImageData = new FormData();
+        profileImageData.append("profileImage", formData.profileImage);
+
+        await fetch("http://localhost:2000/user/profile/photo", {
+          method: formData.profileImage ? "PATCH" : "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+          body: profileImageData,
+        });
+      }
+
+      // Perbarui Password jika `currentPassword` dan `newPassword` diisi
+      if (formData.currentPassword && formData.newPassword) {
+        const passwordResponse = await fetch("http://localhost:2000/user/profile/password", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            currentPassword: formData.currentPassword,
+            newPassword: formData.newPassword,
+          }),
         });
 
-        if (!profileResponse.ok) {
-            throw new Error("Gagal memperbarui profil");
+        if (!passwordResponse.ok) {
+          const errorData = await passwordResponse.json();
+          throw new Error(errorData.message || "Gagal memperbarui password");
         }
+      }
 
-        // Update password only if it's provided
-        if (formData.password) {
-            // Di sini kita akan menggunakan currentPassword yang sudah didapat sebelumnya
-            const currentPassword = 'your_current_password'; // Gantilah ini dengan mekanisme untuk mendapatkan currentPassword
-            
-            const passwordResponse = await fetch(`http://localhost:2000/user/profile/change-password`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    currentPassword: currentPassword, // Kirimkan currentPassword
-                    newPassword: formData.password,
-                }),
-            });
-
-            if (!passwordResponse.ok) {
-                throw new Error("Gagal memperbarui password");
-            }
-        }
-
-        alert("Profil dan password berhasil diperbarui!");
+      alert("Profil berhasil diperbarui!");
+      router.push('/user/dashboard');
     } catch (error) {
-        console.error("Error updating profile:", error);
-        alert("Gagal memperbarui profil.");
+      console.error("Error updating profile:", error);
+      alert("Gagal memperbarui profil.");
     }
-};
-  
+  };
+
   const handleDashboard = () => {
-    // localStorage.removeItem('token'); // Hapus token saat logout
-    router.push('/user/dashboard'); // Arahkan ke halaman login
+    router.push('/user/dashboard');
   };
 
   if (loading) {
-    return <p>Loading...</p>; // Tampilkan loading saat data sedang diambil
+    return <p>Loading...</p>;
   }
 
   if (error) {
-    return <p>{error}</p>; // Tampilkan pesan error jika ada
+    return <p>{error}</p>;
   }
 
   return (
@@ -171,14 +175,14 @@ const handleSave = async (event) => {
                 src="/images/camera.png"
                 alt="Kamera"
                 className="h-6 w-6 absolute bottom-0 right-1 cursor-pointer"
-                onClick={() => document.getElementById('uploadProfileImage').click()} // Memicu klik input file
+                onClick={() => document.getElementById('uploadProfileImage').click()}
               />
               <input
                 type="file"
                 id="uploadProfileImage"
-                style={{ display: 'none' }} // Sembunyikan input file
-                onChange={handleFileChange} // Tangani perubahan file
-                accept="image/*" // Hanya terima file gambar
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+                accept="image/*"
               />
             </div>
             <div className="ml-4">
@@ -188,17 +192,16 @@ const handleSave = async (event) => {
           </div>
         </div>
 
-                  {/* Actions section */}
-                  <div className="actions flex items-center justify-end space-x-2">
-            <div className="flex items-center justify-center w-[29px] h-[29px] bg-white rounded-[10px]">
-              <img src="/img/trash.png" alt="sampah" className="w-5 h-5 cursor-pointer" onClick={handleDeleteProfileImage} />
+        {/* Actions section */}
+        <div className="actions flex items-center justify-end space-x-2">
+          <div className="flex items-center justify-center w-[29px] h-[29px] bg-white rounded-[10px]">
+            <img src="/img/trash.png" alt="sampah" className="w-5 h-5 cursor-pointer" onClick={handleDeleteProfileImage} />
           </div>
         </div>
 
         {/* Form */}
         <div className="w-full max-w-[1228px] mx-auto mt-0 p-4 bg-white shadow-md border border-black rounded-md">
-        <form className="space-y-4 mt-4" onSubmit={(event) => handleSave(event)}>
-
+          <form className="space-y-4 mt-4" onSubmit={handleSave}>
             <div className="relative">
               <label className="block text-gray-700 font-poppins">Nama Depan</label>
               <input
@@ -208,7 +211,6 @@ const handleSave = async (event) => {
                 onChange={handleChange}
                 className="w-full p-2 border border-black rounded-[15px] mt-1 font-poppins"
               />
-              <img src="/img/edit.png" alt="Edit" className="absolute right-6 top-1/2 transform -translate-y-1/2 w-5 h-5 mt-3" />
             </div>
 
             <div className="relative">
@@ -220,7 +222,6 @@ const handleSave = async (event) => {
                 onChange={handleChange}
                 className="w-full p-2 border border-black rounded-[15px] mt-1 pr-10 font-poppins"
               />
-              <img src="/img/edit.png" alt="Edit" className="absolute right-6 top-1/2 transform -translate-y-1/2 w-5 h-5 mt-3" />
             </div>
 
             <div className="relative">
@@ -232,7 +233,6 @@ const handleSave = async (event) => {
                 onChange={handleChange}
                 className="w-full p-2 border border-black rounded-[15px] mt-1 pr-10 font-poppins"
               />
-              <img src="/img/edit.png" alt="Edit" className="absolute right-6 top-1/2 transform -translate-y-1/2 w-5 h-5 mt-3" />
             </div>
 
             <div className="relative">
@@ -243,8 +243,16 @@ const handleSave = async (event) => {
                 value={formData.currentPassword}
                 onChange={handleChange}
                 className="w-full p-2 border border-black rounded-[15px] mt-1 font-poppins"
+                placeholder="Current Password"
               />
-              <img src="/img/edit.png" alt="Edit" className="absolute right-6 top-1/2 transform -translate-y-1/2 w-5 h-5 mt-3" />
+              <input
+                type="password"
+                name="newPassword"
+                value={formData.newPassword}
+                onChange={handleChange}
+                className="w-full p-2 border border-black rounded-[15px] mt-1 font-poppins"
+                placeholder="New Password"
+              />
             </div>
 
             <div className="flex justify-end">
