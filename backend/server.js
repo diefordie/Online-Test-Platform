@@ -22,6 +22,7 @@ import { authenticateToken } from './src/middleware/authMiddleware.js';
 import editProfile from './src/routes/editProfileUser.js';
 import riwayattransaksiRoutes from './src/routes/riwayattransaksiRoutes.js';
 import paymentRoutes from './src/routes/paymentRoutes.js';
+import payoutRoutes from './src/routes/payoutRoutes.js';
 
 dotenv.config();
 const app = express();
@@ -62,6 +63,7 @@ app.use('/api/favorites', authenticateToken, favoriteRoutes);
 app.use("/user", editProfile);
 app.use('/api', riwayattransaksiRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/withdrawals', payoutRoutes);
 
 // Mulai server
 const PORT = process.env.PORT || 2000;

@@ -16,6 +16,28 @@ enum PaymentStatus {
   EXPIRED
 }
 
+enum WithdrawalStatus {
+  PENDING
+  PROCESSING
+  SUCCESS
+  FAILED
+}
+
+model Withdrawal {
+  id            String           @id @default(cuid())
+  authorId      String
+  amount        Int
+  bankCode      String          // Kode bank (e.g., "BCA", "BRI")
+  accountNumber String          // Nomor rekening
+  accountName   String          // Nama pemilik rekening
+  status        WithdrawalStatus @default(PENDING)
+  reference     String?         // Reference ID dari Iris
+  notes         String?         // Catatan tambahan
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  author        Author          @relation(fields: [authorId], references: [id])
+}
+
 model Test {
   id                String        @id @default(cuid())
   authorId         String
@@ -79,17 +101,18 @@ model User {
 }
 
 model Author {
-  id                String        @id @default(cuid())
-  userId           String
-  name              String
-  handphoneNum     String         @default("")
-  authorPhoto       String?       @default("")
-  bank              String         @default("")
-  accountBank      String         @default("")
-  profit           Int            @default(0)
-  isApproved        Boolean       @default(false)
-  user              User          @relation(fields: [userId], references: [id])
-  test              Test[]
+  id            String        @id @default(cuid())
+  userId        String
+  name          String
+  handphoneNum  String        @default("")
+  authorPhoto   String?       @default("")
+  bank          String        @default("")
+  accountBank   String        @default("")
+  profit        Int          @default(0)
+  isApproved    Boolean      @default(false)
+  user          User         @relation(fields: [userId], references: [id])
+  test          Test[]
+  withdrawals   Withdrawal[]  // Menambahkan relasi ke Withdrawal
 }
 
 model Favourite {
