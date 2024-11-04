@@ -57,20 +57,13 @@ const KotakNomor = () => {
 
   const addQuestion = (pageIndex) => {
     setPages(prevPages => {
-        // Buat salinan pages yang ada
         const updatedPages = [...prevPages];
-
-        // Pastikan page yang akan diupdate ada
         const currentPage = updatedPages[pageIndex] ? { ...updatedPages[pageIndex] } : { questions: [] };
 
-        // Pastikan `questions` adalah array
         currentPage.questions = Array.isArray(currentPage.questions) ? currentPage.questions : [];
-
-        // Tambah satu nomor saja ke array questions
-        currentPage.questions = [...currentPage.questions, currentPage.questions.length + 1];
+        currentPage.questions = [...currentPage.questions, currentPage.questions.length + 1];        
         updatedPages[pageIndex] = currentPage;
 
-        // Simpan ke localStorage
         localStorage.setItem(`pages-${testId}`, JSON.stringify(updatedPages));
 
         console.log('Current questions after update:', currentPage.questions);
@@ -78,7 +71,6 @@ const KotakNomor = () => {
         return updatedPages;
     });
   };
-
 
   const addPage = () => {
     setPages(prevPages => {
@@ -99,12 +91,6 @@ const KotakNomor = () => {
       return updatedPages;
     });
   };
-
-  // Function to clear storage (useful for testing or reset functionality)
-  // const clearStorage = () => {
-  //   localStorage.removeItem(`pages-${testId}`);
-  //   setPages([{ pageNumber: 1, questions: [1], pageName: 'Beri Nama Tes' }]);
-  // };
 
   const toggleDropdown = (pageIndex) => {
     setPages(prevPages => 

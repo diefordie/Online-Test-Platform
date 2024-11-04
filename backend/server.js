@@ -18,7 +18,6 @@ import leaderboardRoutes from './src/routes/leaderboardRoutes.js';
 import discussRoutes from './src/routes/discussionRoutes.js';
 import favoriteRoutes from './src/routes/favoriteRoute.js';
 import { authenticateToken } from './src/middleware/authMiddleware.js';
-//import checkStatusTransactionRoutes from './src/routes/checkStatusRoutes.js';
 import editProfile from './src/routes/editProfileUser.js';
 import riwayattransaksiRoutes from './src/routes/riwayattransaksiRoutes.js';
 
@@ -27,23 +26,22 @@ const app = express();
 startCleanupJob();
 
 // Middleware
-app.use(express.json()); // Parse incoming JSON requests
-app.use(cors()); // Enable CORS for all origins
+app.use(express.json()); 
+app.use(cors()); 
 
 // Parsing JSON dari request body
-app.use(bodyParser.json()); 
+app.use(bodyParser.json({ limit: '10mb' })); 
 
 // Parsing URL-encoded data
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:3000', // Mengizinkan request dari frontend di port 3000
-    methods: ['GET', 'POST', 'PATCH', 'PUT'],        // Metode HTTP yang diizinkan
-    credentials: true                // Jika ingin mengirimkan cookies atau auth credentials
+    origin: 'http://localhost:3000', 
+    methods: ['GET', 'POST', 'PATCH', 'PUT'],        
+    credentials: true                
 }));
 
-// Routes
 // app.use("/api/auth", userRoutes);
 app.use("/author", authorRoutes);
 app.use("/api/admin", adminRoutes);
@@ -61,7 +59,6 @@ app.use('/api/favorites', authenticateToken, favoriteRoutes);
 app.use("/user", editProfile);
 app.use('/api', riwayattransaksiRoutes);
 
-// Mulai server
 const PORT = process.env.PORT || 2000;
 app.listen(PORT, () => {
     console.log(`Server berjalan di http://localhost ${PORT}`);

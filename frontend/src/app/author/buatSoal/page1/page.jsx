@@ -6,12 +6,14 @@ import { useEffect } from 'react';
 import sanitizeHtml from 'sanitize-html';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { storage } from "./firebase";
+import { v4 } from 'uuid';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const MembuatSoal = () => {
   const router = useRouter();
   const [testId, setTestId] = useState('');
   const [multiplechoiceId, setMultiplechoiceId] = useState('');
-  const [id, setId] = useState('');
   const [pageName, setPageName] = useState('');
   const [question, setQuestion] = useState('');
   const [number, setNumber] = useState('');
@@ -156,8 +158,23 @@ const MembuatSoal = () => {
     setJawabanBenar(index);
   };
 
+  const uploadImage = () => {
+    if (questionPhoto == null) return;
+      const imageRef = ref(storage, `question/${questionPhoto.name + v4()}`)
+      uploadBytes(imageRef, questionPhoto).then(() => {
+        alert("image uploaded");
+      })
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    let uploadedImageUrl = "";
+    if (questionPhoto) {
+      const imageRef = ref(storage, `question/${questionPhoto.name + v4()}`);
+      const snapshot = await uploadBytes(imageRef, questionPhoto);
+      uploadedImageUrl = await getDownloadURL(snapshot.ref); // Mendapatkan URL download gambar
+    }
     
     const data = {
       testId: testId,
@@ -166,7 +183,7 @@ const MembuatSoal = () => {
           pageName,
           question: cleanHtml(question), 
           number: parseInt(number), 
-          questionPhoto: questionPhoto || "",
+          questionPhoto: uploadedImageUrl,
           weight: parseFloat(weight), 
           discussion: cleanHtml(discussion), 
           options 
@@ -210,17 +227,6 @@ const MembuatSoal = () => {
     } catch (error) {
       console.error('Error:', error);
     }
-  };
-
-  const toolbarOptions = [
-    ['bold', 'italic', 'underline', 'strike'],
-    [{ list: 'ordered' }, { list: 'bullet' }],
-    ['link', 'image'],
-    [{ header: [1, 2, 3, false] }],
-  ];
-
-  const modules = {
-    toolbar: toolbarOptions,
   };
 
   return (
@@ -293,19 +299,36 @@ const MembuatSoal = () => {
               <ReactQuill 
                 value={question} 
                 onChange={setQuestion} 
-                modules={modules}
+                modules={{
+                  toolbar: [
+                    [{ 'header': '1'}, {'header': '2'}, { 'font': [] }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['bold', 'italic', 'underline'],
+                    ['image'],
+                    ['clean']
+                  ]
+                }}
+                formats={[
+                  'header',
+                  'font',
+                  'list',
+                  'bullet',
+                  'bold',
+                  'italic',
+                  'underline',
+                  'image',
+                ]}
+                onImageUpload={uploadImage}
                 className='bg-white shadow-md rounded-md border border-gray-500'
                 style={{ maxWidth: '1220px', height: '150px', overflow: 'hidden' }}
                 required />
             </div>
           </div>
-  
+
           <div className="mb-4">
-            <label className="block mb-2">Unggah Photo Soal</label>
             <input
               type="file"
-              value={questionPhoto}
-              onChange={(e) => setQuestionPhoto(e.target.value)}
+              onChange={(event) => setQuestionPhoto(event.target.files[0])}
               className="border p-2 w-full"
               accept="image/*"
             />
@@ -341,7 +364,29 @@ const MembuatSoal = () => {
   
           <div className="mb-4">
             <label className="block mb-2">Pembahasan</label>
-            <ReactQuill value={discussion} onChange={setDiscussion} modules={modules}
+            <ReactQuill 
+              value={discussion} 
+              onChange={setDiscussion} 
+              modules={{
+                toolbar: [
+                  [{ 'header': '1'}, {'header': '2'}, { 'font': [] }],
+                  [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                  ['bold', 'italic', 'underline'],
+                  ['image'],
+                  ['clean']
+                ]
+              }}
+              formats={[
+                'header',
+                'font',
+                'list',
+                'bullet',
+                'bold',
+                'italic',
+                'underline',
+                'image',
+              ]}
+              onImageUpload={uploadImage}
               placeholder='Tulis kunci jawaban di sini...' />
           </div>
           <div className="flex justify-between items-center">

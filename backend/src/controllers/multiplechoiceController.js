@@ -1,4 +1,21 @@
+import dotenv from 'dotenv';
+import { initializeApp } from 'firebase/app';
 import { createMultipleChoiceService, updateMultipleChoiceService, getMultipleChoiceService, getMultipleChoiceByIdService, deleteMultipleChoiceService, getQuestionsByTestId, fetchMultipleChoiceByNumberAndTestId, updateMultipleChoicePageNameService, getPagesByTestIdService } from '../services/multiplechoiceSevice.js';
+import { Buffer } from 'buffer';
+import { uploadFileToStorage } from '../../firebase/firebaseBucket.js';
+
+dotenv.config();
+
+const firebaseConfig = {
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.FIREBASE_APP_ID,
+};
+
+initializeApp(firebaseConfig);
 
 const createMultipleChoice = async (req, res) => {
     try {
@@ -10,7 +27,25 @@ const createMultipleChoice = async (req, res) => {
             });
         }
 
-        const multipleChoices = await createMultipleChoiceService(testId, questions);
+        const uploadedQuestion = await Promise.all(
+            questions.map(async (question) => {
+                const questionData = { ...question };
+
+                // Cek apakah ada file yang diunggah untuk soal ini
+                if (req.files && req.files[index]) {
+                    const fileBuffer = req.files[index].buffer; // Ambil buffer dari file
+                    const fileName = `questions/${Date.now()}_${req.files[index].originalname}`; // Buat nama file unik
+
+                    // Upload ke Firebase
+                    const imageUrl = await uploadFileToStorage(fileBuffer, fileName);
+                    questionData.questionPhoto = imageUrl; // Simpan URL gambar di questionData
+                }
+
+                return questionData;
+            })
+        );
+
+        const multipleChoices = await createMultipleChoiceService(testId, uploadedQuestion);
 
         res.status(201).send({
             data: multipleChoices,
