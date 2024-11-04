@@ -24,7 +24,7 @@ import editProfile from './src/routes/editProfileUser.js';
 import riwayattransaksiRoutes from './src/routes/riwayattransaksiRoutes.js';
 import testimoni from './src/routes/testimoniRoutes.js';
 
-dotenv.config();
+dotenv.config(); 
 const app = express();
 startCleanupJob();
 
