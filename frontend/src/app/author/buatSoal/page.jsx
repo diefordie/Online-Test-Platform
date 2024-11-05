@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from "react";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from "react";
 
 const KotakNomor = () => {
   const router = useRouter();
@@ -72,6 +72,21 @@ const KotakNomor = () => {
       });
   
       return newPages;
+    });
+  };
+  
+  const deleteQuestion = (pageIndex, questionNumber) => {
+    setPages((prevPages) => {
+      const updatedPages = prevPages.map((page, index) => {
+        if (index === pageIndex) {
+          const updatedQuestions = page.questions.filter((q) => q !== questionNumber);
+          return { ...page, questions: updatedQuestions };
+        }
+        return page;
+      });
+  
+      // Filter halaman yang tidak memiliki soal setelah penghapusan
+      return updatedPages.filter(page => page.questions.length > 0);
     });
   };
   
