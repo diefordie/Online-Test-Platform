@@ -356,7 +356,7 @@ const toggleLike = async (id) => {
           {/* Container untuk kategori, menambahkan grid layout yang konsisten */}
           <div className=" mt-5 grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
             {favorites.filter((test) => !test.isHidden).map((test) => (
-              <div key={test.testId} className="bg-abumuda shadow-lg p-1 relative group">
+              <div key={test.testId} className="bg-abumuda shadow-lg relative group">
                 
                   {/* Overlay background abu-abu yang muncul saat hover */}
                   <div className="absolute inset-0 bg-gray-500 opacity-0 group-hover:opacity-40 transition-opacity duration-300 z-10"></div>

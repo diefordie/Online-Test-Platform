@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import  Swal from 'sweetalert2';
+import { useRef } from 'react';
 
 const MengerjakanTes = () => {
     const { testId } = useParams(); // Ambil testId dari URL path
@@ -19,52 +20,44 @@ const MengerjakanTes = () => {
     const [remainingTime, setRemainingTime] = useState(0);
     const [workTime, setWorkTime] = useState(0); 
     const [timerActive, setTimerActive] = useState(false);
-    
-
+    const workTimeInterval = useRef(null);
     const router = useRouter();
 
     useEffect(() => {
         const handleBeforeUnload = (event) => {
-            event.preventDefault(); // Mencegah tindakan default
-            event.returnValue = ''; // Mengharuskan browser menampilkan dialog konfirmasi default
+            event.preventDefault();
+            event.returnValue = '';
         };
     
-        window.addEventListener('beforeunload', handleBeforeUnload);  // Tambah event listener
-    
-        // Cleanup listener ketika komponen unmount
+        window.addEventListener('beforeunload', handleBeforeUnload);
         return () => {
-            window.removeEventListener('beforeunload', handleBeforeUnload);  // Hapus event listener
+            window.removeEventListener('beforeunload', handleBeforeUnload);
         };
     }, []);
 
     useEffect(() => {
         const savedResultId = localStorage.getItem('resultId');
         if (savedResultId) {
-            setResultId(savedResultId);  // Set resultId dari localStorage
+            setResultId(savedResultId);
             console.log('Loaded resultId from localStorage:', savedResultId);
         }
-    }, []);
-    
-    
+    }, []);    
 
     useEffect(() => {
         const storedAnswers = localStorage.getItem('answers');
         if (storedAnswers) {
             const parsedAnswers = JSON.parse(storedAnswers);
-            setAnswers(parsedAnswers);  // Isi state answers dengan jawaban dari localStorage
+            setAnswers(parsedAnswers);
             const currentQuestionId = questions[currentOption - 1]?.id;
             if (parsedAnswers[currentQuestionId]) {
-                setSelectedOption(parsedAnswers[currentQuestionId].optionValue);  // Atur opsi terpilih dari jawaban yang disimpan
+                setSelectedOption(parsedAnswers[currentQuestionId].optionValue);
             }
         }
-    
-        // Event listener untuk sebelum halaman di-refresh atau ditutup
+
         const handleBeforeUnload = (event) => {
             event.preventDefault();  // Mencegah refresh otomatis
             event.returnValue = '';  // Mengharuskan browser menampilkan dialog konfirmasi default
-        };
-
-    
+        };   
     
         window.addEventListener('beforeunload', handleBeforeUnload);  // Tambahkan event listener
     
@@ -72,34 +65,6 @@ const MengerjakanTes = () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);  // Hapus event listener ketika komponen unmount
         };
     }, [questions, currentOption]);
-
-    // use efect untuk worktime
-    useEffect(() => {
-        if (!resultId) return;  // Pastikan resultId tersedia
-    
-        const storedWorkTime = localStorage.getItem(`workTime_${resultId}`);
-        if (storedWorkTime) {
-            setWorkTime(parseInt(storedWorkTime));  // Ambil workTime dari localStorage berdasarkan resultId
-        }
-    
-        const interval = setInterval(() => {
-            setWorkTime(prevWorkTime => {
-                const newWorkTime = prevWorkTime + 1;  // Tambah 1 detik
-                localStorage.setItem(`workTime_${resultId}`, newWorkTime);  // Simpan workTime ke localStorage berdasarkan resultId
-                return newWorkTime;
-            });
-        }, 1000);  // Setiap 1 detik
-    
-        return () => clearInterval(interval);  // Bersihkan interval saat komponen unmount
-    }, [resultId]);
-    
-
-    useEffect(() => {
-        const storedToken = localStorage.getItem('token');
-        if (storedToken) {
-            setToken(storedToken);
-        }
-    }, []);
 
     useEffect(() => {
         if (!testId) return; // Tunggu hingga testId tersedia dari URL path
@@ -191,39 +156,107 @@ const MengerjakanTes = () => {
         }
     }, [currentOption, answers, questions]);
     
+        // // use efect untuk worktime
+        // useEffect(() => {
+        //     if (!resultId) return;  // Pastikan resultId tersedia
+        
+        //     // Ambil workTime dari localStorage
+        //     const storedWorkTime = localStorage.getItem(`workTime_${resultId}`);
+        //     if (storedWorkTime) {
+        //         setWorkTime(parseInt(storedWorkTime));  // Set workTime dari localStorage
+        //     } else {
+        //         // Jika tidak ada workTime yang disimpan, inisialisasi ke 0
+        //         setWorkTime(0);
+        //     }
+        
+        //     // Mulai interval untuk workTime
+        //     workTimeInterval.current = setInterval(() => {
+        //         setWorkTime(prevWorkTime => {
+        //             const newWorkTime = prevWorkTime + 1;  // Tambah 1 detik
+        //             localStorage.setItem(`workTime_${resultId}`, newWorkTime);  // Simpan workTime ke localStorage
+        //             return newWorkTime;
+        //         });
+        //     }, 1000);  // Setiap 1 detik
+        
+        //     return () => clearInterval(workTimeInterval.current);
+        // }, [resultId]);
+        
+        useEffect(() => {
+            const storedToken = localStorage.getItem('token');
+            if (storedToken) setToken(storedToken);
+    
+            const savedResultId = localStorage.getItem('resultId');
+            if (savedResultId) setResultId(savedResultId);
+        }, []);
 
+    // useEffect untuk workTime dan remainingTime
     useEffect(() => {
-        const fetchWorkTime = async () => {
-            try {
-                const response = await fetch(`http://localhost:2000/timer/${testId}/worktime`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                if (!response.ok) throw new Error('Failed to fetch worktime');
-    
-                const data = await response.json();
-                console.log('Fetched worktime:', data);
-    
-                const { hours, minutes, seconds } = data;
-    
-                const totalWorkTimeInSeconds = hours * 3600 + minutes * 60 + seconds;
-    
-                if (totalWorkTimeInSeconds > 0) {
-                    setRemainingTime(totalWorkTimeInSeconds);
-                    setTimerActive(true); // Aktifkan timer jika ada waktu tersisa
-                } else {
-                    setRemainingTime(0); // Set waktu tersisa menjadi 0 jika sudah habis
-                    alert("Waktu sudah habis!"); // Peringatkan jika waktu sudah habis
+        if (!resultId) return;  // Pastikan resultId tersedia
+
+        // Inisialisasi workTime
+        const storedWorkTime = localStorage.getItem(`workTime_${resultId}`);
+        if (storedWorkTime) {
+            setWorkTime(parseInt(storedWorkTime));  // Set workTime dari localStorage
+        } else {
+            setWorkTime(0);  // Jika tidak ada workTime yang disimpan, inisialisasi ke 0
+        }
+
+        // Mulai interval untuk workTime
+        workTimeInterval.current = setInterval(() => {
+            setWorkTime(prevWorkTime => {
+                const newWorkTime = prevWorkTime + 1;  // Tambah 1 detik
+                localStorage.setItem(`workTime_${resultId}`, newWorkTime);  // Simpan workTime ke localStorage
+                return newWorkTime;
+            });
+        }, 1000);  // Setiap 1 detik
+
+        // Ambil remaining time dari localStorage atau backend
+        const fetchRemainingTime = async () => {
+            const storedRemainingTime = localStorage.getItem(`remainingTime_${resultId}`);
+            console.log('Stored remaining time from localStorage:', storedRemainingTime);
+            
+            if (storedRemainingTime) {
+                const time = Number(storedRemainingTime);
+                if (!isNaN(time) && time > 0) {
+                    setRemainingTime(time);  // Set remaining time dari localStorage
+                    setTimerActive(true); // Aktifkan timer segera
+                    console.log('Loaded remainingTime from localStorage:', time);
                 }
-            } catch (error) {
-                console.error('Failed to fetch worktime:', error);
-                alert("Gagal mengambil waktu kerja."); // Tambahkan alert untuk kesalahan pengambilan data
+            } else {
+                // Jika tidak ada, ambil dari backend
+                try {
+                    const response = await fetch(`http://localhost:2000/timer/${testId}/worktime`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+                    if (!response.ok) throw new Error('Failed to fetch worktime');
+
+                    const data = await response.json();
+                    console.log('Fetched worktime from backend:', data);
+
+                    const { hours, minutes, seconds } = data;
+                    const totalWorkTimeInSeconds = hours * 3600 + minutes * 60 + seconds;
+
+                    if (totalWorkTimeInSeconds > 0) {
+                        setRemainingTime(totalWorkTimeInSeconds);
+                        setTimerActive(true); // Aktifkan timer setelah mendapatkan waktu dari backend
+                        localStorage.setItem(`remainingTime_${resultId}`, totalWorkTimeInSeconds); // Simpan ke localStorage
+                    } else {
+                        setRemainingTime(0);
+                        alert("Waktu sudah habis!");
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch worktime:', error);
+                    alert("Gagal mengambil waktu kerja.");
+                }
             }
         };
-    
-        fetchWorkTime();
-    }, [testId]); 
+
+        fetchRemainingTime(); // Panggil fungsi fetchRemainingTime saat resultId tersedia
+
+        return () => clearInterval(workTimeInterval.current); // Bersihkan interval saat komponen unmount
+    }, [resultId, testId, token]); // Dependensi mencakup resultId, testId, dan token
 
     const formatRemainingTime = (timeInSeconds) => {
         if (typeof timeInSeconds !== 'number' || isNaN(timeInSeconds) || timeInSeconds < 0) {
@@ -243,27 +276,26 @@ const MengerjakanTes = () => {
     // Timer countdown effect
     useEffect(() => {
         let timer;
-    
+
         if (timerActive && remainingTime > 0) {
             timer = setInterval(() => {
                 setRemainingTime((prevTime) => {
                     const newTime = prevTime - 1;
-    
+
                     if (newTime <= 0) {
                         clearInterval(timer);
                         setTimerActive(false);
                         alert('Waktu habis!');
                     }
-    
+
                     localStorage.setItem(`remainingTime_${resultId}`, newTime);  // Simpan waktu tersisa ke localStorage berdasarkan resultId
                     return newTime;
                 });
             }, 1000);
         }
-    
+
         return () => clearInterval(timer);  // Bersihkan interval saat komponen unmount
     }, [timerActive, remainingTime, resultId]);
-
 
     const saveDraftAnswer = async (testId, optionId, selectedOption) => {
         try {
@@ -358,14 +390,6 @@ const MengerjakanTes = () => {
             alert('Terjadi kesalahan saat mengirim jawaban final: ' + error.message);
         }
     };
-    
-
-    
-    
-    
-    
-
-
 
     const handleOption = async (optionId, optionLabel, question) => {
         setSelectedOption(optionLabel);
@@ -414,35 +438,25 @@ const MengerjakanTes = () => {
         }
     };
     
-    
-    
     const saveRemainingTimeToLocalStorage = (time) => {
         localStorage.setItem('remainingTime', time);
         console.log('Saving remaining time to localStorage:', time);
     };
 
-    // Mengambil waktu tersimpan dari localStorage dan melanjutkan timer
     useEffect(() => {
         const storedRemainingTime = localStorage.getItem(`remainingTime_${resultId}`);
         console.log('Stored remaining time from localStorage:', storedRemainingTime);
-    
+        
         if (storedRemainingTime) {
             const time = Number(storedRemainingTime);
-            if (!isNaN(time)) {
-                setRemainingTime(time);  // Set waktu tersisa dari localStorage berdasarkan resultId
-                setTimerActive(true);    // Aktifkan timer jika ada waktu tersisa
+            if (!isNaN(time) && time > 0) {
+                setRemainingTime(time);
+                setTimerActive(true);
             } else {
-                console.error('Invalid time format in localStorage.');
+                console.error('Invalid time format in localStorage or time is zero.');
             }
         }
     }, [resultId]);
-
-    // Mengurangi waktu tersisa dan menyimpannya ke localStorage setiap detik
-    
-    
-    
-    
-    
     
     const handlenextquestion = () => {
         if (currentOption < questions.length) {
@@ -489,12 +503,20 @@ const MengerjakanTes = () => {
     
         if (confirmSubmit.isConfirmed) {
             try {
+                // Bersihkan interval untuk workTime agar tidak terus bertambah
+                clearInterval(workTimeInterval);
+    
+                // Hapus data workTime dari localStorage untuk memastikan tidak ada carry-over
+                localStorage.removeItem(`workTime_${resultId}`);
+                
                 await submitFinalAnswers();
     
-                // Bersihkan localStorage setelah submit
+                // Bersihkan data dari localStorage setelah submit
                 localStorage.removeItem('answers');
-                //localStorage.removeItem('resultId');
+                localStorage.removeItem('resultId');
+                localStorage.removeItem(`remainingTime_${resultId}`);
     
+                // Redirect ke halaman hasil
                 router.push(`/tes/mengerjakan-tes/hasil-tes/${resultId}`);
             } catch (error) {
                 console.error('Error submitting final answers:', error);
@@ -508,7 +530,7 @@ const MengerjakanTes = () => {
             }
         }
     };
-    
+
     useEffect(() => {
         const storedAnswers = localStorage.getItem('answers');
         

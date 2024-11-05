@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import '@fortawesome/fontawesome-free/css/all.min.css';
@@ -8,6 +9,7 @@ import jwtDecode from 'jwt-decode';
 
 
 export default function Pemrograman() {
+  const router = useRouter();
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(true);
   const [rating, setRating] = useState(0);
@@ -28,10 +30,6 @@ export default function Pemrograman() {
     correctAnswers: 0,
     wrongAnswers: 0,
   });
-  
-
-
-
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -210,6 +208,26 @@ export default function Pemrograman() {
     setFeedback("");
   };
 
+    const handleHome = (event) => {
+      event.preventDefault(); // Mencegah perilaku default link
+
+      // Hapus semua data dari localStorage
+      localStorage.removeItem('resultId');
+      localStorage.removeItem('answers');
+
+      // Hapus remainingTime dan workTime berdasarkan resultId
+      const storedResultId = localStorage.getItem('resultId'); // Ini akan null setelah dihapus
+      if (resultId) { // Pastikan resultId ada
+          localStorage.removeItem(`remainingTime_${resultId}`);
+          localStorage.removeItem(`workTime_${resultId}`);
+      }
+
+      console.log('Data pengerjaan tes telah dihapus dari localStorage');
+
+      // Redirect ke halaman dashboard
+      router.push('/user/dashboard');
+    };
+
   const Modal = () => (
     <div 
       className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" 
@@ -315,9 +333,11 @@ export default function Pemrograman() {
               <nav className="mt-0 lg:mt-1">
                 <ol className="list-reset flex space-x-2">
                   <li>
-                    <Link href="/user/dashboard" legacyBehavior>
-                      <a className="text-[0.6rem] lg:text-sm hover:text-orange font-poppins font-bold">Home</a>
-                    </Link>
+                  <Link href="#" legacyBehavior>
+                    <a onClick={handleHome} className="text-[0.6rem] lg:text-sm hover:text-orange font-poppins font-bold">Home</a>
+                </Link>
+
+
                   </li>
                   <li>/</li>
                   <li>

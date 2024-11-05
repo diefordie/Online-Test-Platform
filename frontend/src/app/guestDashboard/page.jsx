@@ -144,7 +144,7 @@ export default function Dashboard() {
               <a className="">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8 font-poppins">
                 {searchResults.map((test) => (
-                  <div key={test.testId} className="bg-abumuda shadow-lg p-1 relative font-poppins ">
+                  <div key={test.testId} className="bg-abumuda shadow-lg relative font-poppins ">
                     <div className="flex justify-between items-center font-poppins">
                       <div className="flex items-center space-x-2 font-bold text-deepBlue font-poppins">
                         <img src="/images/eye-icon.png" alt="Views" className="h-4 w-4 font-poppins" />
@@ -254,7 +254,7 @@ export default function Dashboard() {
               <a className="">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8 font-poppins">
                 {popularTests.map((test) => (
-                  <div key={test.testId} className="bg-abumuda shadow-lg p-1 relative font-poppins ">
+                  <div key={test.testId} className="bg-abumuda shadow-lg relative font-poppins ">
                     <div className="flex justify-between items-center font-poppins">
                       <div className="flex items-center space-x-2 font-bold text-deepBlue font-poppins">
                         <img src="/images/eye-icon.png" alt="Views" className="h-4 w-4 font-poppins" />
@@ -317,7 +317,7 @@ export default function Dashboard() {
               <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-4 gap-4 mt-8">
             
               {freeTests.map((test) => (
-                  <div key={test.testId} className="bg-abumuda shadow-lg p-1 relative">
+                  <div key={test.testId} className="bg-abumuda shadow-lg relative">
                     <div className="flex justify-between items-center">
                       <div className="flex items-center space-x-2 font-bold text-deepBlue">
                         <img src="/images/eye-icon.png" alt="Views" className="h-4 w-4" />

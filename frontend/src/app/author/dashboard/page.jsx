@@ -338,14 +338,14 @@ export default function Home() {
             </div>
           </div>
          
-          {/* Bagian Paling Populer */}
+          {/* Bagian Terbaru */}
           <section className="mx-auto p-5 font-poppins relative">
             <div className="mx-auto mt-5 font-bold font-poppins text-deepBlue">
               Terbaru
               {/* Container untuk kategori, menambahkan grid layout yang konsisten */}
               <div className=" mt-5 grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {authorTests.slice(populercurrentIndex, populercurrentIndex + populeritemsToShow).map((test) => (
-                  <div key={test.id} className="bg-abumuda shadow-lg p-1 relative group">
+                  <div key={test.id} className="bg-abumuda shadow-lg relative group">
                     
                 
                       <div className="flex justify-between items-center z-10">
@@ -414,7 +414,7 @@ export default function Home() {
               {/* Container untuk kategori, menambahkan grid layout yang konsisten */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-5">
                 {authorTests.slice(gratiscurrentIndex, gratiscurrentIndex + gratisitemsToShow).map((test) => (
-                  <div key={test.id} className="bg-abumuda shadow-lg p-1 relative group">
+                  <div key={test.id} className="bg-abumuda shadow-lg relative group">
                     
                     <div className="flex justify-between items-center z-10">
                       <div className="flex items-center space-x-2 font-bold text-deepBlue">

@@ -514,29 +514,24 @@ const [likedGratisItems, setLikedGratisItems] = useState({});
   // Logout function
   const handleLogout = async () => {
     try {
-      const response = await fetch('http://localhost:2000/auth/logout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Include token if needed
-        },
-      });
+        const response = await fetch('http://localhost:2000/auth/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`, // Sertakan token jika perlu
+            },
+        });
+        if (!response.ok) {
+            throw new Error('Logout failed');
+        }
 
-      if (!response.ok) {
-        throw new Error('Logout failed');
-      }
+        localStorage.clear();
 
-      // Optionally clear the token from local storage
-      localStorage.removeItem('token');
-
-      // Redirect to login page
-      window.location.href = '/auth/login';
+        window.location.href = '/auth/login';
     } catch (error) {
-      console.error('Error during logout:', error);
-      setError(error.message);
+        console.error('Error during logout:', error);
     }
-  };
-
+};
 
   return (
     <>
@@ -682,7 +677,7 @@ const [likedGratisItems, setLikedGratisItems] = useState({});
           {/* Container untuk kategori, menambahkan grid layout yang konsisten */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-5">
             {searchResults.slice(searchcurrentIndex, searchcurrentIndex + searchitemsToShow).map((test) => (
-              <div key={test.testId} className="bg-abumuda shadow-lg p-1 relative group">
+              <div key={test.testId} className="bg-abumuda shadow-lg relative group">
                 {/* Overlay background abu-abu yang muncul saat hover */}
                 <div className="absolute inset-0 bg-gray-500 opacity-0 group-hover:opacity-40 transition-opacity duration-300 z-10"></div>
 
@@ -798,7 +793,7 @@ const [likedGratisItems, setLikedGratisItems] = useState({});
           {/* Container untuk kategori, menambahkan grid layout yang konsisten */}
           <div className=" mt-5 grid grid-cols-2 lg:grid-cols-4 gap-4">
             {popularTests.slice(populercurrentIndex, populercurrentIndex + populeritemsToShow).map((test) => (
-              <div key={test.testId} className="bg-abumuda shadow-lg p-1 relative group">
+              <div key={test.testId} className="bg-abumuda shadow-lg relative group">
                 
                   {/* Overlay background abu-abu yang muncul saat hover */}
                   <div className="absolute inset-0 bg-gray-500 opacity-0 group-hover:opacity-40 transition-opacity duration-300 z-10"></div>
