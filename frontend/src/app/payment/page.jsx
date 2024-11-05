@@ -2,9 +2,11 @@
 
 import React from 'react';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 function App() {
-  const [testId, setTestId] = useState('cm2vefs5z0002hity4pkvdzry');
+  const router = useRouter();
+  const { testId } = router.query;
   const [testTitle, setTestTitle] = useState('');
   const [testSimilarity, setTestSimilarity] = useState();
   const [testPrice, setTestPrice] = useState();
@@ -28,7 +30,7 @@ function App() {
   useEffect(() => {
     const fetchTestDetail = async () => {
       try {
-        const response = await fetch(`http://localhost:2000/api/tests/test-detail/cm2vefs5z0002hity4pkvdzry`);
+        const response = await fetch(`http://localhost:2000/api/tests/test-detail/${testId}`);
         if (!response.ok) {
           const errorMessage = await response.text();
           throw new Error(`Error: ${response.status} - ${errorMessage}`)
@@ -43,7 +45,10 @@ function App() {
         setError('Terjadi kesalahan: ' + error.message);
       }
     };
+
+    if (testId) {
       fetchTestDetail(); // Memanggil API ketika testId ada
+    }
   }, [testId]);
 
   const handlePayment = async () => {
