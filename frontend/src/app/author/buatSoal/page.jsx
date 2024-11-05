@@ -38,7 +38,7 @@ const KotakNomor = () => {
       if (savedPages) {
         setPages(JSON.parse(savedPages));
       } else {
-        fetchPagesFromDB(testIdFromUrl); // Fetch pages from DB if not in local storage
+        fetchPagesFromDB(testIdFromUrl);
       }
     }
 
@@ -52,44 +52,145 @@ const KotakNomor = () => {
         pageName: decodeURIComponent(pageNameFromUrl),
       })));
     }
-
   }, []);
 
-  const addQuestion = (pageIndex) => {
-    setPages(prevPages => {
-        const updatedPages = [...prevPages];
-        const currentPage = updatedPages[pageIndex] ? { ...updatedPages[pageIndex] } : { questions: [] };
-
-        currentPage.questions = Array.isArray(currentPage.questions) ? currentPage.questions : [];
-        currentPage.questions = [...currentPage.questions, currentPage.questions.length + 1];        
-        updatedPages[pageIndex] = currentPage;
-
-        localStorage.setItem(`pages-${testId}`, JSON.stringify(updatedPages));
-
-        console.log('Current questions after update:', currentPage.questions);
-
-        return updatedPages;
-    });
+  const getMaxQuestionNumberInPage = (page) => {
+    if (Array.isArray(page.questions)) {
+      return Math.max(...page.questions);
+    }
+    return 0;
   };
 
-  const addPage = () => {
-    setPages(prevPages => {
-      const lastPage = prevPages[prevPages.length - 1];
-      const lastQuestions = lastPage?.questions || [];
-      const lastQuestionNumber = lastQuestions.length > 0 
-        ? Math.max(...lastQuestions)
-        : 0;
-      
-      const updatedPages = [...prevPages, {
-        pageNumber: prevPages.length + 1,
-        questions: [lastQuestionNumber + 1],
-        pageName: 'Beri Nama Tes',
-        isDropdownOpen: false
-      }];
-
-      localStorage.setItem(`pages-${testId}`, JSON.stringify(updatedPages));
-      return updatedPages;
+  const getAllUsedNumbers = (pages) => {
+    const usedNumbers = new Set();
+    pages.forEach(page => {
+      if (Array.isArray(page.questions)) {
+        page.questions.forEach(num => usedNumbers.add(num));
+      }
     });
+    return Array.from(usedNumbers).sort((a, b) => a - b);
+  };
+
+  const getNextAvailableNumber = (pages) => {
+    const usedNumbers = getAllUsedNumbers(pages);
+    let nextNumber = 1;
+    
+    // Mencari nomor terendah yang belum digunakan
+    while (usedNumbers.includes(nextNumber)) {
+      nextNumber++;
+    }
+    return nextNumber;
+  };
+
+  const reorderAllPages = (pages) => {
+    let nextNumber = 1;
+    return pages.map(page => ({
+      ...page,
+      questions: page.questions.map(() => nextNumber++)
+    }));
+  };
+
+  const updateQuestionNumbersInDB = async (testId, maxQuestionNumber) => {
+    try {
+      // Dapatkan semua nomor soal yang ada di database untuk tes ini
+      const response = await fetch(`http://localhost:2000/api/multiplechoice/getQuestionNumbers?testId=${testId}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error ${response.status}`);
+      }
+      const data = await response.json();
+      const questionNumbers = data.questionNumbers;
+  
+      // Filter nomor soal yang lebih besar dari nomor terbesar di halaman saat ini
+      const numbersToUpdate = questionNumbers.filter(num => num > maxQuestionNumber);
+  
+      // Jika tidak ada nomor yang lebih besar, keluar dari fungsi
+      if (numbersToUpdate.length === 0) {
+        return;
+      }
+  
+      // Update nomor soal di database
+      for (const number of numbersToUpdate) {
+        const updateResponse = await fetch(`http://localhost:2000/api/multiplechoice/update-questionNumber?testId=${testId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            oldNumber: number,
+            newNumber: number + 1,
+          }),
+        });
+  
+        if (!updateResponse.ok) {
+          throw new Error(`HTTP error ${updateResponse.status} when updating question number ${number}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error updating question numbers in DB:', error);
+    }
+  };
+
+  const addQuestion = async (pageIndex) => {
+    try {
+      // Dapatkan nomor terbesar di halaman saat ini
+      const maxQuestionNumber = getMaxQuestionNumberInPage(pages[pageIndex]);
+  
+      // Cek apakah nomor sebelumnya sudah ada di database
+      const multiplechoiceId = await fetchMultipleChoiceId(testId, maxQuestionNumber);
+      if (!multiplechoiceId) {
+        // Tampilkan peringatan jika nomor sebelumnya belum ada di database
+        alert(`Silakan isi nomor soal ${maxQuestionNumber} terlebih dahulu.`);
+        return;
+      }
+  
+      // Update nomor soal di database yang lebih besar dari nomor terbesar di halaman saat ini
+      await updateQuestionNumbersInDB(testId, maxQuestionNumber);
+  
+      setPages((prevPages) => {
+        const updatedPages = [...prevPages];
+        const currentPage = { ...updatedPages[pageIndex] };
+        currentPage.questions = [...(currentPage.questions || []), getNextAvailableNumber(updatedPages)];
+        currentPage.questions.sort((a, b) => a - b);
+        updatedPages[pageIndex] = currentPage;
+  
+        // Reorder semua halaman untuk memastikan urutan yang benar
+        const finalPages = reorderAllPages(updatedPages);
+        localStorage.setItem(`pages-${testId}`, JSON.stringify(finalPages));
+        return finalPages;
+      });
+    } catch (error) {
+      console.error('Error adding question:', error);
+    }
+  };
+
+  const addPage = async () => {
+    try {
+      // Get the next available question number
+      const nextNumber = getNextAvailableNumber(pages);
+  
+      // Check if the previous question number is already in the database
+      const multiplechoiceId = await fetchMultipleChoiceId(testId, nextNumber - 1);
+      if (!multiplechoiceId) {
+        // Show a warning if the previous question number is not filled
+        alert(`Silakan isi nomor soal ${nextNumber - 1} terlebih dahulu.`);
+        return;
+      }
+  
+      setPages(prevPages => {
+        const newPage = {
+          pageNumber: prevPages.length + 1,
+          questions: [nextNumber],
+          pageName: 'Beri Nama Tes',
+          isDropdownOpen: false
+        };
+  
+        const updatedPages = [...prevPages, newPage];
+        localStorage.setItem(`pages-${testId}`, JSON.stringify(updatedPages));
+        return updatedPages;
+      });
+    } catch (error) {
+      console.error('Error adding page:', error);
+    }
   };
 
   const toggleDropdown = (pageIndex) => {
@@ -103,7 +204,7 @@ const KotakNomor = () => {
 
   const handleRename = (pageIndex) => {
     setIsRenaming(pageIndex);
-    setRenameValue(pages[pageIndex]);
+    setRenameValue(pages[pageIndex].pageName);
   };
 
   const saveRename = async (pageIndex) => {
@@ -124,12 +225,12 @@ const KotakNomor = () => {
           if (index === pageIndex) {
             return { ...page, pageName: renameValue };
           }
-            return page;
-          });
-          localStorage.setItem(`pages-${testId}`, JSON.stringify(updatedPages));
-          return updatedPages;
+          return page;
         });
-      setIsRenaming(null); 
+        localStorage.setItem(`pages-${testId}`, JSON.stringify(updatedPages));
+        return updatedPages;
+      });
+      setIsRenaming(null);
     } catch (error) {
       console.error("Error updating pageName:", error);
     }
@@ -137,10 +238,36 @@ const KotakNomor = () => {
 
   const deletePage = (pageIndex) => {
     if (confirm("Apakah Anda yakin ingin menghapus tes ini?")) {
-        setPages((prevPages) => prevPages.filter((_, index) => index !== pageIndex));
+      setPages((prevPages) => {
+        const updatedPages = prevPages.filter((_, index) => index !== pageIndex);
+        
+        // Recalculate all question numbers after deletion
+        const finalPages = updatedPages.reduce((acc, page, idx) => {
+          if (idx === 0) return [page];
+          
+          const prevPageLastNumber = Math.max(...acc[idx - 1].questions);
+          const numQuestions = page.questions.length;
+          const newQuestions = Array.from(
+            { length: numQuestions },
+            (_, i) => prevPageLastNumber + i + 1
+          );
+          
+          acc.push({
+            ...page,
+            questions: newQuestions
+          });
+          
+          return acc;
+        }, []);
+
+        localStorage.setItem(`pages-${testId}`, JSON.stringify(finalPages));
+        return finalPages;
+      });
     }
   };
+  
 
+  // Rest of the component remains the same...
   const fetchPagesFromDB = async (testId) => {
     try {
       const response = await fetch(`http://localhost:2000/api/multiplechoice/getPages?testId=${testId}`);
@@ -161,7 +288,7 @@ const KotakNomor = () => {
       const response = await fetch(`http://localhost:2000/api/multiplechoice/${testId}/${number}`);
   
       if (response.status === 404) {
-        console.warn('No multiplechoiceId found. It may not be created yet.');
+        console.warn(`Nomor soal ${number} belum dibuat.`);
         return null; 
       }
   
@@ -186,7 +313,7 @@ const KotakNomor = () => {
     const multiplechoiceId = await fetchMultipleChoiceId(testId, questionNumber);
     const pageName = pages[pageIndex]?.pageName || '';
   
-    if (multiplechoiceId === null) {
+    if (multiplechoiceId !== "null") {
       console.log("multiplechoiceId not found. You can create a new one.");
       router.push(`/author/buatSoal/page1?testId=${testId}&multiplechoiceId=${multiplechoiceId}&nomor=${questionNumber}&pageName=${pageName}`);
     }
@@ -196,14 +323,14 @@ const KotakNomor = () => {
     router.push(`/author/buatSoal/page1?testId=${testId}&multiplechoiceId=${multiplechoiceId}&nomor=${questionNumber}&pageName=${pageName}`);
   };  
   
-const handleSave = () => {
-  if (!testId) {
-    console.error("testId is null. Cannot navigate.");
-    return; 
-  }
+  const handleSave = () => {
+    if (!testId) {
+      console.error("testId is null. Cannot navigate.");
+      return; 
+    }
 
-  router.push(`/author/buattes/publik/syarat?testId=${testId}`);
-};
+    router.push(`/author/buattes/publik/syarat?testId=${testId}`);
+  };
 
   return (
     <div className="w-full p-4">

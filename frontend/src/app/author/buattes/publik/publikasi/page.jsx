@@ -7,19 +7,10 @@ export default function PublikasiPage() {
   const [namaTes, setNamaTes] = useState('');
   const [testId, setTestId] = useState(null);
   const [durasiTes, setDurasiTes] = useState('');
-  // const [acakPertanyaan, setAcakPertanyaan] = useState({
-  //   waktu: false,
-  //   acak: false,
-  // });
-  // const [maksimumPercobaan, setMaksimumPercobaan] = useState('');
   const [hargaTes, setHargaTes] = useState('');
   const [prediksiKemiripan, setPrediksiKemiripan] = useState('');
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
-
-  // const handleCheckboxChange = (event) => {
-  //   setAcakPertanyaan({ ...acakPertanyaan, [event.target.name]: event.target.checked });
-  // };
 
   useEffect(() => {
     const url = new URL(window.location.href);
@@ -79,6 +70,8 @@ export default function PublikasiPage() {
     setShowErrorPopup(false);
   };
   const [activeTab, setActiveTab] = useState('publikasi');
+
+  
   return (
     <div>
       {/* Bar Atas */}
@@ -152,43 +145,6 @@ export default function PublikasiPage() {
                     placeholder="hh:mm"
                 />
             </div>
-
-            {/* Checkbox Acak Pertanyaan */}
-            {/* <div className="mb-4">
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="waktu"
-                  name="waktu"
-                  checked={acakPertanyaan.waktu}
-                  onChange={handleCheckboxChange}
-                  className="mr-2"
-                />
-                <label htmlFor="waktu" className="text-gray-700">Peserta akan memiliki waktu untuk menyelesaikan seluruh kuis.</label>
-              </div>
-              <div className="flex items-center mt-2">
-                <input
-                  type="checkbox"
-                  id="acak"
-                  name="acak"
-                  checked={acakPertanyaan.acak}
-                  onChange={handleCheckboxChange}
-                  className="mr-2"
-                />
-                <label htmlFor="acak" className="text-gray-700">Pertanyaan akan ditampilkan secara acak kepada setiap responden.</label>
-              </div>
-            </div> */}
-
-            {/* Input Maksimum Percobaan Kuis
-            <div className="mb-4">
-              <input
-                type="text"
-                className="w-full border border-gray-300 p-2 rounded-full bg-white text-gray-500"
-                value={maksimumPercobaan}
-                onChange={(e) => setMaksimumPercobaan(e.target.value)}
-                placeholder="Maksimum Percobaan Kuis"
-              />
-            </div> */}
 
             {/* Dropdown Harga Tes */}
             <div className="mb-4">

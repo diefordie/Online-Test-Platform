@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { initializeApp } from 'firebase/app';
-import { createMultipleChoiceService, updateMultipleChoiceService, getMultipleChoiceService, getMultipleChoiceByIdService, deleteMultipleChoiceService, getQuestionsByTestId, fetchMultipleChoiceByNumberAndTestId, updateMultipleChoicePageNameService, getPagesByTestIdService } from '../services/multiplechoiceSevice.js';
+import { createMultipleChoiceService, updateMultipleChoiceService, getMultipleChoiceService, getQuestionNumbersServices, updateQuestionNumberServices, getMultipleChoiceByIdService, deleteMultipleChoiceService, getQuestionsByTestId, fetchMultipleChoiceByNumberAndTestId, updateMultipleChoicePageNameService, getPagesByTestIdService } from '../services/multiplechoiceSevice.js';
 import { Buffer } from 'buffer';
 import { uploadFileToStorage } from '../../firebase/firebaseBucket.js';
 
@@ -63,15 +63,16 @@ export { createMultipleChoice };
 
 const updateMultipleChoice = async (req, res) => {
     try {
-        const { questionId, updatedData } = req.body;
+        const { multiplechoiceId } = req.params; // Ambil multiplechoiceId dari URL
+        const updatedData = req.body; // Ambil updatedData dari body JSON
 
-        if (!questionId || !updatedData) {
+        if (!multiplechoiceId || !updatedData) {
             return res.status(400).send({
-                message: 'questionId and updatedData are required',
+                message: 'multiplechoiceId and updatedData are required',
             });
         }
 
-        const updatedMultipleChoice = await updateMultipleChoiceService(questionId, updatedData);
+        const updatedMultipleChoice = await updateMultipleChoiceService(multiplechoiceId, updatedData);
 
         res.status(200).send({
             data: updatedMultipleChoice,
@@ -136,23 +137,32 @@ export { getMultipleChoiceById };
 
 const deleteMultipleChoice = async (req, res) => {
     try {
-        const { multiplechoiceId } = req.params; 
+        const { multiplechoiceId } = req.params;
 
         if (!multiplechoiceId) {
-            return res.status(400).send({
-                message: 'multiplechoiceId is required',
+            return res.status(400).json({
+                success: false,
+                message: 'multiplechoiceId is required'
             });
         }
 
-        await deleteMultipleChoiceService(multiplechoiceId);
+        const result = await deleteMultipleChoiceService(multiplechoiceId);
 
-        res.status(200).send({
+        res.status(200).json({
+            success: true,
             message: 'Multiple choice question deleted successfully',
+            data: {
+                deletedQuestionNumber: result.deletedQuestionNumber,
+                remainingQuestionsCount: result.remainingQuestions.length,
+                updatedQuestions: result.remainingQuestions
+            }
         });
     } catch (error) {
-        res.status(500).send({
-            message: 'Failed to delete multiple choice question',
-            error: error.message,
+        console.error('Controller Error:', error);
+        res.status(error.message === 'Multiple choice question not found' ? 404 : 500).json({
+            success: false,
+            message: error.message || 'Failed to delete multiple choice question',
+            error: error.message
         });
     }
 };
@@ -243,3 +253,35 @@ const getPagesByTestIdController = async (req, res) => {
   };
   
   export { getPagesByTestIdController };
+
+  const getQuestionNumbers = async (req, res) => {
+    try {
+      const { testId } = req.params;
+      const questionNumbers = await getQuestionNumbersServices(testId);
+      res.json({ questionNumbers });
+    } catch (error) {
+      res.status(500).json({ error: 'Error getting question numbers' });
+    }
+  };
+  
+  const updateQuestionNumber = async (req, res) => {
+    try {
+      const { testId } = req.params;
+      const { oldNumber, newNumber } = req.body;
+  
+      console.log('Received request to update question numbers:');
+      console.log(`testId: ${testId}`);
+      console.log(`oldNumber: ${oldNumber}, newNumber: ${newNumber}`);
+  
+      await updateQuestionNumberServices(testId, oldNumber, newNumber);
+      res.json({ message: 'Question numbers updated successfully' });
+    } catch (error) {
+      console.error('Error updating question numbers:', error);
+      res.status(500).json({ error: 'Error updating question numbers' });
+    }
+  };
+  
+  export {
+    getQuestionNumbers,
+    updateQuestionNumber,
+  };

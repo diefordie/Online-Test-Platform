@@ -29,24 +29,24 @@ const MembuatSoal = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const url = new URL(window.location.href);
-    const params = new URLSearchParams(url.search);
+    // Gunakan window.location.search langsung untuk mendapatkan query string
+    const params = new URLSearchParams(window.location.search);
+    const pageNameFromUrl = params.get("pageName");
     const testIdFromUrl = params.get("testId");
     const multiplechoiceIdFromUrl = params.get("multiplechoiceId");
-    const pageNameFromUrl = params.get("pageName");
-
-    console.log("Fetched testId:", testIdFromUrl); 
-    console.log("Fetched multiplechoiceId:", multiplechoiceIdFromUrl); 
-
-    if (testIdFromUrl) {
-      setTestId(testIdFromUrl);
-    }
-    if (multiplechoiceIdFromUrl) {
-      setMultiplechoiceId(multiplechoiceIdFromUrl); 
-    }
+    const numberFromUrl = params.get("nomor");
+  
+    console.log("Raw pageName from URL:", pageNameFromUrl); // Debug log
+    
     if (pageNameFromUrl) {
-      setPageName(decodeURIComponent(pageNameFromUrl));
+      const decodedPageName = decodeURIComponent(pageNameFromUrl);
+      console.log("Decoded pageName:", decodedPageName); // Debug log
+      setPageName(decodedPageName);
     }
+  
+    if (testIdFromUrl) setTestId(testIdFromUrl);
+    if (multiplechoiceIdFromUrl) setMultiplechoiceId(multiplechoiceIdFromUrl);
+    if (numberFromUrl) setNumber(numberFromUrl);
   }, []);
 
   useEffect(() => {
@@ -55,17 +55,28 @@ const MembuatSoal = () => {
       try {
         const response = await fetch(`http://localhost:2000/api/multiplechoice/question/${multiplechoiceId}`);
         if (!response.ok) {
-          const errorMessage = await response.text(); 
+          const errorMessage = await response.text();
           throw new Error(`Error: ${response.status} - ${errorMessage}`);
         }
         const data = await response.json();
         console.log('Response dari API:', data);
-        setPageName(data.pageName);
+        // setPageName(data.pageName);
         setWeight(data.weight);
         setNumber(data.number);
         setQuestion(data.question);
-        setOptions(data.option);
         setDiscussion(data.discussion);
+        if (data.questionPhoto) {
+          setQuestionPhoto(data.questionPhoto);
+        }
+        
+        // Map the options with their IDs for updating
+        if (data.option && Array.isArray(data.option)) {
+          setOptions(data.option.map(opt => ({
+            id: opt.id,
+            optionDescription: opt.optionDescription,
+            isCorrect: opt.isCorrect
+          })));
+        }
         
       } catch (error) {
         console.error('Error fetching question:', error);
@@ -119,36 +130,80 @@ const MembuatSoal = () => {
 
   const handleDelete = async () => {
     if (confirm("Apakah Anda yakin ingin menghapus soal ini?")) {
-        try {
-            const response = await fetch(`http://localhost:2000/api/multiplechoice/question/${multiplechoiceId}`, {
-                method: 'DELETE',
-            });
-
-            if (!response.ok) {
-                throw new Error('Gagal menghapus soal dari database');
-            }
-
-            setPages(prevPages => {
-                const updatedPages = prevPages.map(page => ({
-                    ...page,
-                    questions: Array.isArray(page.questions)
-                        ? page.questions.filter(q => q !== multiplechoiceId)
-                        : [],
-                }));
-
-                if (testId && typeof window !== 'undefined') {
-                    localStorage.setItem(`pages_${testId}`, JSON.stringify(updatedPages));
-                }
-                
-                return updatedPages;
-            });
-
-            console.log('Soal berhasil dihapus');
-            router.push(`/author/buatSoal?testId=${testId}`);
-        } catch (error) {
-            console.error('Error saat menghapus soal:', error);
-            alert('Terjadi kesalahan saat menghapus soal. Silakan coba lagi.');
+      try {
+        // Ambil key localStorage yang benar
+        const localStorageKey = `pages-${testId}`;
+        
+        // Cek apakah multiplechoiceId ada
+        if (multiplechoiceId) {
+          // 1. Hapus data dari database
+          const response = await fetch(`http://localhost:2000/api/multiplechoice/question/${multiplechoiceId}`, {
+            method: 'DELETE',
+          });
+  
+          if (!response.ok) {
+            throw new Error('Gagal menghapus soal dari database');
+          }
         }
+  
+        // 2. Ambil data pages dari localStorage
+        const savedPages = localStorage.getItem(localStorageKey);
+        console.log('Data sebelum dihapus:', savedPages); // Debug
+  
+        if (savedPages) {
+          let pages = JSON.parse(savedPages);
+          
+          // 3. Temukan dan hapus nomor soal dari pages
+          let deletedNumber = null;
+          let deletedPageIndex = -1;
+          
+          // Cari nomor yang akan dihapus
+          pages.forEach((page, pageIndex) => {
+            const questionIndex = page.questions.indexOf(parseInt(number));
+            if (questionIndex !== -1) {
+              deletedNumber = parseInt(number);
+              deletedPageIndex = pageIndex;
+              // Hapus nomor dari array questions
+              page.questions.splice(questionIndex, 1);
+            }
+          });
+  
+          console.log('Nomor yang dihapus:', deletedNumber); // Debug
+          console.log('Data setelah splice:', pages); // Debug
+  
+          // 4. Reorder semua nomor setelah penghapusan
+          if (deletedNumber !== null) {
+            // Flatkan semua nomor dari semua halaman
+            const allNumbers = pages.reduce((acc, page) => [...acc, ...page.questions], []);
+            console.log('Semua nomor setelah flatten:', allNumbers); // Debug
+            
+            // Update nomor-nomor yang lebih besar dari nomor yang dihapus
+            pages = pages.map(page => ({
+              ...page,
+              questions: page.questions.map(num => 
+                num > deletedNumber ? num - 1 : num
+              ).sort((a, b) => a - b)
+            }));
+  
+            console.log('Data setelah reorder:', pages); // Debug
+  
+            // 5. Hapus page jika tidak ada soal tersisa
+            pages = pages.filter(page => page.questions.length > 0);
+            
+            // 6. Update localStorage dengan key yang benar
+            localStorage.setItem(localStorageKey, JSON.stringify(pages));
+            
+            console.log('Data final yang disimpan:', pages); // Debug
+          }
+        }
+  
+        // 7. Redirect kembali ke halaman luar
+        router.push(`/author/buatSoal?testId=${testId}`);
+        
+      } catch (error) {
+        console.error('Error saat menghapus soal:', error);
+        alert('Terjadi kesalahan saat menghapus soal. Silakan coba lagi.');
+      }
     }
   };
 
@@ -168,62 +223,96 @@ const MembuatSoal = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    let uploadedImageUrl = "";
-    if (questionPhoto) {
-      const imageRef = ref(storage, `question/${questionPhoto.name + v4()}`);
-      const snapshot = await uploadBytes(imageRef, questionPhoto);
-      uploadedImageUrl = await getDownloadURL(snapshot.ref); // Mendapatkan URL download gambar
-    }
-    
-    const data = {
-      testId: testId,
-      questions: [
-        {
-          pageName,
-          question: cleanHtml(question), 
-          number: parseInt(number), 
-          questionPhoto: uploadedImageUrl,
-          weight: parseFloat(weight), 
-          discussion: cleanHtml(discussion), 
-          options 
-        }
-      ]
-    };
-
+  
     try {
-      const response = await fetch('http://localhost:2000/api/multiplechoice/add-questions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-    
-      if (response.ok) {
-        const result = await response.json();
-        console.log('Response dari API:', result);
-        const MultiplechoiceId = result.data[0].id;
-        console.log('MultiplechoiceId:', MultiplechoiceId);
-
-        localStorage.setItem('pageName', pageName);
-    
-        const existingPages = JSON.parse(localStorage.getItem(`pages_${testId}`)) || [];
-        const newQuestion = { pageName, question, number, questionPhoto, weight, discussion, options };
-
-        existingPages.push(newQuestion);
-
-        localStorage.setItem(`pages_${testId}`, JSON.stringify(existingPages));
-        
-        if (MultiplechoiceId) {
-
-          router.push(`/author/buatSoal?testId=${testId}&pageName=${pageName}`);        
-        } else {
-          console.error('MultiplechoiceId is undefined');
+      // Handle image upload if exists
+      let uploadedImageUrl = "";
+      if (questionPhoto) {
+        const imageRef = ref(storage, `question/${questionPhoto.name + v4()}`);
+        const snapshot = await uploadBytes(imageRef, questionPhoto);
+        uploadedImageUrl = await getDownloadURL(snapshot.ref); // Mendapatkan URL download gambar
+      }
+  
+      // Prepare common data structure
+      const questionData = {
+        pageName,
+        question: cleanHtml(question),
+        number: parseInt(number),
+        questionPhoto: uploadedImageUrl,
+        weight: parseFloat(weight),
+        discussion: cleanHtml(discussion),
+        options: options.map(option => ({
+          ...option,
+          optionDescription: option.optionDescription,
+          isCorrect: option.isCorrect,
+        })),
+      };
+  
+      let response;
+      let result;
+  
+      // Check if multiplechoiceId exists to determine if update or create
+      if (multiplechoiceId !== "null") {
+        // UPDATE existing question
+        response = await fetch(`http://localhost:2000/api/multiplechoice/update-question/${multiplechoiceId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(questionData),
+        });
+  
+        if (response.ok) {
+          result = await response.json();
+          console.log('Update successful:', result);
+          
+          // Update localStorage
+          const existingPages = JSON.parse(localStorage.getItem(`pages_${testId}`)) || [];
+          const updatedPages = existingPages.map(page => 
+            page.id === multiplechoiceId 
+              ? { ...questionData, id: multiplechoiceId }
+              : page
+          );
+          localStorage.setItem(`pages_${testId}`, JSON.stringify(updatedPages));
         }
       } else {
-        console.error('Failed to submit:', response.statusText);
+        // CREATE new question
+        response = await fetch('http://localhost:2000/api/multiplechoice/add-questions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            testId: testId,
+            questions: [questionData],
+          }),
+        });
+  
+        if (response.ok) {
+          result = await response.json();
+          console.log('Response dari API:', result);
+          const newMultiplechoiceId = result.data[0].id;
+          console.log('MultiplechoiceId:', newMultiplechoiceId);
+  
+          // Update localStorage
+          localStorage.setItem('pageName', pageName);
+          const existingPages = JSON.parse(localStorage.getItem(`pages_${testId}`)) || [];
+          const newQuestion = { 
+            id: newMultiplechoiceId,
+            ...questionData,
+          };
+          existingPages.push(newQuestion);
+          localStorage.setItem(`pages_${testId}`, JSON.stringify(existingPages));
+        }
       }
+  
+      if (response.ok) {
+        const encodedPageName = encodeURIComponent(pageName);
+        router.push(`/author/buatSoal?testId=${testId}&pageName=${encodedPageName}`);
+      } else {
+        console.error('Failed to process request:', response.statusText);
+      }
+  
     } catch (error) {
       console.error('Error:', error);
     }
