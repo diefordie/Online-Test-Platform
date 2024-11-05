@@ -1,6 +1,5 @@
 'use client';
 import React, { useState } from 'react';
-import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useEffect } from 'react';
 import sanitizeHtml from 'sanitize-html';
@@ -9,6 +8,8 @@ import { useRouter } from 'next/navigation';
 import { storage } from "./firebase";
 import { v4 } from 'uuid';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { useSearchParams } from 'next/navigation';
+import ReactQuill from 'react-quill';
 
 const MembuatSoal = () => {
   const router = useRouter();
@@ -27,14 +28,13 @@ const MembuatSoal = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState(null);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Gunakan window.location.search langsung untuk mendapatkan query string
-    const params = new URLSearchParams(window.location.search);
-    const pageNameFromUrl = params.get("pageName");
-    const testIdFromUrl = params.get("testId");
-    const multiplechoiceIdFromUrl = params.get("multiplechoiceId");
-    const numberFromUrl = params.get("nomor");
+    const pageNameFromUrl = searchParams.get("pageName");
+    const testIdFromUrl = searchParams.get("testId");
+    const multiplechoiceIdFromUrl = searchParams.get("multiplechoiceId");
+    const numberFromUrl = searchParams.get("nomor");
   
     console.log("Raw pageName from URL:", pageNameFromUrl); // Debug log
     
@@ -47,7 +47,7 @@ const MembuatSoal = () => {
     if (testIdFromUrl) setTestId(testIdFromUrl);
     if (multiplechoiceIdFromUrl) setMultiplechoiceId(multiplechoiceIdFromUrl);
     if (numberFromUrl) setNumber(numberFromUrl);
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
     if (!multiplechoiceId) return;
