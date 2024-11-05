@@ -370,17 +370,17 @@ const MembuatSoal = () => {
           </div>
         </div>
         <div className='mt-4 flex justify-end space-x-4 -mr-2'>
-              <div className="flex justify-end space-x-2">
-                  <button className="bg-[#E58A7B] border border-black px-4 py-2 hover:text-white font-poppins rounded-[15px]"
-                  >Hapus
-                  </button>
-              </div>
-              <div className="flex justify-end space-x-2">
-                  <button type="submit" className="bg-[#E8F4FF] border border-black px-4 py-2 hover:text-white font-poppins rounded-[15px]"
-                  >Simpan
-                  </button>
-              </div>  
-            </div>
+          <div className="flex justify-end space-x-2">
+              <button className="bg-[#E58A7B] border border-black px-4 py-2 hover:text-white font-poppins rounded-[15px]"
+              >Hapus
+              </button>
+          </div>
+          <div className="flex justify-end space-x-2">
+              <button type="submit" className="bg-[#E8F4FF] border border-black px-4 py-2 hover:text-white font-poppins rounded-[15px]"
+              >Simpan
+              </button>
+          </div>  
+        </div>
       </div>
   );
 };
