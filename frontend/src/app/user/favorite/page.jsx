@@ -15,6 +15,7 @@ export default function Favorite() {
   const [errorUser, setErrorUser] = useState(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [likedItems, setLikedItems] = useState({});
+    const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     const getUserIdFromToken = () => {
@@ -246,8 +247,8 @@ const toggleLike = async (id) => {
   return (
     <>
       {/* Header */}
-      <header className="fixed p-4 mx-auto bg-deepBlue text-white mx-auto w-full font-poppins md:max-w-3xl lg:max-w-screen-2xl lg:p-6 max-w-full z-50">
-        <div className="mx-auto flex justify-between items-center font-poppins">
+      <header className="fixed p-4 bg-deepBlue top-0 left-0 right-0 text-white w-full font-poppins lg:p-6 z-50">
+      <div className="mx-auto flex justify-between items-center font-poppins max-w-full ">
           <div className="flex justify-between">
             {/* Ikon Menu untuk mobile */}
             <button onClick={toggleSidebar}>
@@ -285,7 +286,7 @@ const toggleLike = async (id) => {
                   <img 
                   src={userData?.userPhoto ||"/images/profile.png" } 
                   alt="profile" 
-                  className="h-14 cursor-pointer mr-5"
+                  className="h-14 w-14 rounded-full cursor-pointer mr-5"
                   onMouseEnter={() => setDropdownOpen(true)}
                   onMouseLeave={() => setDropdownOpen(false)}
                   />
@@ -299,7 +300,7 @@ const toggleLike = async (id) => {
                   onMouseEnter={() => setDropdownOpen(true)}
                   onMouseLeave={() => setDropdownOpen(false)}
               >
-                  <Link legacyBehavior href="/profile-edit">
+                  <Link legacyBehavior href= {`/user/edit-profile/${userId}`} >
                   <a className="block px-4 py-1 text-deepBlue text-sm text-gray-700 hover:bg-deepBlue hover:text-white rounded-md border-abumuda">
                       Ubah Profil
                   </a>
@@ -351,19 +352,19 @@ const toggleLike = async (id) => {
       {/* Bagian Paling Populer */}
 
       <section className="mx-auto p-5 font-poppins relative pt-10 ">
-        <div className="mx-auto mt-5 font-bold font-poppins text-deepBlue">
+        <div className="mx-auto mt-10 font-bold font-poppins text-deepBlue">
         Favorite
           {/* Container untuk kategori, menambahkan grid layout yang konsisten */}
           <div className=" mt-5 grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
             {favorites.filter((test) => !test.isHidden).map((test) => (
-              <div key={test.testId} className="bg-abumuda shadow-lg p-1 relative group">
+              <div key={test.testId} className="bg-abumuda shadow-lg relative group">
                 
                   {/* Overlay background abu-abu yang muncul saat hover */}
                   <div className="absolute inset-0 bg-gray-500 opacity-0 group-hover:opacity-40 transition-opacity duration-300 z-10"></div>
 
                   <div className="flex justify-between items-center group-hover:blur-[2px] transition-opacity duration-300 z-10">
                     <div className="flex items-center space-x-2 font-bold text-deepBlue">
-                      <img src="/images/eye-icon.png" alt="Views" className="h-3 lg:h-4 object-contain" />
+                      <img src="/images/eye-icon.png" alt="Views" className="h-3 lg:h-4 ml-2  object-contain" />
                       <span className="text-[0.6rem] lg:text-sm font-poppins">{test.accessCount}</span>
                     </div>
                   </div>

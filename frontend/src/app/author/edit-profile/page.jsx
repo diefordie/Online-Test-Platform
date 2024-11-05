@@ -19,7 +19,7 @@ export default function EditProfile() {
         if (!token) {
           throw new Error('No authentication token found');
         }
-
+  
         const response = await fetch('http://localhost:2000/author/profile', {
           method: 'GET',
           headers: {
@@ -27,18 +27,22 @@ export default function EditProfile() {
             'Content-Type': 'application/json',
           },
         });
-
+  
         if (!response.ok) {
           throw new Error('Failed to fetch author data');
         }
-
+  
         const data = await response.json();
-        setAuthorData(data);
+        setAuthorData({
+          ...data,
+          authorPhoto: data.authorPhoto || '/images/profil.png' // Gunakan foto default jika tidak ada
+        });
         setFormData({
-          firstName: data.firstName|| '',
+          firstName: data.firstName || '',
           lastName: data.lastName || '',
           email: data.email || '',
           password: '', // Password should not be pre-filled for security reasons
+          authorPhoto: data.authorPhoto || null
         });
       } catch (error) {
         console.error('Error fetching author data:', error);
@@ -51,12 +55,32 @@ export default function EditProfile() {
         setLoading(false);
       }
     };
-
+  
     fetchAuthorData();
   }, [router]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData(prevData => ({
+        ...prevData,
+        authorPhoto: file
+      }));
+      
+      // Preview gambar (opsional)
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAuthorData(prevData => ({
+          ...prevData,
+          authorPhotoPreview: reader.result
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSave = (e) => {
@@ -74,17 +98,24 @@ export default function EditProfile() {
         throw new Error('No authentication token found');
       }
   
+      const formDataToSend = new FormData();
+      formDataToSend.append('firstName', formData.firstName);
+      formDataToSend.append('lastName', formData.lastName);
+      formDataToSend.append('email', formData.email);
+      if (formData.password) {
+        formDataToSend.append('password', formData.password);
+      }
+      // Jika ada file foto yang diupload
+      if (formData.authorPhoto instanceof File) {
+        formDataToSend.append('authorPhoto', formData.authorPhoto);
+      }
+  
       const response = await fetch('http://localhost:2000/author/profile/edit', {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          name: `${formData.firstName} ${formData.lastName}`.trim(),
-          email: formData.email,
-          // Add other fields as needed
-        }),
+        body: formDataToSend,
       });
   
       if (!response.ok) {
@@ -114,6 +145,7 @@ export default function EditProfile() {
     await router.push('/user/page');
   };  
 
+
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col p-0 md:px-0" style={{ maxWidth: '1440px' }}>
       <div className="w-full bg-[#0B61AA] p-4 text-white flex justify-between items-center rounded-md">
@@ -128,9 +160,21 @@ export default function EditProfile() {
       <div className="min-h-screen flex flex-col p-8 bg-[#FFFFFF] font-sans">
         <div className="w-full max-w-[1228px] h-[88px] mx-auto mt-2 p-4 bg-[#0B61AA] text-white flex items-center justify-between rounded-md">
           <div className="flex items-center">
-            <div className="w-16 h-16 rounded-full flex justify-center items-center relative">
-              <img src="/img/Profil.png" alt="Profil" className="h-16 w-16 rounded-full" />
-              <img src="/img/kamera.png" alt="Kamera" className="h-6 w-6 absolute bottom-0 right-1" />
+          <div className="w-16 h-16 rounded-full flex justify-center items-center relative">
+              <img src={authorData.authorPhoto || "/images/profil.png"} alt="Profil" className="h-16 w-16 rounded-full object-cover" />
+              <img
+                src="/images/camera.png"
+                alt="Kamera"
+                className="h-6 w-6 absolute bottom-0 right-1 cursor-pointer"
+                onClick={() => document.getElementById('uploadProfileImage').click()}
+              />
+              <input
+                type="file"
+                id="uploadProfileImage"
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+                accept="image/*"
+              />
             </div>
             <div className="ml-4">
               <h3 className="text-xl font-semibold font-poppins">{authorData.firstName} {authorData.lastName}</h3>
@@ -206,6 +250,5 @@ export default function EditProfile() {
     </div>
   );
 }
-
 
 
