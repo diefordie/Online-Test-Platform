@@ -1,5 +1,6 @@
 import MidtransClient from 'midtrans-client';
 import { PrismaClient } from '@prisma/client';
+import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
 
@@ -26,47 +27,51 @@ class PaymentService {
                 throw new Error(`Payment service initialization failed: ${error.message}`);
             }
         }
-    async createPaymentToken(testId, userId) {
-        try {
-            const test = await prisma.test.findFirst({
-                where: { id: testId }
-            });
-
-            if (!test) {
-                throw new Error(`Test not found with ID: ${testId}`);
-            }
-
-            const orderId = `${test.id}-${userId}-${Date.now()}`;
-            const parameter = {
-                transaction_details: {
-                    order_id: orderId,
-                    gross_amount: test.price,
-                },
-                callbacks: {
-                    finish: process.env.DOMAIN
-                },
-                enabled_payments: [
-                    "mandiri_clicpay", "bca_clicpay", "bni_va", "bca_va",
-                ],
-            };
-
-            const transaction = await prisma.transaction.create({
-                data: {
-                    testId,
-                    userId: "cm2vedsc50000hity09oao84f",
-                    paymentMethod: 'midtrans',
-                    total: test.price,
-                    paymentStatus: 'PENDING',
-                    paymentId: orderId
+        async createPaymentToken(testId, token) {
+            try {
+                // Decode token to get userId
+                const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+                const userId = decodedToken.id;
+    
+                const test = await prisma.test.findFirst({
+                    where: { id: testId }
+                });
+    
+                if (!test) {
+                    throw new Error(`Test not found with ID: ${testId}`);
                 }
-            });
-
-            const snapResponse = await this.snap.createTransaction(parameter);
-            return snapResponse;
-        } catch (error) {
-            throw new Error(`Failed to create payment token: ${error.message}`);
+    
+                const orderId = `${testId.slice(-6)}-${userId.slice(-6)}-${Date.now().toString().slice(-6)}`;
+                const parameter = {
+                    transaction_details: {
+                        order_id: orderId,
+                        gross_amount: test.price,
+                    },
+                    callbacks: {
+                        finish: process.env.DOMAIN
+                    },
+                    enabled_payments: [
+                        "mandiri_clicpay", "bca_clicpay", "bni_va", "bca_va",
+                    ],
+                };
+    
+                const transaction = await prisma.transaction.create({
+                    data: {
+                        testId,
+                        userId: userId,  // Now using the userId from the token
+                        paymentMethod: 'midtrans',
+                        total: test.price,
+                        paymentStatus: 'PENDING',
+                        paymentId: orderId
+                    }
+                });
+    
+                const snapResponse = await this.snap.createTransaction(parameter);
+                return snapResponse;
+            } catch (error) {
+                throw new Error(`Failed to create payment token: ${error.message}`);
+            }
         }
-    }
 
     async processNotification(notification) {
         try {

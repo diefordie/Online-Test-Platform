@@ -150,7 +150,7 @@ export default function EditProfile() {
     <div className="min-h-screen bg-gray-100 flex flex-col p-0 md:px-0" style={{ maxWidth: '1440px' }}>
       <div className="w-full bg-[#0B61AA] p-4 text-white flex justify-between items-center rounded-md">
         <div className="flex-shrink-0">
-          <img src="/img/etamtest.png" alt="Etamtest" className="h-6 object-contain" style={{ maxWidth: '216px', height: '52px' }} />
+          <img src="/images/etamtest.png" alt="Etamtest" className="h-6 object-contain" style={{ maxWidth: '216px', height: '52px' }} />
         </div>
         <div className="flex-shrink-0">
           <img src="/img/keluar.png" alt="Home" className="max-w-[44px] h-[22px]" onClick={handleLogout} />
@@ -184,7 +184,7 @@ export default function EditProfile() {
 
           <div className="actions flex items-center justify-end space-x-2">
             <div className="flex items-center justify-center w-[29px] h-[29px] bg-white rounded-[10px]">
-              <img src="/img/sampah.png" alt="sampah" className="w-5 h-5" />
+              <img src="/images/trash.png" alt="sampah" className="w-5 h-5" />
             </div>
           </div>
         </div>
@@ -200,7 +200,7 @@ export default function EditProfile() {
                 onChange={handleChange}
                 className="w-full p-2 border border-black rounded-[15px] mt-1 font-poppins"
               />
-              <img src="/img/edit.png" alt="Edit" className="absolute right-6 top-1/2 transform -translate-y-1/2 w-5 h-5 mt-3" />
+              
             </div>
 
             <div className="relative">
@@ -212,7 +212,7 @@ export default function EditProfile() {
                 onChange={handleChange}
                 className="w-full p-2 border border-black rounded-[15px] mt-1 pr-10 font-poppins"
               />
-              <img src="/img/edit.png" alt="Edit" className="absolute right-6 top-1/2 transform -translate-y-1/2 w-5 h-5 mt-3" />
+              
             </div>
 
             <div className="relative">
@@ -224,7 +224,7 @@ export default function EditProfile() {
                 onChange={handleChange}
                 className="w-full p-2 border border-black rounded-[15px] mt-1 pr-10 font-poppins"
               />
-              <img src="/img/edit.png" alt="Edit" className="absolute right-6 top-1/2 transform -translate-y-1/2 w-5 h-5 mt-3" />
+              
             </div>
 
             <div className="relative">
@@ -236,7 +236,7 @@ export default function EditProfile() {
                 onChange={handleChange}
                 className="w-full p-2 border border-black rounded-[15px] mt-1 font-poppins"
               />
-              <img src="/img/edit.png" alt="Edit" className="absolute right-6 top-1/2 transform -translate-y-1/2 w-5 h-5 mt-3" />
+              
             </div>
 
             <div className="flex justify-end">

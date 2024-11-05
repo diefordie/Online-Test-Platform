@@ -2,12 +2,15 @@
 
 import React from 'react';
 import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import { jwtDecode } from "jwt-decode";
 
 function App() {
-  const [testId, setTestId] = useState('cm2vefs5z0002hity4pkvdzry');
+  const { testId } = useParams();
+  const [userId, setUserId] = useState(null);
   const [testTitle, setTestTitle] = useState('');
-  const [testSimilarity, setTestSimilarity] = useState();
-  const [testPrice, setTestPrice] = useState();
+  const [testSimilarity, setTestSimilarity] = useState(null);
+  const [testPrice, setTestPrice] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -20,6 +23,13 @@ function App() {
 
     document.body.appendChild(script)
 
+     // Decode token to get userId
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      setUserId(decodedToken.id);
+    }
+
     return () => {
       document.body.removeChild(script)
     }
@@ -28,7 +38,7 @@ function App() {
   useEffect(() => {
     const fetchTestDetail = async () => {
       try {
-        const response = await fetch(`http://localhost:2000/api/tests/test-detail/cm2vefs5z0002hity4pkvdzry`);
+        const response = await fetch(`http://localhost:2000/api/tests/get-tests/${testId}`);
         if (!response.ok) {
           const errorMessage = await response.text();
           throw new Error(`Error: ${response.status} - ${errorMessage}`)
@@ -50,11 +60,14 @@ function App() {
   const handlePayment = async () => {
     if (testId) {
       try {
+        const token = localStorage.getItem('token'); // Ambil token dari localStorage
+        
         // Ambil token dari backend
         const response = await fetch('http://localhost:2000/api/payment/payment-process', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // Tambahkan token ke header
           },
           body: JSON.stringify({ testId }), 
         });

@@ -23,6 +23,7 @@ import { authenticateToken } from './src/middleware/authMiddleware.js';
 import editProfile from './src/routes/editProfileUser.js';
 import riwayattransaksiRoutes from './src/routes/riwayattransaksiRoutes.js';
 import testimoni from './src/routes/testimoniRoutes.js';
+import checkStatusTransactionRoutes from './src/routes/checkStatusRoutes.js';
 
 dotenv.config(); 
 const app = express();
@@ -65,6 +66,8 @@ app.use('/api', riwayattransaksiRoutes);
 app.use('/api', testimoni);
 app.use('/api/payment', paymentRoutes);
 
+
+app.use('/api', checkStatusTransactionRoutes);
 
 // Mulai server
 const PORT = process.env.PORT || 2000;

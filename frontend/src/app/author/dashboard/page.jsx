@@ -228,11 +228,7 @@ export default function Home() {
           <div className="text-white mb-5">
             <img src="/images/etamtest.png" alt="Logo" className="h-auto w-36" />
           </div>
-          <div className="flex justify-center w-full mb-5">
-            <button className="bg-[#0B61AA] text-white py-2 px-5 rounded-[10px]">
-              + NEW
-            </button>
-          </div>
+         
           <nav>
             <ul className="space-y-3">
               <li className="text-white cursor-pointer bg-[#0B61AA] hover:bg-deepBlue bg-opacity-50 rounded-lg py-2 px-4 min-w-[200px]">
@@ -327,15 +323,23 @@ export default function Home() {
 
           {/* Informasi Total Soal dan Peserta */}
       
-          <div className="flex pr-4 gap-5 mt-4 ml-3">
-            <div className="bg-[#F3F3F3] px-3 py-1 max-w-auto justify-between item-center rounded-[15px] shadow-lg shadow-lg text-[#0B61AA]">
-              <span>Total Soal</span>
-              <span className="font-semibold ml-4">{authorData[0].totalSoal}</span>
+          <div className="flex pr-4 gap-5 mt-4 ml-3 justify-between">
+            <div className="flex pr-4 gap-5 mt-4 ml-3 ">
+              <div className="bg-[#F3F3F3] px-3 py-1 max-w-auto justify-between item-center rounded-[15px] shadow-lg shadow-lg text-[#0B61AA]">
+                <span>Total Soal</span>
+                <span className="font-semibold ml-4">{authorData[0].totalSoal}</span>
+              </div>
+              <div className="bg-[#F3F3F3] px-3 py-1 max-w-auto justify-between item-center rounded-[15px] shadow-lg shadow-lg text-[#0B61AA]">
+                <span>Total Peserta</span> 
+                <span className="font-semibold ml-2">{authorData[0].totalPeserta}</span>
+              </div>
             </div>
-            <div className="bg-[#F3F3F3] px-3 py-1 max-w-auto justify-between item-center rounded-[15px] shadow-lg shadow-lg text-[#0B61AA]">
-              <span>Total Peserta</span> 
-              <span className="font-semibold ml-2">{authorData[0].totalPeserta}</span>
-            </div>
+            
+            <Link href='/author/buattes'>
+              <button className="bg-[#0B61AA] text-white py-2 mt-2 px-5 p-5 rounded-[10px]">
+              + NEW
+              </button>
+            </Link>
           </div>
          
           {/* Bagian Paling Populer */}

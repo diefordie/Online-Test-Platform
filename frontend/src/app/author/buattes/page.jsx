@@ -17,6 +17,38 @@ const BuatTes = () => {
 
   const jenisDropdownRef = useRef(null);
   const kategoriDropdownRef = useRef(null);
+  const [authorId, setAuthorId] = useState(null);
+
+  useEffect(() => {
+    const fetchAuthorId = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No token found');
+        }
+
+        const response = await fetch('http://localhost:2000/author/author-data', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch author data');
+        }
+
+        const authorData = await response.json();
+        setAuthorId(authorData.id);
+      } catch (error) {
+        console.error('Error fetching author data:', error);
+        // Handle error (e.g., redirect to login page)
+      }
+    };
+
+    fetchAuthorId();
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -36,7 +68,7 @@ const BuatTes = () => {
     e.preventDefault();
   
     const newTest = {
-      authorId: 'cm2ncb27u000148hn62zyv46a',
+      authorId: authorId,
       type: jenisTes,
       category: kategoriTes,
       title: namaTes,

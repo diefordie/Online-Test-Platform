@@ -4,20 +4,21 @@ class PaymentController {
     processPayment = async (req, res) => {
         try {
             const { testId } = req.body;
+            const token = req.headers.authorization.split(' ')[1]; // Ambil token dari header
             
             if (!testId) {
                 return res.status(400).json({ 
                     error: 'testId is required' 
                 });
             }
-
-            const result = await PaymentService.createPaymentToken(testId);
+    
+            const result = await PaymentService.createPaymentToken(testId, token);
             
             console.log('Payment token created:', {
                 testId,
                 token: result.token
             });
-
+    
             res.status(200).json({ token: result.token });
         } catch (error) {
             console.error("Payment process error:", {
@@ -27,7 +28,7 @@ class PaymentController {
             });
             res.status(500).json({ error: error.message });
         }
-    }
+    };
 
     handleWebhook = async (req, res) => {
         try {

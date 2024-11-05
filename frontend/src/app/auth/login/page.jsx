@@ -108,7 +108,7 @@ const Login = () => {
                             onClick={togglePasswordVisibility} // Menambahkan event handler untuk toggle
                         >
                             <img
-                                src={showPassword ? '/images/eye.png' : '/images/hide.png'} // Gambar berdasarkan state
+                                src={showPassword ? 'images/eye[1].png' : 'images/hide.png'} // Gambar berdasarkan state
                                 alt={showPassword ? 'Show Password' : 'Hide Password'}
                                 className="w-5 h-5"
                             />

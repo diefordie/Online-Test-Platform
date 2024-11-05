@@ -151,9 +151,6 @@ const getDataByTab = () => {
               <Link href="/transaksi" className="text-sm text-[#0B61AA] font-bold">
                 Transaksi
               </Link>
-              <Link href="/faq" className="text-sm text-[#0B61AA]">
-                FAQ
-              </Link>
               <Link href="/profile">
                 <img
                   src="/images/profil.png"
