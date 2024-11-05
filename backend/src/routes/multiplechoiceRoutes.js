@@ -1,5 +1,5 @@
 import express from 'express';
-import { createMultipleChoice, updateMultipleChoice, getMultipleChoice, getMultipleChoiceById, deleteMultipleChoice, getQuestions, getMultipleChoiceByNumberAndTestId, updateMultipleChoicePageNameController, getPagesByTestIdController } from '../controllers/multiplechoiceController.js';
+import { createMultipleChoice, updateMultipleChoice, getMultipleChoice, getMultipleChoiceById, deleteMultipleChoice, getQuestions, getMultipleChoiceByNumberAndTestId, updateMultipleChoicePageNameController, getPagesByTestIdController, deleteOption } from '../controllers/multiplechoiceController.js';
 import multer from 'multer';
 
 const router = express.Router();
@@ -15,7 +15,7 @@ router.post('/add-questions', upload.array('questionPhoto'), (req, res) => {
     createMultipleChoice(req, res);
 });
 
-router.put('/update-question', updateMultipleChoice);
+router.put('/update-question/:multiplechoiceId', updateMultipleChoice);
 router.put('/update-pageName', updateMultipleChoicePageNameController);
 
 router.get('/questions/:testId', getQuestions);
@@ -25,5 +25,6 @@ router.get('/question/:id', getMultipleChoiceById);
 router.get('/:testId/:number', getMultipleChoiceByNumberAndTestId);
 router.get('/get-pages/:testId', getPagesByTestIdController);
 router.delete('/question/:multiplechoiceId', deleteMultipleChoice);
+router.delete('/option/:optionId', deleteOption);
 
 export default router; 

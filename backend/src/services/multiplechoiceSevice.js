@@ -42,11 +42,11 @@ const createMultipleChoiceService = async (testId, questions) => {
 
 export { createMultipleChoiceService }; 
 
-const updateMultipleChoiceService = async (questionId, updatedData) => {
+const updateMultipleChoiceService = async (multiplechoiceId, updatedData) => {
     const { pageName, question, number, questionPhoto, weight, discussion, options } = updatedData;
 
     const updateMultipleChoice = await prisma.multiplechoice.update({
-        where: {id: questionId},
+        where: {id: multiplechoiceId},
         data: {
             pageName,
             question,
@@ -71,7 +71,7 @@ const updateMultipleChoiceService = async (questionId, updatedData) => {
                 } else {
                     await prisma.option.create({
                         data: {
-                            multiplechoiceId: questionId,
+                            multiplechoiceId,
                             optionDescription: option.optionDescription,
                             isCorrect: option.isCorrect,
                         },
@@ -195,5 +195,21 @@ const getPagesByTestIdService = async (testId) => {
     });
   };
   
-  export { getPagesByTestIdService };
+export { getPagesByTestIdService };
+
+const deleteOptionService = async (optionId) => {
+    try {
+        const deletedOption = await prisma.option.delete({
+            where: {
+                id: optionId,
+            },
+        });
+        return deletedOption;
+    } catch (error) {
+        console.error('Error in deleteOptionService:', error);
+        throw error;
+    }
+};
+
+export { deleteOptionService };
   
