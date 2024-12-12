@@ -2,6 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { IoPersonCircle } from 'react-icons/io5';
+import { AiTwotoneCamera } from 'react-icons/ai';
+import { BsTrash3 } from "react-icons/bs";
+import { BsDoorOpen } from 'react-icons/bs';
+import { AiOutlineForm } from 'react-icons/ai';
 
 export default function EditProfile({ params }) {
   const { userId } = params;
@@ -73,6 +78,12 @@ export default function EditProfile({ params }) {
   const handleDeleteProfileImage = () => {
     setFormData({ ...formData, profileImage: '' });
   };
+
+  const handleEdit = () => {
+    // Logika untuk menangani klik pada ikon edit
+    console.log("Edit clicked");
+  };
+  
 
   const handleSave = async (event) => {
     event.preventDefault();
@@ -160,8 +171,12 @@ export default function EditProfile({ params }) {
         <div className="flex-shrink-0 items-center">
           <img src="/images/etamtest.png" alt="Etamtest" className="h-[30px] lg:h-10 pl-3"  />
         </div>
-        <div className="flex-shrink-0 items-center" >
-          <img src="/images/back.png" alt="Home" className="max-w-[44px] h-[22px] mt-2" onClick={handleDashboard} />
+        <div className="flex-shrink-0 items-center">
+          {/* Ikon Pintu Menggunakan react-icons */}
+          <BsDoorOpen
+            className="max-w-[44px] h-[22px] mt-2 cursor-pointer"
+            onClick={handleDashboard}
+          />
         </div>
       </div>
 
@@ -170,14 +185,25 @@ export default function EditProfile({ params }) {
         <div className="w-full max-w-[1228px] h-[88px] mx-auto mt-2 p-4 bg-[#0B61AA] text-white flex items-center justify-between rounded-md">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center">
-            <div className='w-16 h-16 rounded-full flex justify-center items-center relative'>
-              <img src={formData.profileImage || "/images/profil.png"} alt="Profil" className="h-16 w-16 rounded-full object-cover" />
-              <img
-                src="/images/camera.png"
-                alt="Kamera"
-                className="h-6 w-6 absolute bottom-0 right-1 cursor-pointer"
+            <div className="w-16 h-16 rounded-full flex justify-center items-center relative">
+              {/* Gambar Profil atau Ikon Default */}
+              {formData.profileImage ? (
+                <img
+                  src={formData.profileImage}
+                  alt="Profil"
+                  className="h-16 w-16 rounded-full object-cover"
+                />
+              ) : (
+                <IoPersonCircle className="h-16 w-16 text-white-500" />
+              )}
+              
+              {/* Ikon Kamera */}
+              <AiTwotoneCamera
+                className="h-6 w-6 absolute bottom-0 right-1 cursor-pointer text-gray-600"
                 onClick={() => document.getElementById('uploadProfileImage').click()}
               />
+              
+              {/* Input File (Hidden) */}
               <input
                 type="file"
                 id="uploadProfileImage"
@@ -186,37 +212,39 @@ export default function EditProfile({ params }) {
                 accept="image/*"
               />
             </div>
-            <div className="ml-4">
-              <h3 className="text-xl font-semibold font-poppins">{`${formData.firstName} ${formData.lastName}`}</h3>
-              <p className="font-poppins">{formData.email}</p>
-            </div>
+              <div className="ml-4">
+                <h3 className="text-xl font-semibold font-poppins">{`${formData.firstName} ${formData.lastName}`}</h3>
+                <p className="font-poppins">{formData.email}</p>
+              </div>
           </div>
           <div className="flex items-center justify-center w-[29px] h-[29px] bg-white rounded-[10px] ml-auto">
-            <img 
-              src="/images/trash.png" 
-              alt="sampah" 
-              className="w-5 h-5 cursor-pointer" 
-              onClick={handleDeleteProfileImage} 
+            {/* Ikon Sampah (Trash) Menggunakan react-icons */}
+            <BsTrash3
+              className="w-5 h-5 cursor-pointer  text-black"
+              onClick={handleDeleteProfileImage}
             />
           </div>
         </div>
         </div>
 
-        
-
         {/* Form */}
         <div className="w-full max-w-[1228px] mx-auto mt-0 p-4 bg-white shadow-md border border-black rounded-md">
           <form className="space-y-4 mt-4" onSubmit={handleSave}>
-            <div className="relative">
-              <label className="block text-gray-700 font-poppins">Nama Depan</label>
-              <input
-                type="text"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                className="w-full p-2 border border-black rounded-[15px] mt-1 font-poppins"
-              />
-            </div>
+          <div className="relative">
+            <label className="block text-gray-700 font-poppins">Nama Depan</label>
+            <input
+              type="text"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              className="w-full p-2 border border-black rounded-[15px] mt-1 font-poppins"
+            />
+            {/* Ikon Edit Menggunakan react-icons */}
+            <AiOutlineForm 
+              className="absolute right-6 top-1/2 transform -translate-y-1/2 w-5 h-5 cursor-pointer mt-3"
+              onClick={handleEdit} // Tambahkan fungsi handleEdit jika diperlukan
+            />
+          </div>
 
             <div className="relative">
               <label className="block text-gray-700 font-poppins">Nama Belakang</label>
@@ -227,6 +255,10 @@ export default function EditProfile({ params }) {
                 onChange={handleChange}
                 className="w-full p-2 border border-black rounded-[15px] mt-1 pr-10 font-poppins"
               />
+              <AiOutlineForm 
+              className="absolute right-6 top-1/2 transform -translate-y-1/2 w-5 h-5 cursor-pointer mt-3"
+              onClick={handleEdit} // Tambahkan fungsi handleEdit jika diperlukan
+            />
             </div>
 
             <div className="relative">
@@ -238,6 +270,10 @@ export default function EditProfile({ params }) {
                 onChange={handleChange}
                 className="w-full p-2 border border-black rounded-[15px] mt-1 pr-10 font-poppins"
               />
+              <AiOutlineForm 
+              className="absolute right-6 top-1/2 transform -translate-y-1/2 w-5 h-5 cursor-pointer mt-3"
+              onClick={handleEdit} // Tambahkan fungsi handleEdit jika diperlukan
+            />
             </div>
 
             <div className="relative">
@@ -250,14 +286,10 @@ export default function EditProfile({ params }) {
                 className="w-full p-2 border border-black rounded-[15px] mt-1 font-poppins"
                 placeholder="Current Password"
               />
-              <input
-                type="password"
-                name="newPassword"
-                value={formData.newPassword}
-                onChange={handleChange}
-                className="w-full p-2 border border-black rounded-[15px] mt-1 font-poppins"
-                placeholder="New Password"
-              />
+              <AiOutlineForm 
+              className="absolute right-6 top-1/2 transform -translate-y-1/2 w-5 h-5 cursor-pointer mt-3"
+              onClick={handleEdit} // Tambahkan fungsi handleEdit jika diperlukan
+            />
             </div>
 
             <div className="flex justify-end">
