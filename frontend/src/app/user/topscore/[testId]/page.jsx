@@ -59,19 +59,14 @@ const TopScore = () => {
     return (
         <div className="min-h-screen bg-[#FFFFFF] font-sans">
             {/* Header */}
-            <header className="w-full bg-[#0B61AA] text-white p-4" style={{ maxWidth: '1440px', height: '90px' }}>
-                <div className="max-w-6xl mx-auto flex justify-between items-center flex-wrap">
-                    <div>
-                        <img 
-                            src="/img/vector.png" 
-                            alt="Etamtest" 
-                            className="h-6 sm:h-auto sm:max-h-[52px] w-auto max-w-[216px] md:max-h-[52px] md:max-w-[216px]" 
-                            style={{ height: '45px', width: '120px' }} 
-                        />
+            <header className="w-full bg-[#0B61AA] text-white p-4" style={{  height: '90px' }}>
+                <div className="max-w-8xl mx-auto flex justify-between items-center flex-wrap">
+                    <div className="flex-shrink-0 items-center">
+                        <img src="/images/etamtest.png" alt="Etamtest" className="h-[30px] lg:h-10 pl-3"  />
                     </div>
 
                     {/* Title and breadcrumb */}
-                    <div className="flex items-center justify-between sm:justify-end sm:space-x-4">
+                    <div className="flex items-center justify-end sm:justify-end sm:space-x-4">
                         <h1 className="text-xl sm:text-2xl font-bold text-center whitespace-nowrap font-poppins">
                             Top Score
                         </h1>
