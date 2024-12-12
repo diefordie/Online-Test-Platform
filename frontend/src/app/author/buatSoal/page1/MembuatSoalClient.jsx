@@ -9,6 +9,7 @@ import { storage } from "../../../firebase/config";
 import { v4 } from 'uuid';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import dynamic from 'next/dynamic';
+import { AiOutlineCloseSquare } from 'react-icons/ai';
 const ReactQuill = dynamic(() => import('react-quill'), {
   ssr: false 
 });
@@ -24,11 +25,11 @@ const MembuatSoal = () => {
   const [questionPhoto, setQuestionPhoto] = useState(null);
   const [weight, setWeight] = useState();
   const [discussion, setDiscussion] = useState('');
-  const [options, setOptions] = useState([{ optionDescription: '', isCorrect: false }]);
+  const [options, setOptions] = useState([{ optionDescription: '', isCorrect: false, weight:'' }]);
   const [pages, setPages] = useState([{ questions: [] }]);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('');
+  const [activeTab, setActiveTab] = useState('buatSoal');
   const [labelCount, setLabelCount] = useState(0); 
 
   useEffect(() => {
@@ -37,6 +38,7 @@ const MembuatSoal = () => {
     const multiplechoiceIdFromUrl = params.get("multiplechoiceId");
     const pageNameFromUrl = params.get("pageName");
     const numberFromUrl = params.get("nomor");
+    
 
     console.log("Fetched testId:", testIdFromUrl); 
     console.log("Fetched multiplechoiceId:", multiplechoiceIdFromUrl); 
@@ -73,6 +75,7 @@ const MembuatSoal = () => {
         setQuestion(data.question);
         setOptions(data.option);
         setDiscussion(data.discussion);
+        setIsCPNS(data.isCPNS);
         if (data.questionPhoto) {
           setQuestionPhoto(data.questionPhoto);
         }
@@ -95,9 +98,10 @@ const MembuatSoal = () => {
   }, [multiplechoiceId]);
   
   const addOption = () => {
-    setOptions([...options, { optionDescription: '', isCorrect: false }]);
+    setOptions([...options, { optionDescription: '', isCorrect: false, weight:'' }]);
   };
 
+  // Fungsi untuk mengubah text opsi
   const handleOptionChange = (index, field, value) => {
     const newOptions = options.map((option, i) => 
       i === index ? { ...option, [field]: value } : option
@@ -359,31 +363,31 @@ const MembuatSoal = () => {
       <header className="bg-[#0B61AA] text-white p-4 sm:p-6 font-poppins" style={{ maxWidth: '1440px', height: '108px' }}>
         <div className="container mx-auto flex justify-start items-center">
           <Link href="/">
-            <img src="/img/Vector.png" alt="Vector" className="h-[50px]" style={{ maxWidth: '179px' }} />
+            <img src="/images/etamtest.png" alt="Etamtest" className="h-[50px]" style={{ maxWidth: '179px' }} />
           </Link>
         </div>
       </header>
   
-      <nav className="bg-[#FFFF] text-black p-4 sm:p-6">
-        <ul className="flex space-x-6 sm:space-x-20">
-          <li>
-            <button
-              className={`w-[120px] sm:w-[220px] h-[48px] rounded-[20px] shadow-md font-bold font-poppins ${activeTab === 'buatTes' ? 'bg-[#78AED6]' : ''}`}
-              onClick={() => setActiveTab('buatTes')}
+      <nav className="bg-[#FFFFFF] text-black p-4">
+          <ul className="grid grid-cols-2 flex justify-start sm:flex sm:justify-around gap-4 sm:gap-10">
+            <li>
+              <button
+                className={`w-[140px] sm:w-[180px] px-4 sm:px-8 py-2 sm:py-4 rounded-full shadow-xl font-bold font-poppins ${activeTab === 'buatSoal' ? 'bg-[#78AED6]' : ''}`}
+                onClick={() => setActiveTab('buatSoal')}
               >
-              Buat Soal
-            </button>
-          </li> 
-          <li>
-            <button
-              className={`w-[120px] sm:w-[220px] h-[48px] rounded-[20px] shadow-md font-bold font-poppins ${activeTab === 'publikasi' ? 'bg-[#78AED6]' : ''}`}
-              onClick={() => setActiveTab('publikasi')}
+                Buat Soal
+              </button>
+            </li>
+            <li>
+              <button
+                className={`w-[140px] sm:w-[180px] px-4 sm:px-8 py-2 sm:py-4 rounded-full shadow-xl font-bold font-poppins ${activeTab === 'publikasi' ? 'bg-[#78AED6]' : ''}`}
+                onClick={() => setActiveTab('publikasi')}
               >
-              Publikasi
-            </button>
-          </li>
-        </ul>
-      </nav>
+                Publikasi
+              </button>
+            </li>
+          </ul>
+        </nav>
   
       <div className="container mx-auto lg: p-2 p-4 w-full" style={{ maxWidth: '1309px' }}>
         <header className='bg-[#0B61AA] font-bold font-poppins text-white p-4'>
@@ -479,32 +483,25 @@ const MembuatSoal = () => {
                   theme='snow'
                   required
                 />
-                <div className="flex items-center space-x-4">
-                    <button
-                      type="button"
-                      className="flex items-center justify-between text-black font-bold px-4 rounded-[10px] border border-black space-x-2"
-                    >
+                <div className="flex items-center justify-between px-2 space-x-50 border border-black rounded-[10px]">
+                <label className="font-medium-bold mr-4">Bobot</label>
                       <input
-                        type="radio"
-                        id={`jawaban-${index}`}
-                        name="jawabanBenar"
-                        value={index}
-                        checked={option.isCorrect}
-                        onChange={() => handleCorrectOptionChange(index)}
-                        className="w-4 h-4"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        id="weight"
+                        value={option.weight}
+                        onChange={(e) => handleOptionChange(index, 'weight', e.target.value)}
+                        className="border p-2 w-[100px]"
+                        required
                       />
-                      <span>Benar</span>
-                    </button>
                     <button
                       type="button"
                       onClick={() => handleDeleteJawaban(index, option.id)}
                       className="ml-4"
                     >
-                      <img
-                        src="/img/Hapus.png" 
-                        alt="Delete"
-                        className="w-15 h-15 "
-                      />
+                      {/* Ganti gambar dengan ikon React */}
+                      <AiOutlineCloseSquare className="w-6 h-6" />
                     </button>
                   </div>
                 </div>
@@ -559,7 +556,6 @@ const MembuatSoal = () => {
                 </button>
               </div>
           </div>
-
         </div>
       </div>
     </div>
