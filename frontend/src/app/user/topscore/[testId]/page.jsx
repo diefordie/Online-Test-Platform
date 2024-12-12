@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useParams } from 'next/navigation';
+import { AiOutlineUser } from "react-icons/ai";
 
 const TopScore = () => {
     // State untuk menyimpan data score
@@ -37,20 +38,17 @@ const TopScore = () => {
     useEffect(() => {
         const fetchTestTitle = async () => {
             try {
-                setLoadingTitle(true);
-                const response = await axios.get(`http://localhost:2000/api/tests/get-test/${testId}`);
-                if (response.data && response.data.title) {
-                    setTestTitle(response.data.title);
-                } else {
-                    throw new Error('Judul tes tidak ditemukan');
-                }
+              const response = await fetch('/api/getTestTitle');
+              if (!response.ok) throw new Error('Failed to fetch');
+              const data = await response.json();
+              setTestTitle(data.title);
             } catch (error) {
-                console.error('Error fetching test title:', error);
-                setErrorTitle('Gagal mengambil judul tes');
+              console.error('Error fetching test title:', error);
+              setErrorTitle('Gagal mengambil judul tes');
             } finally {
-                setLoadingTitle(false);
+              setLoadingTitle(false);
             }
-        };
+          };
 
         fetchTestTitle();
     }, [testId]);
@@ -65,7 +63,7 @@ const TopScore = () => {
                 <div className="max-w-6xl mx-auto flex justify-between items-center flex-wrap">
                     <div>
                         <img 
-                            src="/img/etamtest.png" 
+                            src="/img/vector.png" 
                             alt="Etamtest" 
                             className="h-6 sm:h-auto sm:max-h-[52px] w-auto max-w-[216px] md:max-h-[52px] md:max-w-[216px]" 
                             style={{ height: '45px', width: '120px' }} 
@@ -79,7 +77,9 @@ const TopScore = () => {
                         </h1>
 
                         {/* Profil icon hanya muncul pada ukuran sm ke atas */}
-                        <img src="/img/Profil.png" alt="Profil" className="h-10 w-10 hidden sm:block ml-2" />
+                        <div className="flex items-center justify-center h-12 w-12 bg-white rounded-full">
+                            <AiOutlineUser className="h-14 w-14 text-gray-700" />
+                        </div>
                     </div>
                 </div>
             </header>
